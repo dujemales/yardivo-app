@@ -5880,11 +5880,55 @@ html[data-theme="dark"][data-theme-preset="greeny"] #yardivoWar3DHost{
 </style>
 
 
-<script type="module" id="yardivo-three-loader-v2">
-import * as THREE_NS from "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.min.js";
-window.THREE = THREE_NS;
-window.dispatchEvent(new CustomEvent("yardivo-three-ready"));
-</script>
+
+<style id="yardivo-native-yard-v3-style">
+#yardivoNative3D,#yardivoNativeWar3D{
+ position:absolute;inset:42px 0 0;z-index:60;overflow:hidden;
+ background:
+ radial-gradient(ellipse at 50% 38%,rgba(43,60,50,.34),transparent 48%),
+ linear-gradient(#101613,#090d0b);
+ perspective:1050px;perspective-origin:50% 42%;
+ user-select:none;touch-action:none;cursor:grab
+}
+#yardivoNative3D.dragging,#yardivoNativeWar3D.dragging{cursor:grabbing}
+#yardivoNativeWar3D{inset:0}
+.ny-world{position:absolute;left:50%;top:50%;width:1000px;height:700px;transform-style:preserve-3d;transition:transform .06s linear}
+.ny-ground{
+ position:absolute;left:50%;top:50%;width:900px;height:560px;transform:translate(-50%,-50%) rotateX(90deg);
+ background:
+ repeating-linear-gradient(90deg,transparent 0 69px,rgba(150,170,158,.10) 70px 71px),
+ repeating-linear-gradient(0deg,transparent 0 69px,rgba(150,170,158,.10) 70px 71px),
+ #252c28;border:6px solid #424c46;box-shadow:0 0 90px #000 inset
+}
+.ny-building{position:absolute;transform-style:preserve-3d}
+.ny-face{position:absolute;box-sizing:border-box;border:1px solid rgba(255,255,255,.14);backface-visibility:visible}
+.ny-warehouse{left:220px;top:105px;width:570px;height:135px;transform:translateZ(54px)}
+.ny-warehouse .front{width:570px;height:108px;background:linear-gradient(#d9dfdb,#9ba59f);transform:translateZ(67px)}
+.ny-warehouse .back{width:570px;height:108px;background:#737e78;transform:rotateY(180deg) translateZ(67px)}
+.ny-warehouse .left{width:135px;height:108px;background:#89948e;transform:rotateY(-90deg) translateZ(67px);left:-67px}
+.ny-warehouse .right{width:135px;height:108px;background:#7c8881;transform:rotateY(90deg) translateZ(503px);left:0}
+.ny-warehouse .roof{width:570px;height:135px;background:#e7ebe8;transform:rotateX(90deg) translateZ(67px);transform-origin:top}
+.ny-ramp{position:absolute;width:52px;height:36px;background:#101412;border:3px solid #6d7872;border-bottom:7px solid #0a0c0b;box-shadow:0 0 0 2px #222 inset;color:#75e09f;font:900 12px Arial;text-align:center;padding-top:7px;transform:translateZ(69px)}
+.ny-gatehouse{position:absolute;left:80px;top:435px;width:95px;height:70px;transform:translateZ(28px);background:linear-gradient(135deg,#4b5851,#222a26);border:2px solid #66756d;box-shadow:12px 12px 18px rgba(0,0,0,.4)}
+.ny-gatehouse:after{content:"PORTA";position:absolute;inset:15px 8px auto;text-align:center;color:#dfe9e3;font:900 12px Arial}
+.ny-lane{position:absolute;left:125px;top:355px;width:670px;height:110px;transform:translateZ(2px);border-top:3px dashed #a7b2ac;border-bottom:3px dashed #a7b2ac;background:rgba(12,16,14,.2)}
+.ny-label{position:absolute;padding:5px 8px;border:1px solid #357d54;border-radius:5px;background:#0c1510;color:#77e3a2;font:900 10px Arial;transform:translateZ(6px)}
+.ny-in{left:88px;top:345px}.ny-out{left:88px;top:445px}
+.ny-truck{position:absolute;width:86px;height:36px;transform-style:preserve-3d;transition:left 1.6s ease,top 1.6s ease,opacity 1.4s ease,transform 1.6s ease;cursor:pointer}
+.ny-truck .trailer{position:absolute;left:0;top:2px;width:58px;height:31px;background:linear-gradient(#f8faf9,#b9c2bd);border:2px solid #707a75;box-shadow:0 5px 9px #0008}
+.ny-truck .cab{position:absolute;right:0;top:7px;width:28px;height:27px;background:#eef2ef;border:2px solid #68736d;clip-path:polygon(0 0,75% 0,100% 30%,100% 100%,0 100%)}
+.ny-truck .cab:after{content:"";position:absolute;right:3px;top:3px;width:12px;height:8px;background:#293c42}
+.ny-truck .wheel{position:absolute;width:10px;height:10px;border-radius:50%;background:#090a09;border:2px solid #3d4541;bottom:-5px}
+.ny-truck .w1{left:9px}.ny-truck .w2{left:48px}.ny-truck .w3{right:4px}
+.ny-truck .tag{position:absolute;left:0;bottom:41px;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:3px 5px;background:#0b120e;border:1px solid #397b54;color:#e8f2ec;font:800 8px Arial}
+.ny-truck.dock{animation:nyDock 1.05s ease-in-out infinite alternate}.ny-truck.done{opacity:.08}
+@keyframes nyDock{to{filter:drop-shadow(0 0 9px #39d77d);transform:translateZ(10px)}}
+.ny-hud{position:absolute;z-index:100;left:13px;top:13px;display:flex;gap:7px;align-items:center;padding:7px 9px;border:1px solid #335242;border-radius:7px;background:#0a100dcc;color:#9bb2a5;font:800 8px Arial}
+.ny-live{width:7px;height:7px;border-radius:50%;background:#39d77d;box-shadow:0 0 10px #39d77d}
+.ny-help{position:absolute;right:13px;bottom:13px;z-index:100;padding:7px 9px;border:1px solid #334039;border-radius:7px;background:#0a100dcc;color:#81968a;font:700 8px Arial}
+.ny-empty{position:absolute;z-index:90;left:50%;bottom:20px;transform:translateX(-50%);padding:7px 10px;background:#101713dd;border:1px solid #33453b;border-radius:7px;color:#9aad9f;font:700 8px Arial}
+@media(max-width:900px){.ny-world{transform-origin:center}.ny-help{display:none}}
+</style>
 
 </head>
 <body>
@@ -19854,6 +19898,76 @@ function ensure(){
 }
 window.addEventListener('load',()=>setTimeout(ensure,900));
 document.addEventListener('click',e=>{if(e.target.closest('[data-view="overview"],[data-home-target="overview"]'))setTimeout(ensure,100)},true);
+})();
+</script>
+
+
+<script id="yardivo-native-yard-v3">
+(function(){
+'use strict';
+const states=new WeakMap();
+function role(){let r='';try{r=String(currentSession?.role||'').toLowerCase()}catch(e){};if(r==='zalihe'||r.includes('zalih'))r='inventory';if(r==='prijam')r='reception';return r}
+function A(){try{return Array.isArray(announcements)?announcements:[]}catch(e){return[]}}
+function date(){return document.getElementById('lyDate')?.value||new Date().toISOString().slice(0,10)}
+function wh(){return document.getElementById('lyWarehouse')?.value||(currentSession?.location==='DU'?'W201':'W101')}
+function ramps(w){try{return Math.max(1,Number(WAREHOUSES?.[w]?.ramps||6))}catch(e){return 6}}
+function phase(a){let s='';try{s=String(normalizedPlanStatus?.(a)||operationalPlanStatus?.(a)||a.status||'').toLowerCase()}catch(e){s=String(a.status||'').toLowerCase()}
+ if(a.receivedAt||a.rejectedAt||/zaprim|odbij|zavr/.test(s))return'done';
+ if(a.dockArrivalAt||/rampi/.test(s))return'dock';if(a.yardArrivalAt||/dvori/.test(s))return'yard';
+ if(a.gateCheckedAt||a.actualDate||a.actualTime||/porta|gate|ulaz/.test(s))return'gate';return'incoming'}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function pos(a,i,n){const p=phase(a),d=Math.max(1,Math.min(n,Number(a.dock||1)));
+ if(p==='dock')return [235+(d-1)*(500/Math.max(1,n-1)),255,90];
+ if(p==='yard')return [260+(i%5)*105,330+Math.floor(i/5)*58,180];
+ if(p==='gate')return [145+(i%3)*95,405+(i%2)*42,0];
+ if(p==='done')return [20,455-(i%3)*40,180];
+ return [-100-(i%4)*100,365+(i%4)*45,0]}
+function cubeFaces(){
+ return '<div class="ny-face front"></div><div class="ny-face back"></div><div class="ny-face left"></div><div class="ny-face right"></div><div class="ny-face roof"></div>'
+}
+function makeHost(parent,id,war){
+ let h=document.getElementById(id);if(h)return h;
+ h=document.createElement('div');h.id=id;
+ h.innerHTML='<div class="ny-hud"><i class="ny-live"></i><b>'+(war?'WAR ROOM · 3D DIGITAL TWIN':'LIVE YARD · 3D DIGITAL TWIN')+'</b><span>360° · ZOOM</span></div><div class="ny-help">DRŽI LIJEVI KLIK I VUCI · ROTACIJA &nbsp; | &nbsp; KOTAČIĆ · ZOOM</div><div class="ny-world"><div class="ny-ground"></div><div class="ny-lane"></div><div class="ny-gatehouse"></div><div class="ny-label ny-in">ULAZ →</div><div class="ny-label ny-out">← IZLAZ</div><div class="ny-building ny-warehouse">'+cubeFaces()+'</div><div class="ny-dynamic"></div></div>';
+ parent.appendChild(h);
+ const s={rx:58,rz:-25,scale:.78,drag:false,x:0,y:0};states.set(h,s);
+ const world=h.querySelector('.ny-world');
+ const apply=()=>world.style.transform=`translate(-50%,-50%) scale(${s.scale}) rotateX(${s.rx}deg) rotateZ(${s.rz}deg)`;
+ apply();
+ h.addEventListener('pointerdown',e=>{if(e.button!==0)return;s.drag=true;s.x=e.clientX;s.y=e.clientY;h.classList.add('dragging');h.setPointerCapture?.(e.pointerId)});
+ h.addEventListener('pointermove',e=>{if(!s.drag)return;s.rz+=(e.clientX-s.x)*.22;s.rx=Math.max(28,Math.min(78,s.rx-(e.clientY-s.y)*.16));s.x=e.clientX;s.y=e.clientY;apply()});
+ const up=e=>{s.drag=false;h.classList.remove('dragging');try{h.releasePointerCapture?.(e.pointerId)}catch(_){}};
+ h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up);
+ h.addEventListener('wheel',e=>{e.preventDefault();s.scale=Math.max(.42,Math.min(1.45,s.scale-e.deltaY*.0008));apply()},{passive:false});
+ return h
+}
+function render(h,w,list){
+ const dyn=h.querySelector('.ny-dynamic');if(!dyn)return;const n=ramps(w);
+ let rampHtml='';for(let i=1;i<=n;i++){const x=235+(i-1)*(500/Math.max(1,n-1));rampHtml+=`<div class="ny-ramp" style="left:${x}px;top:220px">R${i}</div>`}
+ const trucks=list.map((a,i)=>{const [x,y,r]=pos(a,i,n),p=phase(a);return `<div class="ny-truck ${p}" data-id="${esc(a.id)}" style="left:${x}px;top:${y}px;transform:translateZ(12px) rotate(${r}deg)"><span class="tag">${esc(a.supplier||'DOBAVLJAČ')}</span><div class="trailer"></div><div class="cab"></div><i class="wheel w1"></i><i class="wheel w2"></i><i class="wheel w3"></i></div>`}).join('');
+ dyn.innerHTML=rampHtml+trucks;
+ h.querySelector('.ny-empty')?.remove();
+ if(!list.length){const e=document.createElement('div');e.className='ny-empty';e.textContent=`${w} · ${date()} · 0 najava — 3D infrastruktura aktivna`;h.appendChild(e)}
+ dyn.querySelectorAll('.ny-truck').forEach(el=>el.onclick=e=>{e.stopPropagation();const a=list.find(x=>String(x.id)===el.dataset.id);try{if(a&&typeof openTruck==='function')openTruck(a)}catch(_){}});
+}
+function live(){
+ if(!['admin','inventory','reception'].includes(role()))return;
+ const stage=document.getElementById('liveYardStage');if(!stage)return;
+ stage.dataset.viewmode='3d';
+ const old=document.getElementById('yardivoReal3DHost');if(old)old.style.display='none';
+ const h=makeHost(stage,'yardivoNative3D',false),w=wh(),d=date();
+ render(h,w,A().filter(a=>(a.warehouse||'W101')===w&&a.date===d))
+}
+function war(){
+ const c=document.getElementById('wrYardCanvas'),room=document.getElementById('yardivoWarRoom');if(!c||!room?.classList.contains('active'))return;
+ const old=document.getElementById('yardivoWar3DHost');if(old)old.style.display='none';
+ const h=makeHost(c,'yardivoNativeWar3D',true),w=wh(),d=date();
+ render(h,w,A().filter(a=>(a.warehouse||'W101')===w&&a.date===d))
+}
+document.addEventListener('click',e=>{if(e.target.closest('[data-view="liveYard"],[data-home-target="liveYard"],.ly-view'))setTimeout(live,60);if(e.target.closest('[data-view="yardivoWarRoom"],[data-home-target="yardivoWarRoom"]'))setTimeout(war,80)},true);
+window.addEventListener('load',()=>setTimeout(()=>{live();war()},900));
+setInterval(()=>{live();war()},1800);
+window.YardivoNative3D={live,war};
 })();
 </script>
 
