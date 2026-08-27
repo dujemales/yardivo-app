@@ -5792,6 +5792,59 @@ html[data-theme="dark"][data-theme-preset="greeny"] ::selection{
   background:#126944;color:#fff
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.min.js"></script>
+
+<style id="yardivo-real-webgl-yard-v1-style">
+/* Real WebGL Digital Twin */
+#yardivoReal3DHost{
+  position:absolute;inset:42px 0 0;z-index:20;display:none;overflow:hidden;
+  background:radial-gradient(circle at 50% 45%,#1a211e,#0d100f 65%,#080a09);
+  border-radius:0 0 10px 10px;
+}
+#liveYardStage[data-viewmode="3d"] #yardivoReal3DHost{display:block}
+#liveYardStage[data-viewmode="3d"] #lyCanvas{visibility:hidden}
+#yardivoReal3DHost canvas,#yardivoWar3DHost canvas{display:block;width:100%;height:100%;outline:none}
+.y3d-hud{
+  position:absolute;left:12px;top:12px;z-index:5;display:flex;gap:6px;align-items:center;flex-wrap:wrap;
+  padding:7px 8px;border:1px solid #324039;border-radius:8px;background:rgba(12,15,13,.86);
+  backdrop-filter:blur(8px);font-size:7px;color:#9bb0a4
+}
+.y3d-hud strong{color:#e7eee9}.y3d-dot{width:7px;height:7px;border-radius:50%;background:#38c976;box-shadow:0 0 10px #38c976}
+.y3d-help{
+  position:absolute;right:12px;bottom:12px;z-index:5;padding:7px 9px;border:1px solid #303a35;border-radius:8px;
+  background:rgba(9,12,10,.82);color:#83978c;font-size:7px
+}
+#yardivo3DTruckModal{
+ position:fixed;inset:0;z-index:70000;display:none;align-items:center;justify-content:center;
+ background:rgba(0,0,0,.52);backdrop-filter:blur(6px)
+}
+#yardivo3DTruckModal.open{display:flex}
+.y3d-modal-card{
+ width:min(520px,calc(100vw - 32px));border:1px solid #3d5548;border-radius:14px;background:#111714;
+ box-shadow:0 26px 80px rgba(0,0,0,.55);overflow:hidden;color:#eef3f0
+}
+.y3d-modal-head{display:flex;justify-content:space-between;gap:12px;padding:15px 17px;border-bottom:1px solid #2d3832;background:#151c18}
+.y3d-modal-head h3{margin:0;font-size:16px}.y3d-modal-head small{display:block;margin-top:4px;color:#769083}
+.y3d-modal-head button{width:34px;height:34px;border:1px solid #3a4840;border-radius:8px;background:#0e1311;color:#fff;cursor:pointer}
+.y3d-modal-body{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:15px 17px}
+.y3d-field{padding:9px;border:1px solid #2b3831;border-radius:8px;background:#0d1210}.y3d-field small{display:block;color:#70877a;font-size:7px}.y3d-field strong{display:block;margin-top:4px;font-size:10px}
+.y3d-status{color:#65d99a!important}
+
+/* War Room real 3D */
+#wrYardCanvas{position:relative!important;overflow:hidden!important}
+#yardivoWar3DHost{position:absolute;inset:0;z-index:10;background:#0b0e0c}
+#yardivoWar3DHost .y3d-hud{top:10px;left:10px}
+
+/* Greeny theme integration */
+html[data-theme="dark"][data-theme-preset="greeny"] #yardivoReal3DHost,
+html[data-theme="dark"][data-theme-preset="greeny"] #yardivoWar3DHost{
+ background:radial-gradient(circle at 50% 42%,#1b211e,#101311 66%,#080a09)
+}
+@media(max-width:850px){
+ #yardivoReal3DHost{inset:38px 0 0}.y3d-help{display:none}.y3d-modal-body{grid-template-columns:1fr}
+}
+</style>
+
 </head>
 <body>
 <button id="yardivoFullscreenBtn" type="button" aria-label="Uključi full screen" title="Full screen"><span class="fs-icon">⛶</span><span class="fs-label">FULL SCREEN</span></button>
@@ -11529,7 +11582,7 @@ function allowedViewsForRole(role){
   const map={
     admin:[],
     inventory:['homeMenu','dashboard','weeklyMap','dailyMap','announcements','weeklyDeliveries','overview','suppliers','calendar','heatmap','controltower','controlTower','plannerPro','incidents','incidentArchive','reports','settings','unannounced','epal','orderSearch'],
-    reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','yard','docks','operations','incidents','incidentArchive','plannerPro','controltower','controlTower','settings','unannounced','epal','orderSearch'],
+    reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','docks','operations','incidents','incidentArchive','plannerPro','controltower','controlTower','settings','unannounced','epal','orderSearch'],
     gate:['homeMenu','checkin','unannounced','docks','yard'],
     management:['homeMenu','dashboard','weeklyMap','dailyMap','overview','reports','calendar','heatmap','controltower','controlTower','suppliers','incidents','incidentArchive','settings']
   };
@@ -16850,7 +16903,7 @@ function allViewIds(){
   ])];
 }
 function allowedFor(r){
-  if(r==='admin') return allViewIds(); // Admin = SVE, uključujući Nenajavljene dolaske.
+  if(r==='admin') return allViewIds().filter(v=>v!=='yard'); // Dvorište je operativni pogled samo za Portu.
 
   const map={
     inventory:[
@@ -16862,7 +16915,7 @@ function allowedFor(r){
       'homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','yard','docks','operations',
       'incidents','incidentArchive','plannerPro','controltower','controlTower','settings','unannounced','epal','orderSearch','liveYard','smartReplanning'
     ],
-    gate:['homeMenu','checkin','unannounced','docks','yard','liveYard'],
+    gate:['homeMenu','checkin','unannounced','docks','yard'],
     management:[
       'homeMenu','dashboard','weeklyMap','dailyMap','overview','reports','calendar','heatmap','controltower','controlTower',
       'suppliers','incidents','incidentArchive','settings'
@@ -19752,6 +19805,291 @@ document.addEventListener('click',e=>{
 },true);
 
 window.YardivoThemePresets={apply:applyPreset,current,refresh:syncWithMainTheme};
+})();
+</script>
+
+
+<script id="yardivo-real-webgl-yard-v1">
+(function(){
+'use strict';
+
+const instances=new Map();
+
+function normRole(){
+ let r='';try{r=String(currentSession?.role||'').toLowerCase().trim()}catch(e){}
+ if(r==='zalihe'||r==='upravljanje zalihama')r='inventory';
+ if(r==='prijam')r='reception';
+ if(r==='porta'||r==='portir')r='gate';
+ return r;
+}
+function canLive3D(){return ['admin','inventory','reception'].includes(normRole())}
+function today(){return new Date().toISOString().slice(0,10)}
+function anns(){try{return Array.isArray(announcements)?announcements:[]}catch(e){return[]}}
+function cfg(w){try{return WAREHOUSES?.[w]||{ramps:6,label:w}}catch(e){return{ramps:6,label:w}}}
+function liveWarehouse(){
+ return document.getElementById('lyWarehouse')?.value
+   || (currentSession?.location==='DU'?'W201':'W101');
+}
+function liveDate(){return document.getElementById('lyDate')?.value||today()}
+function phase(a){
+ try{
+  const s=String(normalizedPlanStatus?.(a)||operationalPlanStatus?.(a)||a.status||'').toLowerCase();
+  if(a.receivedAt||a.rejectedAt||/zaprim|odbij|zavr|izašao|izasao/.test(s))return 'done';
+  if(a.dockArrivalAt||/rampi/.test(s))return 'dock';
+  if(a.yardArrivalAt||/dvori/.test(s))return 'yard';
+  if(a.gateCheckedAt||a.actualDate||a.actualTime||/porta|gate|ulaz/.test(s))return 'gate';
+  return 'incoming';
+ }catch(e){return 'incoming'}
+}
+function plate(a){try{return effectivePlate?.(a)||a.plannedPlate||a.arrivalPlate||a.vehiclePlate||'—'}catch(e){return a.plannedPlate||a.arrivalPlate||'—'}}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+
+function modal(){
+ let m=document.getElementById('yardivo3DTruckModal');if(m)return m;
+ m=document.createElement('div');m.id='yardivo3DTruckModal';
+ m.innerHTML='<div class="y3d-modal-card"><div class="y3d-modal-head"><div><h3 id="y3dModalTitle">KAMION</h3><small id="y3dModalSub"></small></div><button type="button">×</button></div><div class="y3d-modal-body" id="y3dModalBody"></div></div>';
+ document.body.appendChild(m);
+ m.querySelector('button').onclick=()=>m.classList.remove('open');
+ m.onclick=e=>{if(e.target===m)m.classList.remove('open')};
+ return m;
+}
+function openTruck(a){
+ const m=modal();
+ m.querySelector('#y3dModalTitle').textContent=a.supplier||'Dobavljač';
+ m.querySelector('#y3dModalSub').textContent=`${a.date||''} · ${a.time||''} · ${a.warehouse||''}`;
+ const st=phase(a);
+ m.querySelector('#y3dModalBody').innerHTML=[
+  ['STATUS',st==='dock'?'NA RAMPI':st==='yard'?'U DVORIŠTU':st==='gate'?'NA ULAZU':st==='done'?'IZLAZI / ZAVRŠENO':'U DOLASKU'],
+  ['RAMPA',a.dock?'R'+a.dock:'—'],['TABLICE',plate(a)],['VOZAČ',a.plannedDriver||a.arrivalDriver||'—'],
+  ['PALETE',a.pallets||0],['NARUDŽBA',a.orderNumber||'—']
+ ].map(([k,v])=>`<div class="y3d-field"><small>${esc(k)}</small><strong class="${k==='STATUS'?'y3d-status':''}">${esc(v)}</strong></div>`).join('');
+ m.classList.add('open');
+}
+
+/* Geometry helpers */
+function mat(color,rough=.72,metal=.08,transparent=false,opacity=1){
+ return new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal,transparent,opacity});
+}
+function box(scene,w,h,d,color,x,y,z,opts={}){
+ const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(color,opts.rough??.75,opts.metal??.06,opts.transparent,opts.opacity??1));
+ mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;scene.add(mesh);return mesh;
+}
+function labelSprite(text){
+ const c=document.createElement('canvas');c.width=512;c.height=96;const x=c.getContext('2d');
+ x.clearRect(0,0,c.width,c.height);x.fillStyle='rgba(7,12,9,.82)';x.roundRect(4,4,504,88,14);x.fill();
+ x.strokeStyle='rgba(70,190,120,.75)';x.lineWidth=3;x.stroke();
+ x.font='900 30px Arial';x.fillStyle='#f0f7f3';x.textAlign='center';x.textBaseline='middle';
+ const t=String(text||'DOBAVLJAČ').slice(0,27);x.fillText(t,256,48);
+ const tex=new THREE.CanvasTexture(c);tex.minFilter=THREE.LinearFilter;
+ const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false}));
+ s.scale.set(9,1.7,1);s.position.y=3.7;return s;
+}
+function truckGroup(a){
+ const g=new THREE.Group();g.userData={announcement:a};
+ // trailer
+ const trailer=new THREE.Mesh(new THREE.BoxGeometry(6.8,2.4,2.45),mat(0xeeeeea,.45,.16));
+ trailer.position.set(-1.2,1.55,0);trailer.castShadow=true;trailer.receiveShadow=true;g.add(trailer);
+ // trailer roof highlight
+ const roof=new THREE.Mesh(new THREE.BoxGeometry(6.6,.08,2.25),mat(0xffffff,.35,.18));
+ roof.position.set(-1.2,2.79,0);g.add(roof);
+ // cab
+ const cab=new THREE.Mesh(new THREE.BoxGeometry(2.3,2.8,2.35),mat(0xf4f4ef,.38,.18));
+ cab.position.set(3.15,1.45,0);cab.castShadow=true;g.add(cab);
+ const windshield=new THREE.Mesh(new THREE.BoxGeometry(.08,1.15,1.72),mat(0x233238,.24,.35));
+ windshield.position.set(4.32,1.85,0);g.add(windshield);
+ // underbody
+ const under=new THREE.Mesh(new THREE.BoxGeometry(7.9,.42,2.1),mat(0x202422,.85,.2));under.position.set(.1,.48,0);g.add(under);
+ // wheels
+ const wheelGeo=new THREE.CylinderGeometry(.48,.48,.38,16);const wheelMat=mat(0x111312,.9,.05);
+ [[-3.0,.48,-1.2],[-3,.48,1.2],[1.6,.48,-1.2],[1.6,.48,1.2],[3.25,.48,-1.2],[3.25,.48,1.2]].forEach(p=>{
+  const w=new THREE.Mesh(wheelGeo,wheelMat);w.rotation.x=Math.PI/2;w.position.set(...p);w.castShadow=true;g.add(w);
+ });
+ g.add(labelSprite(a.supplier||'DOBAVLJAČ'));
+ g.traverse(o=>{if(o.isMesh)o.userData.announcement=a});
+ return g;
+}
+
+function createEngine(host,mode){
+ if(!window.THREE||!host)return null;
+ const scene=new THREE.Scene();scene.background=new THREE.Color(0x0b0e0c);scene.fog=new THREE.FogExp2(0x0b0e0c,.009);
+ const camera=new THREE.PerspectiveCamera(44,1,.1,400);
+ const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+ host.appendChild(renderer.domElement);
+
+ scene.add(new THREE.HemisphereLight(0xdde8df,0x20241f,1.4));
+ const sun=new THREE.DirectionalLight(0xffffff,2.1);sun.position.set(-26,42,20);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-60;sun.shadow.camera.right=60;sun.shadow.camera.top=60;sun.shadow.camera.bottom=-60;scene.add(sun);
+ const green=new THREE.PointLight(0x24c878,18,42,2);green.position.set(-18,5,18);scene.add(green);
+
+ const ground=new THREE.Mesh(new THREE.PlaneGeometry(92,62),mat(0x202522,.95,.02));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+ const grid=new THREE.GridHelper(90,30,0x304139,0x292e2b);grid.position.y=.015;scene.add(grid);
+
+ // curbs / perimeter
+ box(scene,92,.35,1.1,0x343b37,0,.18,-30.5);box(scene,92,.35,1.1,0x343b37,0,.18,30.5);
+ box(scene,1.1,.35,62,0x343b37,-45.5,.18,0);box(scene,1.1,.35,62,0x343b37,45.5,.18,0);
+
+ // gate house and gate
+ box(scene,7,3.8,6,0x343a37,-34,1.9,23);box(scene,9,.25,.4,0xe5e5df,-26,.8,25,{rough:.45,metal:.1});
+ const barrier=box(scene,8,.18,.22,0xdedfdc,-26,1.1,24.5,{rough:.4,metal:.1});barrier.rotation.y=.05;
+
+ // warehouse solid cuboid, upright
+ box(scene,64,8.5,13,0xd9dcda,7,4.25,-22,{rough:.72,metal:.08});
+ box(scene,62,.18,11.5,0xf0f1ef,7,8.58,-22,{rough:.55,metal:.12});
+ // side office
+ box(scene,12,5.2,8,0x4b5550,35,2.6,-13);
+
+ // trees/bollards simplified
+ for(let i=0;i<13;i++){box(scene,.7,2,.7,0x31533d,-43,1, -25+i*4.2);}
+
+ const root=new THREE.Group();scene.add(root);
+ const inst={host,mode,scene,camera,renderer,root,trucks:new Map(),ramps:[],yaw:-.55,pitch:.78,dist:75,target:new THREE.Vector3(0,0,0),drag:false,px:0,py:0,lastWh:'',lastData:'',raf:0,resizeObs:null};
+
+ function setCamera(){
+  const cp=Math.cos(inst.pitch),sp=Math.sin(inst.pitch);
+  camera.position.set(Math.sin(inst.yaw)*cp*inst.dist,sp*inst.dist,Math.cos(inst.yaw)*cp*inst.dist);
+  camera.lookAt(inst.target);
+ }
+ setCamera();
+
+ renderer.domElement.addEventListener('pointerdown',e=>{if(e.button!==0)return;inst.drag=true;inst.px=e.clientX;inst.py=e.clientY;renderer.domElement.setPointerCapture?.(e.pointerId)});
+ renderer.domElement.addEventListener('pointermove',e=>{if(!inst.drag)return;const dx=e.clientX-inst.px,dy=e.clientY-inst.py;inst.yaw-=dx*.008;inst.pitch=Math.max(.24,Math.min(1.34,inst.pitch+dy*.006));inst.px=e.clientX;inst.py=e.clientY;setCamera()});
+ const stop=e=>{inst.drag=false;try{renderer.domElement.releasePointerCapture?.(e.pointerId)}catch(_){}};
+ renderer.domElement.addEventListener('pointerup',stop);renderer.domElement.addEventListener('pointercancel',stop);
+ renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();inst.dist=Math.max(28,Math.min(125,inst.dist+e.deltaY*.055));setCamera()},{passive:false});
+
+ const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();
+ renderer.domElement.addEventListener('click',e=>{
+  if(inst.drag)return;const r=renderer.domElement.getBoundingClientRect();mouse.x=((e.clientX-r.left)/r.width)*2-1;mouse.y=-((e.clientY-r.top)/r.height)*2+1;ray.setFromCamera(mouse,camera);
+  const hits=ray.intersectObjects([...inst.trucks.values()].flatMap(g=>{const a=[];g.traverse(o=>{if(o.isMesh)a.push(o)});return a}),true);
+  const a=hits[0]?.object?.userData?.announcement;if(a)openTruck(a);
+ });
+
+ inst.resizeObs=new ResizeObserver(()=>{
+  const w=Math.max(10,host.clientWidth),h=Math.max(10,host.clientHeight);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()
+ });inst.resizeObs.observe(host);
+
+ function loop(t){
+  // smooth truck movements
+  inst.trucks.forEach(g=>{
+   const tg=g.userData.target;if(tg){g.position.lerp(tg,.035)}
+   if(g.userData.targetRot!=null){let d=g.userData.targetRot-g.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));g.rotation.y+=d*.035}
+   if(g.userData.phase==='dock'){g.position.y=.06+Math.sin(t*.009)*.05}
+   if(g.userData.phase==='done'){
+    g.traverse(o=>{if(o.material){o.material.transparent=true;o.material.opacity=Math.max(.08,(o.material.opacity??1)*.985)}});
+   }
+  });
+  renderer.render(scene,camera);inst.raf=requestAnimationFrame(loop);
+ }inst.raf=requestAnimationFrame(loop);
+ return inst;
+}
+
+function targetFor(a,i,ramps){
+ const p=phase(a),dock=Math.max(1,Math.min(ramps,Number(a.dock||1)));
+ const rampX=-22+(dock-1)*(44/Math.max(1,ramps-1));
+ if(p==='dock')return {p:new THREE.Vector3(rampX,.05,-12.8),r:-Math.PI/2};
+ if(p==='yard')return {p:new THREE.Vector3(-5+(i%5)*8,.05,2+Math.floor(i/5)*7),r:Math.PI};
+ if(p==='gate')return {p:new THREE.Vector3(-28+(i%2)*9,.05,18-(i%3)*4),r:-Math.PI/2};
+ if(p==='done')return {p:new THREE.Vector3(-42,.05,25-(i%3)*4),r:Math.PI};
+ return {p:new THREE.Vector3(-48-(i%4)*10,.05,13-(i%5)*5),r:-Math.PI/2};
+}
+
+function syncEngine(inst,list,w){
+ const c=cfg(w),ramps=Math.max(1,Number(c.ramps||6));
+ // ramps recreated when warehouse changes
+ if(inst.lastWh!==w){
+  inst.ramps.forEach(x=>inst.scene.remove(x));inst.ramps=[];
+  for(let d=1;d<=ramps;d++){
+   const x=-22+(d-1)*(44/Math.max(1,ramps-1));
+   const ramp=box(inst.scene,5.3,.7,2.8,0x090b0a,x,.35,-14.9,{rough:.7,metal:.15});inst.ramps.push(ramp);
+   // ramp number sprite
+   const s=labelSprite('R'+d);s.scale.set(3.5,.72,1);s.position.set(x,2.5,-14.4);inst.scene.add(s);inst.ramps.push(s);
+  }
+  inst.lastWh=w;
+ }
+ const alive=new Set();
+ list.forEach((a,i)=>{
+  const id=String(a.id);alive.add(id);let g=inst.trucks.get(id);
+  if(!g){g=truckGroup(a);g.position.copy(targetFor(a,i,ramps).p.clone().add(new THREE.Vector3(-15,0,12)));inst.root.add(g);inst.trucks.set(id,g)}
+  g.userData.announcement=a;g.userData.phase=phase(a);
+  const t=targetFor(a,i,ramps);g.userData.target=t.p;g.userData.targetRot=t.r;
+  g.traverse(o=>{if(o.isMesh)o.userData.announcement=a});
+ });
+ inst.trucks.forEach((g,id)=>{if(!alive.has(id)){inst.root.remove(g);inst.trucks.delete(id)}});
+}
+
+function ensureLiveHost(){
+ const stage=document.getElementById('liveYardStage');if(!stage||!canLive3D())return null;
+ let h=document.getElementById('yardivoReal3DHost');
+ if(!h){
+  h=document.createElement('div');h.id='yardivoReal3DHost';
+  h.innerHTML='<div class="y3d-hud"><i class="y3d-dot"></i><strong>LIVE 3D DIGITAL TWIN</strong><span>· 360° · REAL-TIME</span></div><div class="y3d-help">POVUCI MIŠ · ROTACIJA 360° &nbsp; | &nbsp; KOTAČIĆ · ZOOM &nbsp; | &nbsp; KLIK KAMIONA · DETALJI</div>';
+  stage.appendChild(h);
+ }
+ if(!instances.has('live')){
+  const inst=createEngine(h,'live');if(inst)instances.set('live',inst);
+ }
+ return instances.get('live');
+}
+function updateLive(){
+ if(!canLive3D())return;
+ const inst=ensureLiveHost();if(!inst)return;
+ const w=liveWarehouse(),d=liveDate(),list=anns().filter(a=>(a.warehouse||'W101')===w&&a.date===d);
+ syncEngine(inst,list,w);
+}
+function forceLive3D(){
+ if(!canLive3D())return;
+ const stage=document.getElementById('liveYardStage');if(stage)stage.dataset.viewmode='3d';
+ document.querySelectorAll('.ly-view').forEach(b=>b.classList.toggle('active',b.dataset.lyView==='3d'));
+ ensureLiveHost();updateLive();
+}
+
+/* War Room shares the same real 3D engine */
+function ensureWar3D(){
+ const canvas=document.getElementById('wrYardCanvas');if(!canvas||!document.getElementById('yardivoWarRoom')?.classList.contains('active'))return;
+ let h=document.getElementById('yardivoWar3DHost');
+ if(!h){
+  canvas.innerHTML='';
+  h=document.createElement('div');h.id='yardivoWar3DHost';
+  h.innerHTML='<div class="y3d-hud"><i class="y3d-dot"></i><strong>WAR ROOM · REAL 3D YARD</strong><span>360° / ZOOM</span></div>';
+  canvas.appendChild(h);
+ }
+ let inst=instances.get('war');
+ if(!inst||inst.host!==h){
+  inst=createEngine(h,'war');if(inst)instances.set('war',inst);
+ }
+ let w='';try{w=(document.getElementById('wrSubtitle')?.textContent.match(/W\d+/)||[])[0]||liveWarehouse()}catch(e){w=liveWarehouse()}
+ const list=anns().filter(a=>(a.warehouse||'W101')===w&&a.date===today());
+ syncEngine(inst,list,w);
+}
+
+/* Role enforcement requested:
+   Dvorište = Gate only. Live Yard = Admin / Inventory / Reception only. */
+function enforceRoles(){
+ const r=normRole();
+ const yardOk=r==='gate',liveOk=['admin','inventory','reception'].includes(r);
+ document.querySelectorAll('[data-view="yard"],[data-home-target="yard"]').forEach(x=>x.style.setProperty('display',yardOk?'':'none',yardOk?'':'important'));
+ const yard=document.getElementById('yard');if(yard&&!yardOk){yard.classList.remove('active');yard.style.setProperty('display','none','important')}
+ document.querySelectorAll('[data-view="liveYard"],[data-home-target="liveYard"]').forEach(x=>x.style.setProperty('display',liveOk?'':'none',liveOk?'':'important'));
+ const ly=document.getElementById('liveYard');if(ly&&!liveOk){ly.classList.remove('active');ly.style.setProperty('display','none','important')}
+}
+
+/* Intercept Live Yard view selector and make true 3D default. */
+document.addEventListener('click',e=>{
+ const b=e.target.closest('.ly-view');
+ if(b?.dataset.lyView==='3d'){setTimeout(forceLive3D,0)}
+ if(e.target.closest('[data-view="liveYard"],[data-home-target="liveYard"]'))setTimeout(forceLive3D,180);
+},true);
+
+window.addEventListener('load',()=>setTimeout(()=>{enforceRoles();ensureLiveHost();forceLive3D()},1900));
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(()=>{updateLive();ensureWar3D()},80)});
+setInterval(()=>{enforceRoles();updateLive();ensureWar3D()},2500);
+
+/* Existing War Room renderer rewrites #wrYardCanvas every 10s. Mutation observer remounts WebGL immediately. */
+const warObs=new MutationObserver(()=>setTimeout(ensureWar3D,0));
+window.addEventListener('load',()=>setTimeout(()=>{const c=document.getElementById('wrYardCanvas');if(c)warObs.observe(c,{childList:true})},2300));
+
+window.YardivoReal3D={refresh:updateLive,force3D:forceLive3D,war:ensureWar3D};
 })();
 </script>
 
