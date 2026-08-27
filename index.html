@@ -5931,6 +5931,18 @@ html[data-theme="dark"][data-theme-preset="greeny"] #yardivoWar3DHost{
 @media(max-width:900px){.ny-world{transform-origin:center}.ny-help{display:none}}
 </style>
 
+
+<style id="yardivo-webgl-v25-style">
+#yardivoV25Live,#yardivoV25War{position:absolute;inset:42px 0 0;z-index:90;background:#0a0f0c;overflow:hidden}
+#yardivoV25War{inset:0}
+#yardivoV25Live canvas,#yardivoV25War canvas{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+#yardivoV25Live canvas:active,#yardivoV25War canvas:active{cursor:grabbing}
+.yv25hud{position:absolute;left:12px;top:12px;z-index:3;padding:8px 10px;border:1px solid #31513f;border-radius:8px;background:#0a100ddd;color:#a9c0b2;font:800 9px Arial;pointer-events:none}
+.yv25hud b{color:#fff}.yv25dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#38d27b;box-shadow:0 0 10px #38d27b;margin-right:7px}
+.yv25help{position:absolute;right:12px;bottom:12px;z-index:3;padding:7px 9px;border:1px solid #2d3d34;border-radius:7px;background:#09100cdd;color:#84998d;font:700 8px Arial;pointer-events:none}
+.yv25err{position:absolute;inset:0;display:grid;place-items:center;color:#ff9c9c;font:800 12px Arial}
+</style>
+
 </head>
 <body>
 <button id="yardivoFullscreenBtn" type="button" aria-label="Uključi full screen" title="Full screen"><span class="fs-icon">⛶</span><span class="fs-label">FULL SCREEN</span></button>
@@ -19573,7 +19585,7 @@ window.YardivoThemePresets={apply:applyPreset,current,refresh:syncWithMainTheme}
 
 
 <!-- YARDIVO REAL 3D ENGINE: pinned Three.js build -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js" onload="window.dispatchEvent(new Event('yardivo-three-ready'))" onerror="console.error('YARDIVO: Three.js engine failed to load')"></script>
+<!-- YARDIVO V2.5: external Three.js removed; self-contained WebGL renderer below -->
 
 <script id="yardivo-real-webgl-yard-v1">
 (function(){
@@ -19974,6 +19986,142 @@ document.addEventListener('click',e=>{if(e.target.closest('[data-view="liveYard"
 window.addEventListener('load',()=>setTimeout(()=>{live();war()},900));
 setInterval(()=>{live();war()},1800);
 window.YardivoNative3D={live,war};
+})();
+</script>
+
+
+<script id="yardivo-webgl-v25">
+(function(){
+"use strict";
+const V25={live:null,war:null};
+
+function anns(){try{return Array.isArray(announcements)?announcements:[]}catch(e){return[]}}
+function role(){try{let r=String(currentSession?.role||"").toLowerCase();if(r==="zalihe"||r.includes("zalih"))r="inventory";if(r==="prijam")r="reception";return r}catch(e){return""}}
+function canLive(){return ["admin","inventory","reception"].includes(role())}
+function wh(){return document.getElementById("lyWarehouse")?.value||(currentSession?.location==="DU"?"W201":"W101")}
+function dt(){return document.getElementById("lyDate")?.value||new Date().toISOString().slice(0,10)}
+function rampCount(w){try{return Math.max(1,Number(WAREHOUSES?.[w]?.ramps||6))}catch(e){return 6}}
+function phase(a){let s=String(a.status||"").toLowerCase();try{s=String(normalizedPlanStatus?.(a)||operationalPlanStatus?.(a)||s).toLowerCase()}catch(e){}
+ if(a.receivedAt||a.rejectedAt||/zaprim|odbij|zavr/.test(s))return"done";
+ if(a.dockArrivalAt||/rampi/.test(s))return"dock";
+ if(a.yardArrivalAt||/dvori/.test(s))return"yard";
+ if(a.gateCheckedAt||a.actualDate||a.actualTime||/porta|gate|ulaz/.test(s))return"gate";
+ return"incoming";
+}
+const VS=`attribute vec3 p;attribute vec3 c;uniform mat4 mvp;varying vec3 v;void main(){v=c;gl_Position=mvp*vec4(p,1.0);}`;
+const FS=`precision mediump float;varying vec3 v;void main(){gl_FragColor=vec4(v,1.0);}`;
+function sh(gl,t,s){const x=gl.createShader(t);gl.shaderSource(x,s);gl.compileShader(x);if(!gl.getShaderParameter(x,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(x));return x}
+function program(gl){const p=gl.createProgram();gl.attachShader(p,sh(gl,gl.VERTEX_SHADER,VS));gl.attachShader(p,sh(gl,gl.FRAGMENT_SHADER,FS));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));return p}
+function mul(a,b){let o=new Float32Array(16);for(let r=0;r<4;r++)for(let c=0;c<4;c++)o[c*4+r]=a[r]*b[c*4]+a[4+r]*b[c*4+1]+a[8+r]*b[c*4+2]+a[12+r]*b[c*4+3];return o}
+function persp(f,a,n,fz){let q=1/Math.tan(f/2),nf=1/(n-fz);return new Float32Array([q/a,0,0,0,0,q,0,0,0,0,(fz+n)*nf,-1,0,0,2*fz*n*nf,0])}
+function look(e,t,u){let zx=e[0]-t[0],zy=e[1]-t[1],zz=e[2]-t[2],zl=Math.hypot(zx,zy,zz);zx/=zl;zy/=zl;zz/=zl;let xx=u[1]*zz-u[2]*zy,xy=u[2]*zx-u[0]*zz,xz=u[0]*zy-u[1]*zx,xl=Math.hypot(xx,xy,xz);xx/=xl;xy/=xl;xz/=xl;let yx=zy*xz-zz*xy,yy=zz*xx-zx*xz,yz=zx*xy-zy*xx;return new Float32Array([xx,yx,zx,0,xy,yy,zy,0,xz,yz,zz,0,-(xx*e[0]+xy*e[1]+xz*e[2]),-(yx*e[0]+yy*e[1]+yz*e[2]),-(zx*e[0]+zy*e[1]+zz*e[2]),1])}
+function model(x,y,z,sx,sy,sz,ry=0){let c=Math.cos(ry),s=Math.sin(ry);return new Float32Array([c*sx,0,-s*sx,0,0,sy,0,0,s*sz,0,c*sz,0,x,y,z,1])}
+const cube=[
+[-1,-1,1, 1,-1,1, 1,1,1,-1,-1,1,1,1,1,-1,1,1],
+[1,-1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,1,-1,1,1,-1],
+[-1,1,1,1,1,1,1,1,-1,-1,1,1,1,1,-1,-1,1,-1],
+[-1,-1,-1,1,-1,-1,1,-1,1,-1,-1,-1,1,-1,1,-1,-1,1],
+[1,-1,1,1,-1,-1,1,1,-1,1,-1,1,1,1,-1,1,1,1],
+[-1,-1,-1,-1,-1,1,-1,1,1,-1,-1,-1,-1,1,1,-1,1,-1]
+].flat();
+function init(host){
+ const cv=document.createElement("canvas");host.appendChild(cv);
+ const gl=cv.getContext("webgl",{antialias:true,alpha:false})||cv.getContext("experimental-webgl");
+ if(!gl){host.insertAdjacentHTML("beforeend",'<div class="yv25err">WEBGL NIJE DOSTUPAN</div>');return null}
+ let pr;try{pr=program(gl)}catch(e){host.insertAdjacentHTML("beforeend",'<div class="yv25err">WEBGL SHADER ERROR</div>');console.error(e);return null}
+ gl.useProgram(pr);gl.enable(gl.DEPTH_TEST);gl.enable(gl.CULL_FACE);gl.cullFace(gl.BACK);
+ const pb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(cube),gl.STATIC_DRAW);
+ const ap=gl.getAttribLocation(pr,"p");gl.enableVertexAttribArray(ap);gl.vertexAttribPointer(ap,3,gl.FLOAT,false,0,0);
+ const cb=gl.createBuffer(),ac=gl.getAttribLocation(pr,"c");gl.enableVertexAttribArray(ac);
+ const um=gl.getUniformLocation(pr,"mvp");
+ const st={host,cv,gl,pr,pb,cb,ap,ac,um,yaw:-0.72,pitch:0.58,dist:92,drag:false,px:0,py:0,trucks:new Map(),last:performance.now()};
+ function resize(){const d=Math.min(devicePixelRatio||1,2),w=Math.max(2,host.clientWidth),h=Math.max(2,host.clientHeight);let W=Math.round(w*d),H=Math.round(h*d);if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H}gl.viewport(0,0,W,H)}
+ function drawBox(vp,x,y,z,sx,sy,sz,col,ry=0){
+   gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.vertexAttribPointer(ap,3,gl.FLOAT,false,0,0);
+   let colors=[];for(let i=0;i<36;i++)colors.push(col[0]*(.72+(i%6)*.045),col[1]*(.72+(i%6)*.045),col[2]*(.72+(i%6)*.045));
+   gl.bindBuffer(gl.ARRAY_BUFFER,cb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(colors),gl.DYNAMIC_DRAW);gl.vertexAttribPointer(ac,3,gl.FLOAT,false,0,0);
+   gl.uniformMatrix4fv(um,false,mul(vp,model(x,y,z,sx,sy,sz,ry)));gl.drawArrays(gl.TRIANGLES,0,36);
+ }
+ st.drawBox=drawBox;st.resize=resize;
+ cv.addEventListener("pointerdown",e=>{if(e.button!==0)return;st.drag=true;st.px=e.clientX;st.py=e.clientY;cv.setPointerCapture?.(e.pointerId)});
+ cv.addEventListener("pointermove",e=>{if(!st.drag)return;st.yaw-=(e.clientX-st.px)*.009;st.pitch=Math.max(.18,Math.min(1.25,st.pitch+(e.clientY-st.py)*.006));st.px=e.clientX;st.py=e.clientY});
+ const up=e=>{st.drag=false;try{cv.releasePointerCapture?.(e.pointerId)}catch(_){}};
+ cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
+ cv.addEventListener("wheel",e=>{e.preventDefault();st.dist=Math.max(38,Math.min(150,st.dist+e.deltaY*.08))},{passive:false});
+ return st;
+}
+function truckTarget(a,i,n){
+ const p=phase(a),d=Math.max(1,Math.min(n,Number(a.dock||1))),rx=-27+(d-1)*(54/Math.max(1,n-1));
+ if(p==="dock")return[rx,1.3,-15,Math.PI/2];
+ if(p==="yard")return[-5+(i%5)*10,1.3,3+Math.floor(i/5)*8,Math.PI];
+ if(p==="gate")return[-31+(i%2)*9,1.3,20-(i%3)*5,Math.PI/2];
+ if(p==="done")return[-46,1.3,22-(i%4)*5,Math.PI];
+ return[-55-(i%4)*11,1.3,12-(i%5)*6,Math.PI/2];
+}
+function render(st,w,d,list,t){
+ const {gl}=st;st.resize();gl.clearColor(.035,.055,.043,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+ const asp=st.cv.width/st.cv.height,cp=Math.cos(st.pitch),eye=[Math.sin(st.yaw)*cp*st.dist,Math.sin(st.pitch)*st.dist,Math.cos(st.yaw)*cp*st.dist];
+ const vp=mul(persp(.78,asp,.1,400),look(eye,[0,0,0],[0,1,0])),B=st.drawBox;
+ // yard/asphalt, curbs and roads
+ B(vp,0,-.55,0,48,.5,34,[.14,.17,.15]); B(vp,0,.05,-33,48,.35,.7,[.32,.35,.33]); B(vp,-47,.05,0,.7,.35,33,[.32,.35,.33]);
+ // warehouse like Dvorište: long solid building
+ B(vp,7,5,-24,35,5,7,[.72,.76,.73]); B(vp,7,10.1,-24,35,.25,7,[.9,.92,.9]);
+ B(vp,39,3,-15,7,3,5,[.27,.32,.29]);
+ // gatehouse, entry and exit lanes
+ B(vp,-36,2.3,25,4.5,2.3,3.5,[.23,.29,.25]); B(vp,-27,.25,25,7,.16,.25,[.88,.9,.86]);
+ for(let i=0;i<8;i++)B(vp,-31+i*7,.02,17,2.2,.025,.08,[.85,.88,.82]);
+ for(let i=0;i<8;i++)B(vp,-31+i*7,.02,27,2.2,.025,.08,[.85,.88,.82]);
+ // ramps
+ const n=rampCount(w);
+ for(let r=1;r<=n;r++){let x=-27+(r-1)*(54/Math.max(1,n-1));B(vp,x,.45,-16.5,2.8,.45,1.5,[.05,.06,.055]);B(vp,x,2.5,-17.6,2.1,1.7,.35,[.13,.16,.14])}
+ // trees/bollards
+ for(let i=0;i<12;i++){B(vp,-44,1,-27+i*4.5,.35,1,.35,[.12,.3,.18]);B(vp,-44,2.6,-27+i*4.5,1.2,1.4,1.2,[.1,.35,.18])}
+ // true 3D trucks, animated toward operational position
+ const alive=new Set();
+ list.forEach((a,i)=>{
+   let id=String(a.id),tg=truckTarget(a,i,n);alive.add(id);let q=st.trucks.get(id);
+   if(!q){q={x:tg[0]-18,y:tg[1],z:tg[2]+10,r:tg[3],alpha:1};st.trucks.set(id,q)}
+   q.x+=(tg[0]-q.x)*.035;q.y+=(tg[1]-q.y)*.035;q.z+=(tg[2]-q.z)*.035;let dr=Math.atan2(Math.sin(tg[3]-q.r),Math.cos(tg[3]-q.r));q.r+=dr*.035;
+   const ph=phase(a);if(ph==="dock")q.y=1.3+Math.sin(t*.006)*.08;if(ph==="done")q.alpha=Math.max(.12,q.alpha*.992);
+   let c=ph==="dock"?[.22,.82,.42]:ph==="done"?[.45,.25,.25]:[.92,.94,.92];
+   // trailer, cab, chassis, windshield and wheels: all separate 3D cuboids
+   B(vp,q.x-1.5,q.y+1.2,q.z,3.8,1.25,1.35,c,q.r);
+   B(vp,q.x+3.1,q.y+1.25,q.z,1.15,1.45,1.25,[.88,.91,.89],q.r);
+   B(vp,q.x+.2,q.y+.15,q.z,4.2,.2,1.05,[.08,.1,.09],q.r);
+   // wheels
+   [[-3,-1.25],[-3,1.25],[1.5,-1.25],[1.5,1.25],[3.2,-1.25],[3.2,1.25]].forEach(p=>{
+      let ca=Math.cos(q.r),sa=Math.sin(q.r),wx=q.x+p[0]*ca+p[1]*sa,wz=q.z-p[0]*sa+p[1]*ca;B(vp,wx,q.y-.1,wz,.38,.42,.38,[.025,.028,.026],q.r)
+   });
+ });
+ st.trucks.forEach((v,id)=>{if(!alive.has(id))st.trucks.delete(id)});
+}
+function makeHost(parent,id,war){
+ let h=document.getElementById(id);if(h)return h;
+ h=document.createElement("div");h.id=id;h.innerHTML=`<div class="yv25hud"><span class="yv25dot"></span><b>${war?"WAR ROOM":"LIVE YARD"}</b> · PRAVI WEBGL 3D · ${wh()}</div><div class="yv25help">LIJEVI KLIK + VUCI = 360° &nbsp; · &nbsp; KOTAČIĆ = ZOOM</div>`;parent.appendChild(h);return h
+}
+function live(){
+ if(!canLive())return;
+ const stage=document.getElementById("liveYardStage");if(!stage)return;
+ if(stage.dataset.viewmode!=="3d")return;
+ const old=document.getElementById("yardivoReal3DHost");if(old)old.style.display="none";
+ const native=document.getElementById("yardivoNative3D");if(native)native.style.display="none";
+ const h=makeHost(stage,"yardivoV25Live",false);if(!V25.live)V25.live=init(h);if(!V25.live)return;
+ const w=wh(),d=dt(),list=anns().filter(a=>(a.warehouse||"W101")===w&&a.date===d);render(V25.live,w,d,list,performance.now());
+}
+function war(){
+ const room=document.getElementById("yardivoWarRoom"),c=document.getElementById("wrYardCanvas");if(!room?.classList.contains("active")||!c)return;
+ const old=document.getElementById("yardivoWar3DHost");if(old)old.style.display="none";
+ const native=document.getElementById("yardivoNativeWar3D");if(native)native.style.display="none";
+ const h=makeHost(c,"yardivoV25War",true);if(!V25.war)V25.war=init(h);if(!V25.war)return;
+ const w=wh(),d=dt(),list=anns().filter(a=>(a.warehouse||"W101")===w&&a.date===d);render(V25.war,w,d,list,performance.now());
+}
+function loop(){try{live();war()}catch(e){console.error("YARDIVO V2.5 WebGL",e)}requestAnimationFrame(loop)}
+document.addEventListener("click",e=>{
+ if(e.target.closest('.ly-view[data-ly-view="3d"]'))setTimeout(live,30);
+ if(e.target.closest('[data-view="yardivoWarRoom"],[data-home-target="yardivoWarRoom"]'))setTimeout(war,80);
+},true);
+window.addEventListener("load",()=>requestAnimationFrame(loop));
+window.YardivoWebGLV25={live,war};
 })();
 </script>
 
