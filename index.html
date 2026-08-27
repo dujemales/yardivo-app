@@ -5703,6 +5703,22 @@ html[data-theme="dark"][data-theme-preset="greeny"] a,
 html[data-theme="dark"][data-theme-preset="greeny"] .accent{color:#70d3a2!important}
 </style>
 
+<style id="yardivo-theme-final-v233">
+html[data-theme="dark"][data-theme-preset="greeny"] body,html[data-theme="dark"][data-theme-preset="greeny"] main,html[data-theme="dark"][data-theme-preset="greeny"] .app-shell,html[data-theme="dark"][data-theme-preset="greeny"] .view{background:#111513!important;color:#e8efeb!important}
+html[data-theme="dark"][data-theme-preset="greeny"] header,html[data-theme="dark"][data-theme-preset="greeny"] .topbar,html[data-theme="dark"][data-theme-preset="greeny"] .sidebar,html[data-theme="dark"][data-theme-preset="greeny"] nav{background:#171c19!important;border-color:#33443a!important}
+html[data-theme="dark"][data-theme-preset="greeny"] .panel,html[data-theme="dark"][data-theme-preset="greeny"] .card,html[data-theme="dark"][data-theme-preset="greeny"] .stat-card,html[data-theme="dark"][data-theme-preset="greeny"] .dashboard-card{background:#1b201d!important;border-color:#35433b!important}
+html[data-theme="dark"][data-theme-preset="greeny"] input,html[data-theme="dark"][data-theme-preset="greeny"] select,html[data-theme="dark"][data-theme-preset="greeny"] textarea{background:#141916!important;color:#eef4f0!important;border-color:#3c5044!important}
+html[data-theme="dark"][data-theme-preset="greeny"] .nav-item:hover,html[data-theme="dark"][data-theme-preset="greeny"] .nav-item.active{background:#183126!important;color:#a9e8c4!important;border-color:#397154!important}
+html[data-theme="dark"][data-theme-preset="greeny"] button.primary,html[data-theme="dark"][data-theme-preset="greeny"] .primary{background:#1c4935!important;color:#c3f3d7!important;border-color:#4a8b68!important}
+html[data-theme="dark"][data-theme-preset="greeny"] .schedule-board,html[data-theme="dark"][data-theme-preset="greeny"] #announcementSchedule,html[data-theme="dark"][data-theme-preset="greeny"] #yardivoExpandedSchedule,html[data-theme="dark"][data-theme-preset="greeny"] #yardivoAvailabilityGrid{background:#111b16!important;border-color:#365443!important}
+html[data-theme="dark"][data-theme-preset="greeny"] .yam-rh,html[data-theme="dark"][data-theme-preset="greeny"] .yam-time{background:#1b3025!important;color:#c6ead5!important;border-color:#3b634d!important}
+html[data-theme="dark"][data-theme-preset="greeny"] .yam-free{background:#17482e!important;color:#c0f1d3!important;border-color:#3b8a5d!important}
+html[data-theme="light"][data-theme-preset="rose"] body,html[data-theme="light"][data-theme-preset="rose"] main,html[data-theme="light"][data-theme-preset="rose"] .app-shell,html[data-theme="light"][data-theme-preset="rose"] .view{background:#fff9fb!important;color:#412d35!important}
+html[data-theme="light"][data-theme-preset="rose"] header,html[data-theme="light"][data-theme-preset="rose"] .topbar,html[data-theme="light"][data-theme-preset="rose"] .sidebar,html[data-theme="light"][data-theme-preset="rose"] nav{background:#fff4f7!important;border-color:#ebcad6!important}
+html[data-theme="light"][data-theme-preset="rose"] .nav-item:hover,html[data-theme="light"][data-theme-preset="rose"] .nav-item.active{background:#f9dfe8!important;color:#793f55!important;border-color:#dba9ba!important}
+html[data-theme="light"][data-theme-preset="rose"] .schedule-board,html[data-theme="light"][data-theme-preset="rose"] #announcementSchedule,html[data-theme="light"][data-theme-preset="rose"] #yardivoExpandedSchedule,html[data-theme="light"][data-theme-preset="rose"] #yardivoAvailabilityGrid{background:#fff7fa!important;border-color:#e7c4d0!important}
+html[data-theme="light"][data-theme-preset="rose"] .yam-rh,html[data-theme="light"][data-theme-preset="rose"] .yam-time{background:#f8e3ea!important;color:#704154!important;border-color:#ddb8c5!important}
+</style>
 </head>
 <body>
 <button id="yardivoFullscreenBtn" type="button" aria-label="Uključi full screen" title="Full screen"><span class="fs-icon">⛶</span><span class="fs-label">FULL SCREEN</span></button>
@@ -19583,7 +19599,7 @@ function mode(){
   return document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
 }
 function allowed(m){
-  return m==='light'?['original','rose']:['original','black','gray','greeny'];
+  return m==='light'?['original','rose']:['original','greeny'];
 }
 function saved(){
   try{
@@ -19629,9 +19645,7 @@ function ensureBox(){
     </div>
     <div class="ytp-options" data-for-mode="dark">
       <button type="button" data-mode="dark" data-preset="original">ORIGINAL</button>
-      <button type="button" data-mode="dark" data-preset="black">BLACK</button>
-      <button type="button" data-mode="dark" data-preset="gray">DARK GRAY</button>
-      <button type="button" data-mode="dark" data-preset="greeny">GREENY</button>
+      <button type="button" data-mode="dark" data-preset="greeny">DARK GREY / GREENY</button>
     </div>`;
   document.body.appendChild(box);
   box.addEventListener('click',e=>{
