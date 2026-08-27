@@ -1,0 +1,23 @@
+{
+  "name": "YARDIVO – Yard Management System",
+  "short_name": "YARDIVO",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#071925",
+  "theme_color": "#071925",
+  "description": "YARDIVO Yard Management System",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
