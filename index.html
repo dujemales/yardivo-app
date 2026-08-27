@@ -5800,6 +5800,7 @@ html[data-theme="dark"][data-theme-preset="greeny"] ::selection{
   background:radial-gradient(circle at 50% 45%,#1a211e,#0d100f 65%,#080a09);
   border-radius:0 0 10px 10px;
 }
+#liveYardStage{position:relative!important}
 #liveYardStage[data-viewmode="3d"] #yardivoReal3DHost{display:block}
 #liveYardStage[data-viewmode="3d"] #lyCanvas{visibility:hidden}
 #yardivoReal3DHost canvas,#yardivoWar3DHost canvas{display:block;width:100%;height:100%;outline:none}
@@ -19571,6 +19572,9 @@ window.YardivoThemePresets={apply:applyPreset,current,refresh:syncWithMainTheme}
 </script>
 
 
+<!-- YARDIVO REAL 3D ENGINE: pinned Three.js build -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js" onload="window.dispatchEvent(new Event('yardivo-three-ready'))" onerror="console.error('YARDIVO: Three.js engine failed to load')"></script>
+
 <script id="yardivo-real-webgl-yard-v1">
 (function(){
 'use strict';
@@ -19951,6 +19955,7 @@ function render(h,w,list){
  dyn.querySelectorAll('.ny-truck').forEach(el=>el.onclick=e=>{e.stopPropagation();const a=list.find(x=>String(x.id)===el.dataset.id);try{if(a&&typeof openTruck==='function')openTruck(a)}catch(_){}});
 }
 function live(){
+ if(window.THREE)return;
  if(!['admin','inventory','reception'].includes(role()))return;
  const stage=document.getElementById('liveYardStage');if(!stage)return;
  stage.dataset.viewmode='3d';
@@ -19959,6 +19964,7 @@ function live(){
  render(h,w,A().filter(a=>(a.warehouse||'W101')===w&&a.date===d))
 }
 function war(){
+ if(window.THREE)return;
  const c=document.getElementById('wrYardCanvas'),room=document.getElementById('yardivoWarRoom');if(!c||!room?.classList.contains('active'))return;
  const old=document.getElementById('yardivoWar3DHost');if(old)old.style.display='none';
  const h=makeHost(c,'yardivoNativeWar3D',true),w=wh(),d=date();
