@@ -5792,7 +5792,6 @@ html[data-theme="dark"][data-theme-preset="greeny"] ::selection{
   background:#126944;color:#fff
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.min.js"></script>
 
 <style id="yardivo-real-webgl-yard-v1-style">
 /* Real WebGL Digital Twin */
@@ -5844,6 +5843,48 @@ html[data-theme="dark"][data-theme-preset="greeny"] #yardivoWar3DHost{
  #yardivoReal3DHost{inset:38px 0 0}.y3d-help{display:none}.y3d-modal-body{grid-template-columns:1fr}
 }
 </style>
+
+
+<style id="yardivo-overview-reliability-engine-v2-style">
+#overviewSupplierChart{
+  display:flex!important;align-items:flex-end!important;gap:8px!important;
+  min-height:310px!important;overflow-x:auto!important;overflow-y:hidden!important;
+  padding:18px 12px 8px!important;border-bottom:1px solid #263a46
+}
+#overviewSupplierChart .overview-chart-col{
+  flex:0 0 72px!important;min-width:72px!important;height:282px!important;
+  display:grid!important;grid-template-rows:24px 190px 64px!important;gap:3px!important;
+  align-items:end!important;cursor:pointer
+}
+#overviewSupplierChart .overview-chart-bar-wrap{
+  height:190px!important;display:flex!important;align-items:flex-end!important;
+  border-bottom:1px solid #3b4e58!important;
+  background:linear-gradient(to top,rgba(210,50,55,.035),rgba(220,175,35,.025) 50%,rgba(45,190,105,.035))!important
+}
+#overviewSupplierChart .overview-chart-bar{
+  width:34px!important;margin:0 auto!important;border-radius:5px 5px 2px 2px!important;
+  min-height:3px!important;transition:height .35s ease,background .35s ease!important
+}
+#overviewSupplierChart .overview-chart-value{
+  text-align:center!important;font-size:9px!important;font-weight:1000!important
+}
+#overviewSupplierChart .overview-chart-name{
+  overflow:hidden!important;text-align:center!important;font-size:6px!important;
+  line-height:1.25!important;color:#9eb0ba!important
+}
+#overviewSupplierChart .overview-chart-name span{color:#687d88!important;font-size:5.5px!important}
+.overview-reliability-legend-v2{
+ display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0 0;font-size:7px;color:#8499a5
+}
+.overview-reliability-legend-v2 i{display:inline-block;width:40px;height:7px;border-radius:999px;background:linear-gradient(90deg,hsl(0 72% 45%),hsl(60 72% 45%),hsl(120 72% 40%))}
+</style>
+
+
+<script type="module" id="yardivo-three-loader-v2">
+import * as THREE_NS from "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.min.js";
+window.THREE = THREE_NS;
+window.dispatchEvent(new CustomEvent("yardivo-three-ready"));
+</script>
 
 </head>
 <body>
@@ -16628,431 +16669,36 @@ function supplierNames(){
 function visibleByWarehouse(x){
   try{return typeof whMatch==='function'?whMatch(x):true}catch(e){return true}
 }
+function localToday(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function eventDate(a){return String(a?.date||'')}
+function due(a){const d=eventDate(a);return !!d && d<=localToday()}
 function actual(a){
-  try{return typeof actualDateTime==='function'?!!actualDateTime(a):!!(a.actualDate&&a.actualTime)}catch(e){return !!(a.actualDate&&a.actualTime)}
+  /* Any operational evidence that the vehicle really arrived counts as arrival.
+     This covers Porta, Yard, Ramp, Receiving and legacy fields. */
+  try{if(typeof actualDateTime==='function'&&actualDateTime(a))return true}catch(e){}
+  return !!(
+    a?.actualDate || a?.actualTime || a?.actualArrival ||
+    a?.gateCheckedAt || a?.gateInAt || a?.gateEnteredAt || a?.enteredAt ||
+    a?.yardArrivalAt || a?.yardInAt ||
+    a?.dockArrivalAt || a?.dockAt || a?.atDockAt ||
+    a?.unloadStartedAt || a?.receivedAt || a?.completedAt ||
+    a?.rejectedAt || a?.gateOutAt
+  );
 }
 function delay(a){
-  try{const d=delayMinutes(a);return d==null?null:Number(d)}catch(e){return null}
-}
-function formatM(n){if(n==null||!Number.isFinite(n))return '—';try{return formatDelay(Math.round(n))}catch(e){return `${Math.round(n)} min`}}
-function status(a){
-  try{return operationalPlanStatus(a)||normalizedPlanStatus(a)||a.status||'Najavljeno'}catch(e){return a.status||'Najavljeno'}
-}
-function scoreFor(name, allScope, incScope){
-  const all=allScope.filter(a=>a.supplier===name);
-  const arrived=all.filter(actual);
-  const late=arrived.filter(a=>(delay(a)||0)>15);
-  const on=Math.max(0,arrived.length-late.length);
-  const lateVals=late.map(delay).filter(x=>x!=null);
-  const avgLate=lateVals.length?Math.round(lateVals.reduce((a,b)=>a+b,0)/lateVals.length):0;
-  const incidents=incScope.filter(i=>i.supplier===name).length;
-  const noShows=all.filter(a=>/NO.?SHOW|NIJE DOŠAO/i.test(status(a))).length;
-  const rejected=all.filter(a=>/ODBIJ/i.test(status(a))).length;
-  const unannounced=all.filter(a=>a.arrivalType==='UNANNOUNCED').length;
-  const pallets=all.reduce((s,a)=>s+Number(a.pallets||0),0);
-  /* OVERVIEW SCORE: 100% = najbolji / 0% = najgori.
-     Lošiji dobavljač zato uvijek ide prema MANJEM postotku, ne većem. */
-  const baseCount=Math.max(1,all.length);
-  const punctualPct=arrived.length?(on/arrived.length)*100:0;
-  const lateRate=arrived.length?late.length/arrived.length:0;
-  const incidentRate=Math.min(1,incidents/baseCount);
-  const noShowRate=noShows/baseCount;
-  const rejectedRate=rejected/baseCount;
-  const unannouncedRate=unannounced/baseCount;
-  const severeLatePenalty=avgLate>15?Math.min(15,(avgLate-15)/4):0;
-
-  let score=
-      punctualPct * 0.70
-    + (1-lateRate) * 10
-    + (1-incidentRate) * 8
-    + (1-noShowRate) * 6
-    + (1-rejectedRate) * 4
-    + (1-unannouncedRate) * 2
-    - severeLatePenalty;
-
-  /* Bez ijednog evidentiranog dolaska ne dodjeljuj lažnih 100%. */
-  if(!arrived.length) score=Math.min(score,50);
-
-  score=Math.max(0,Math.min(100,Math.round(score)));
-  return{name,all,arrived:arrived.length,on,late:late.length,avgLate,incidents,noShows,rejected,unannounced,pallets,score};
-}
-
-function renderOverviewFinal(){
-  const root=document.getElementById('overview');if(!root)return;
-  const select=document.getElementById('overviewSupplierSelect');
-  const previous=select?.value||'';
-  const names=supplierNames();
-  if(select){
-    const current=previous;
-    select.innerHTML='<option value="">Svi dobavljači</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
-    if(names.includes(current))select.value=current;
-  }
-  const selected=select?.value||'';
-  const allScope=arr().filter(visibleByWarehouse);
-  const incScope=inc().filter(visibleByWarehouse);
-  const filteredAll=selected?allScope.filter(a=>a.supplier===selected):allScope;
-  const filteredInc=selected?incScope.filter(i=>i.supplier===selected):incScope;
-  const arrived=filteredAll.filter(actual);
-  const late=arrived.filter(a=>(delay(a)||0)>15);
-  const on=arrived.length-late.length;
-  const lateVals=late.map(delay).filter(x=>x!=null);
-  const avgLate=lateVals.length?Math.round(lateVals.reduce((a,b)=>a+b,0)/lateVals.length):0;
-  const unloads=filteredAll.map(a=>{
-    try{
-      if(a.unloadStartDate&&a.unloadEndDate&&typeof ymsDT==='function'&&typeof ymsMinutes==='function'){
-        return ymsMinutes(ymsDT(a.unloadStartDate,a.unloadStartTime),ymsDT(a.unloadEndDate,a.unloadEndTime));
-      }
-    }catch(e){}
-    return null;
-  }).filter(x=>x>0&&x<600);
-  const avgUnload=unloads.length?Math.round(unloads.reduce((a,b)=>a+b,0)/unloads.length):0;
-  const changeCount=filteredAll.reduce((s,a)=>s+(Array.isArray(a.changeHistory)?a.changeHistory.length:0),0);
-  const dates=new Set(filteredAll.map(a=>a.date).filter(Boolean));
-  const booked=filteredAll.reduce((s,a)=>s+Number(a.duration||0),0);
-  const ramps=6;
-  const cap=Math.max(1,dates.size)*ramps*7*60;
-  const set=(id,val)=>{const e=document.getElementById(id);if(e)e.textContent=val};
-  set('ovTotal',arrived.length);
-  set('ovOnTime',arrived.length?`${Math.round(on/arrived.length*100)}%`:'0%');
-  set('ovAvgDelay',formatM(avgLate));
-  set('ovIncidents',filteredInc.length);
-  set('ovChanges',changeCount);
-  set('ovAvgUnload',`${avgUnload} min`);
-  set('ovDockUtil',`${Math.min(100,Math.round(booked/cap*100))}%`);
-
-  let info=document.getElementById('overviewFilterStatus');
-  if(!info){
-    info=document.createElement('div');info.id='overviewFilterStatus';info.className='overview-filter-status';
-    document.querySelector('#overview .overview-hero')?.appendChild(info);
-  }
-  info.textContent=selected?`Prikaz filtriran samo za dobavljača: ${selected}`:'Prikaz za sve dobavljače u odabranom skladištu/lokaciji.';
-
-  const scores=names.map(n=>scoreFor(n,allScope,incScope)).sort((a,b)=>b.score-a.score||b.arrived-a.arrived);
-  const displayScores=selected?scores.filter(x=>x.name===selected):scores;
-
-  const chart=document.getElementById('overviewSupplierChart');
-  if(chart){
-    chart.innerHTML=displayScores.length?displayScores.map(r=>{
-      const cls=r.score>=90?'good':r.score>=70?'mid':'bad';
-      return `<div class="overview-chart-col ${selected===r.name?'selected':''}" data-ov-s="${esc(r.name)}" title="${esc(r.name)} · ${r.score}%">
-        <div class="overview-chart-value">${r.score}%</div>
-        <div class="overview-chart-bar-wrap"><div class="overview-chart-bar ${cls}" style="height:${Math.max(3,r.score)}%"></div></div>
-        <div class="overview-chart-name">${esc(r.name)}</div>
-      </div>`;
-    }).join(''):'<div class="overview-empty">Nema podataka za analitički graf.</div>';
-    chart.querySelectorAll('[data-ov-s]').forEach(el=>el.onclick=()=>{
-      if(select){select.value=el.dataset.ovS||'';renderOverviewFinal()}
-    });
-  }
-
-  const q=(document.getElementById('overviewSearch')?.value||'').trim().toLocaleLowerCase('hr-HR');
-  const tableScores=displayScores.filter(r=>!q||r.name.toLocaleLowerCase('hr-HR').includes(q));
-  const count=document.getElementById('overviewSupplierCount');
-  if(count)count.textContent=`${tableScores.length} dobavljača · ${selected?'filtrirano':'kompletna lista'}`;
-  const tbody=document.getElementById('supplierPerformance');
-  if(tbody)tbody.innerHTML=tableScores.length?tableScores.map(r=>`<tr data-ovrow="${esc(r.name)}" style="cursor:pointer">
-    <td><strong>${esc(r.name)}</strong></td><td>${r.arrived}</td><td>${r.on}</td><td>${r.late}</td>
-    <td>${r.avgLate?formatM(r.avgLate):'—'}</td><td>${r.incidents}</td>
-    <td><span class="score ${r.score>=90?'good':r.score>=70?'mid':'bad'}">${r.score}%</span></td>
-  </tr>`).join(''):'<tr><td colspan="7"><div class="overview-empty">Nema podataka za odabrani filter.</div></td></tr>';
-  tbody?.querySelectorAll('[data-ovrow]').forEach(tr=>tr.onclick=()=>{if(select){select.value=tr.dataset.ovrow;renderOverviewFinal()}});
-
-  const best=document.getElementById('overviewBest10');
-  const worst=document.getElementById('overviewWorst10');
-  const ranking=(rows,bad=false)=>rows.length?rows.map((r,i)=>`<div class="ranking-row"><div class="ranking-pos">${i+1}</div><div class="ranking-name">${esc(r.name)}</div><div class="ranking-track"><div class="ranking-fill ${bad?'bad':''}" style="width:${Math.max(2,r.score)}%"></div></div><div class="ranking-score">${r.score}%</div></div>`).join(''):'<div class="overview-empty">Nema podataka.</div>';
-  if(best)best.innerHTML=ranking(displayScores.slice().sort((a,b)=>b.score-a.score).slice(0,10));
-  if(worst)worst.innerHTML=ranking(displayScores.slice().sort((a,b)=>a.score-b.score).slice(0,10),true);
-
-  const bars=document.getElementById('supplierBars');
-  if(bars)bars.innerHTML=displayScores.length?displayScores.slice(0,10).map(r=>`<div class="supplier-bar"><div class="name">${esc(r.name)}</div><div class="bar-track"><div class="bar-fill" style="width:${r.score}%"></div></div><div class="bar-score">${r.score}%</div></div>`).join(''):'<div class="overview-empty">Nema podataka.</div>';
-
-  const detail=document.getElementById('overviewSupplierDetail');
-  if(detail){
-    if(!selected)detail.innerHTML='<div class="overview-empty">Odaberi dobavljača iz dropdowna za detaljnu analizu.</div>';
-    else{
-      const r=scores.find(x=>x.name===selected);
-      if(!r)detail.innerHTML='<div class="overview-empty">Nema podataka za odabranog dobavljača.</div>';
-      else{
-        const recent=r.all.slice().sort((a,b)=>(String(b.actualDate||b.date)+String(b.actualTime||b.time)).localeCompare(String(a.actualDate||a.date)+String(a.actualTime||a.time))).slice(0,10);
-        detail.innerHTML=`<div class="supplier-detail-head"><div><h2>${esc(r.name)}</h2><p>${r.all.length} ukupnih najava</p></div><div class="supplier-score-big ${r.score<70?'bad':r.score<90?'mid':''}"><strong>${r.score}%</strong><small>POUZDANOST</small></div></div>
-          <div class="supplier-detail-kpis">
-            <div><small>DOLASCI</small><strong>${r.arrived}</strong></div><div><small>NA VRIJEME</small><strong>${r.on}</strong></div>
-            <div><small>KAŠNJENJA</small><strong>${r.late}</strong></div><div><small>AVG KAŠNJENJE</small><strong>${r.avgLate?formatM(r.avgLate):'—'}</strong></div>
-            <div><small>NO-SHOW</small><strong>${r.noShows}</strong></div><div><small>INCIDENTI</small><strong>${r.incidents}</strong></div>
-            <div><small>NENAJAVLJENI</small><strong>${r.unannounced}</strong></div><div><small>PALETE</small><strong>${r.pallets}</strong></div>
-          </div>
-          <div class="supplier-detail-bottom"><div class="supplier-detail-box"><h3>ZADNJIH 10 NAJAVA</h3>${recent.map(a=>`<div class="supplier-history-row"><span>${esc(a.date||'—')} ${esc(a.time||'')}</span><strong>${esc(a.warehouse||'—')} · R${esc(a.dock||'—')}</strong><span>${Number(a.pallets||0)} pal.</span><span>${esc(status(a))}</span></div>`).join('')||'<div class="overview-empty">Nema povijesti.</div>'}</div></div>`;
-      }
+  try{
+    if(typeof delayMinutes==='function'){
+      const d=delayMinutes(a);
+      if(d!=null&&Number.isFinite(Number(d)))return Number(d);
     }
+  }catch(e){}
+  for(const k of ['lateMinutes','delayMinutes','arrivalDelayMinutes','delay']){
+    const v=Number(a?.[k]);if(Number.isFinite(v))return v;
   }
-
-  const delayBody=document.getElementById('delayHistory');
-  if(delayBody){
-    const hist=arrived.slice().sort((a,b)=>(String(b.actualDate)+String(b.actualTime)).localeCompare(String(a.actualDate)+String(a.actualTime)));
-    delayBody.innerHTML=hist.length?hist.map(a=>`<tr><td><strong>${esc(a.warehouse||'—')}</strong></td><td><strong>${esc(a.supplier||'—')}</strong></td><td>${esc(a.date||'—')} ${esc(a.time||'')}</td><td>${esc(a.actualDate||'—')} ${esc(a.actualTime||'')}</td><td>${formatM(delay(a))}</td><td>Rampa ${esc(a.dock||'—')}</td><td>${Number(a.pallets||0)}</td><td>${Number(a.sku||0)}</td></tr>`).join(''):'<tr><td colspan="8"><div class="overview-empty">Nema evidentiranih dolazaka.</div></td></tr>';
-  }
-
-  const ch=document.getElementById('changeHistoryTable');
-  if(ch){
-    const rows=[];
-    filteredAll.forEach(a=>(a.changeHistory||[]).forEach(c=>rows.push({supplier:a.supplier,warehouse:a.warehouse,...c})));
-    rows.sort((a,b)=>String(b.changedAt||'').localeCompare(String(a.changedAt||'')));
-    ch.innerHTML=rows.length?rows.map(c=>`<tr><td><strong>${esc(c.supplier||'—')}</strong></td><td>${esc(c.oldWarehouse||c.warehouse||'—')} → ${esc(c.newWarehouse||c.warehouse||'—')}</td><td>${esc(c.oldDate||'—')} ${esc(c.oldTime||'')}</td><td>${esc(c.newDate||'—')} ${esc(c.newTime||'')}</td><td>${esc(c.reason||'—')}</td><td>${c.changedAt?new Date(c.changedAt).toLocaleString('hr-HR'):'—'}</td><td>${c.countsAsLate?'Negativno':'Neutralno'}</td></tr>`).join(''):'<tr><td colspan="7"><div class="overview-empty">Nema promjena za odabrani filter.</div></td></tr>';
-  }
-}
-window.renderOverview=renderOverviewFinal;
-try{renderOverview=renderOverviewFinal}catch(e){}
-const sel=document.getElementById('overviewSupplierSelect');
-if(sel){sel.onchange=renderOverviewFinal}
-const search=document.getElementById('overviewSearch');
-if(search){search.oninput=renderOverviewFinal}
-
-// ----- Nenajavljeni: authoritative role access + complete detail -----
-function uaRole(){
-  let r='';try{r=String(currentSession?.role||'').toLowerCase().trim()}catch(e){}
-  if(r==='zalihe'||r==='upravljanje zalihama')r='inventory';
-  if(r==='prijam')r='reception';if(r==='porta'||r==='portir')r='gate';return r;
-}
-function uaAllowed(){return ['admin','inventory','reception','gate'].includes(uaRole())}
-function uaApprove(){return ['admin','reception'].includes(uaRole())}
-function uaRecords(){return arr().filter(a=>a.arrivalType==='UNANNOUNCED').sort((a,b)=>String(b.requestCreatedAt||b.createdAt||'').localeCompare(String(a.requestCreatedAt||a.createdAt||'')))}
-function fmtDate(v){if(!v)return '—';const d=new Date(v);return isNaN(d)?esc(v):d.toLocaleString('hr-HR')}
-function renderUnannouncedComplete(){
-  const view=document.getElementById('unannounced'),host=document.getElementById('unannouncedSectionList');if(!view||!host)return;
-  const nav=document.querySelector('[data-view="unannounced"]'),home=document.querySelector('[data-home-target="unannounced"]');
-  const allowed=uaAllowed();
-  if(nav){nav.classList.toggle('role-hidden',!allowed);nav.style.setProperty('display',allowed?'flex':'none','important')}
-  if(home)home.style.setProperty('display',allowed?'flex':'none','important');
-  if(!allowed){host.innerHTML='<div class="overview-empty">Nemaš ovlasti za ovu sekciju.</div>';return}
-  const all=uaRecords();
-  const pending=all.filter(a=>a.approvalStatus==='PENDING').length,approved=all.filter(a=>a.approvalStatus==='APPROVED').length,rejected=all.filter(a=>a.approvalStatus==='REJECTED').length;
-  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set('uaKpiPending',pending);set('uaKpiApproved',approved);set('uaKpiRejected',rejected);set('uaKpiTotal',all.length);
-  const badge=document.getElementById('unannouncedNavBadge');if(badge){badge.textContent=pending;badge.style.display=pending?'inline-flex':'none'}
-  const active=document.querySelector('[data-ua-filter].active')?.dataset.uaFilter||'PENDING';
-  const q=(document.getElementById('uaSearch')?.value||'').trim().toLocaleLowerCase('hr-HR');
-  let data=all.filter(a=>active==='ALL'||a.approvalStatus===active);
-  if(q)data=data.filter(a=>[a.supplier,a.plannedPlate,a.plannedDriver,a.warehouse,a.unannouncedReason,a.unannouncedDocument,a.approvalRequestedBy,a.orderNumber,a.status,a.responsible].some(v=>String(v||'').toLocaleLowerCase('hr-HR').includes(q)));
-  host.innerHTML=data.length?data.map(a=>{
-    const cls=a.approvalStatus==='APPROVED'?'approved':a.approvalStatus==='REJECTED'?'rejected':'pending';
-    const label=a.approvalStatus==='APPROVED'?'ODOBRENO':a.approvalStatus==='REJECTED'?'ODBIJENO':'ČEKA ODOBRENJE';
-    const decision=a.approvalStatus==='APPROVED'?`Odobrio ${esc(a.approvedBy||'—')} · ${fmtDate(a.approvedAt)}`:a.approvalStatus==='REJECTED'?`Odbio ${esc(a.approvalRejectedBy||'—')} · ${fmtDate(a.approvalRejectedAt)}`:'Čeka odluku';
-    const timeline=[['Zahtjev',a.requestCreatedAt],['Dvorište',a.yardArrivalAt],['Rampa',a.dockArrivalAt],['Zaprimljeno',a.receivedAt],['Odbijeno',a.rejectedAt]];
-    return `<div class="unannounced-request ${cls}">
-      <div class="unannounced-request-head"><div><strong>${esc(a.supplier||'—')} · ${esc(a.plannedPlate||'—')}</strong><div class="meta">${esc(a.warehouse||'—')} · ${esc(a.status||'—')}</div></div><span class="unannounced-badge ${cls}">${label}</span></div>
-      <div class="ua-full-grid">
-        <div><small>DOBAVLJAČ</small><strong>${esc(a.supplier||'—')}</strong></div>
-        <div><small>TABLICE</small><strong>${esc(a.plannedPlate||a.plate||'—')}</strong></div>
-        <div><small>VOZAČ</small><strong>${esc(a.plannedDriver||a.driver||'—')}</strong></div>
-        <div><small>SKLADIŠTE / RAMPA</small><strong>${esc(a.warehouse||'—')} · R${esc(a.dock||'—')}</strong></div>
-        <div><small>RAZLOG</small><strong>${esc(a.unannouncedReason||'—')}</strong></div>
-        <div><small>DOKUMENT</small><strong>${esc(a.unannouncedDocument||'—')}</strong></div>
-        <div><small>NARUDŽBA</small><strong>${esc(a.orderNumber||'—')}</strong></div>
-        <div><small>PALETE / SKU</small><strong>${Number(a.pallets||0)} / ${Number(a.sku||0)}</strong></div>
-        <div><small>ODGOVORNA OSOBA</small><strong>${esc(a.responsible||'—')}</strong></div>
-        <div><small>PORTA / ZAHTJEV</small><strong>${esc(a.approvalRequestedBy||'—')} · ${fmtDate(a.requestCreatedAt)}</strong></div>
-        <div><small>ODLUKA</small><strong>${decision}</strong></div>
-        <div><small>RAZLOG ODBIJANJA</small><strong>${esc(a.approvalRejectionReason||'—')}</strong></div>
-        <div style="grid-column:1/-1"><small>NAPOMENA</small><strong>${esc(a.unannouncedNote||a.note||'—')}</strong></div>
-      </div>
-      <div class="ua-timeline">${timeline.map(([n,t])=>`<span class="${t?'done':''}">${n}: ${t?fmtDate(t):'—'}</span>`).join('')}</div>
-      ${uaApprove()&&a.approvalStatus==='PENDING'?`<div class="ua-request-actions"><button class="unannounced-approve" onclick="YardivoUnannounced.approve(${a.id});setTimeout(renderUnannouncedComplete,80)">ODOBRI ULAZ</button><button class="unannounced-reject" onclick="document.getElementById('uaFullReject_${a.id}').classList.toggle('show')">ODBIJ</button></div><div class="unannounced-reject-box" id="uaFullReject_${a.id}"><input id="uaRejectReason_${a.id}" placeholder="Razlog odbijanja..."><button class="unannounced-reject" onclick="YardivoUnannounced.reject(${a.id});setTimeout(renderUnannouncedComplete,80)">POTVRDI ODBIJANJE</button></div>`:''}
-    </div>`;
-  }).join(''):'<div class="overview-empty">Nema nenajavljenih dolazaka za odabrani filter.</div>';
-}
-window.renderUnannouncedComplete=renderUnannouncedComplete;
-if(window.YardivoUnannouncedSection){
-  window.YardivoUnannouncedSection.render=renderUnannouncedComplete;
-  window.YardivoUnannouncedSection.updateBadge=renderUnannouncedComplete;
-}
-document.querySelectorAll('[data-ua-filter]').forEach(b=>b.addEventListener('click',()=>setTimeout(renderUnannouncedComplete,0)));
-document.getElementById('uaSearch')?.addEventListener('input',renderUnannouncedComplete);
-document.addEventListener('click',e=>{
-  if(e.target.closest('[data-view="overview"],[data-home-target="overview"]'))setTimeout(renderOverviewFinal,20);
-  if(e.target.closest('[data-view="unannounced"],[data-home-target="unannounced"]'))setTimeout(renderUnannouncedComplete,20);
-},true);
-window.addEventListener('load',()=>setTimeout(()=>{renderOverviewFinal();renderUnannouncedComplete()},600));
-setInterval(()=>{if(document.getElementById('unannounced')?.classList.contains('active'))renderUnannouncedComplete()},5000);
-})();
-</script>
-
-
-<style id="yardivo-role-flicker-fix-style">
-html.yardivo-role-gate [data-view="dailyMap"],
-html.yardivo-role-gate [data-home-target="dailyMap"],
-html.yardivo-role-gate [data-view="weeklyMap"],
-html.yardivo-role-gate [data-home-target="weeklyMap"]{display:none!important}
-</style>
-<script id="yardivo-authoritative-role-access-v2">
-(function(){
-'use strict';
-
-function normRole(){
-  let r='';
-  try{r=String(currentSession?.role||'').toLowerCase().trim()}catch(e){}
-  if(r==='zalihe'||r==='upravljanje zalihama')r='inventory';
-  if(r==='prijam')r='reception';
-  if(r==='porta'||r==='portir')r='gate';
-  return r;
-}
-function allViewIds(){
-  return [...new Set([
-    'homeMenu',
-    ...Array.from(document.querySelectorAll('.view[id]')).map(v=>v.id),
-    ...Array.from(document.querySelectorAll('[data-view]')).map(v=>v.dataset.view).filter(Boolean),
-    ...Array.from(document.querySelectorAll('[data-home-target]')).map(v=>v.dataset.homeTarget).filter(Boolean)
-  ])];
-}
-function allowedFor(r){
-  if(r==='admin') return allViewIds().filter(v=>v!=='yard'); // Dvorište je operativni pogled samo za Portu.
-
-  const map={
-    inventory:[
-      'homeMenu','dashboard','weeklyMap','dailyMap','announcements','weeklyDeliveries','overview','suppliers',
-      'calendar','heatmap','controltower','controlTower','plannerPro','incidents','incidentArchive','reports',
-      'settings','unannounced','epal','orderSearch','liveYard','smartReplanning'
-    ],
-    reception:[
-      'homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','yard','docks','operations',
-      'incidents','incidentArchive','plannerPro','controltower','controlTower','settings','unannounced','epal','orderSearch','liveYard','smartReplanning'
-    ],
-    gate:['homeMenu','checkin','unannounced','docks','yard'],
-    management:[
-      'homeMenu','dashboard','weeklyMap','dailyMap','overview','reports','calendar','heatmap','controltower','controlTower',
-      'suppliers','incidents','incidentArchive','settings'
-    ]
-  };
-  return map[r]||[];
-}
-function stampHtmlRole(r){
-  const root=document.documentElement;
-  ['admin','inventory','reception','gate','management'].forEach(x=>root.classList.remove('yardivo-role-'+x));
-  if(r)root.classList.add('yardivo-role-'+r);
-}
-function apply(){
-  if(!window.currentSession)return;
-  const r=normRole();
-  stampHtmlRole(r);
-  const allowed=new Set(allowedFor(r));
-
-  document.querySelectorAll('[data-view]').forEach(el=>{
-    const v=el.dataset.view;
-    const ok=allowed.has(v);
-    el.classList.toggle('role-hidden',!ok);
-    el.style.setProperty('display',ok?'':'none',ok?'':'important');
-  });
-
-  document.querySelectorAll('[data-home-target]').forEach(el=>{
-    const v=el.dataset.homeTarget;
-    const ok=allowed.has(v);
-    el.style.setProperty('display',ok?'':'none',ok?'':'important');
-  });
-
-  document.querySelectorAll('.view[id]').forEach(v=>{
-    const ok=allowed.has(v.id);
-    if(!ok){
-      v.classList.remove('active');
-      v.style.setProperty('display','none','important');
-    }else{
-      v.style.removeProperty('display');
-    }
-  });
-
-  // Strong explicit rules requested by user.
-  if(r==='gate'){
-    ['dailyMap','weeklyMap'].forEach(v=>{
-      document.querySelectorAll(`[data-view="${v}"],[data-home-target="${v}"]`).forEach(el=>{
-        el.classList.add('role-hidden');
-        el.style.setProperty('display','none','important');
-      });
-      const view=document.getElementById(v);
-      if(view){view.classList.remove('active');view.style.setProperty('display','none','important')}
-    });
-  }
-
-  // Unannounced: Admin + Zalihe + Prijam.
-  const canUa=['admin','inventory','reception','gate'].includes(r);
-  document.querySelectorAll('[data-view="unannounced"],[data-home-target="unannounced"]').forEach(el=>{
-    el.classList.toggle('role-hidden',!canUa);
-    el.style.setProperty('display',canUa?'':'none',canUa?'':'important');
-  });
-  const ua=document.getElementById('unannounced');
-  if(ua&&!canUa){ua.classList.remove('active');ua.style.setProperty('display','none','important')}
-  else if(ua&&canUa)ua.style.removeProperty('display');
-
-  return {role:r,allowed:[...allowed]};
-}
-
-// Override legacy role functions so other code sees same rules.
-window.allowedViewsForRole=allowedFor;
-window.can=function(view){
-  if(!window.currentSession)return true;
-  return allowedFor(normRole()).includes(view);
-};
-window.YardivoRoleAccessFinal={apply,roleViews:allowedFor};
-
-function safeHomeForRole(){
-  if(!window.currentSession)return;
-  const r=normRole();
-  const active=document.querySelector('.view.active');
-  if(active && !allowedFor(r).includes(active.id)){
-    active.classList.remove('active');
-    const home=document.getElementById('homeMenu')||document.getElementById('checkin');
-    if(home){home.classList.add('active');home.style.removeProperty('display')}
-  }
-}
-
-window.addEventListener('load',()=>setTimeout(()=>{apply();safeHomeForRole()},50));
-document.addEventListener('click',e=>{
-  if(e.target.closest('[data-view],[data-home-target]')) setTimeout(()=>{apply();safeHomeForRole()},0);
-},true);
-
-// Detect login/session changes quickly, before slower legacy intervals can flash forbidden items.
-let lastSig='';
-setInterval(()=>{
-  let sig='';
-  try{sig=String(currentSession?.username||currentSession?.user||'')+'|'+normRole()}catch(e){}
-  if(sig!==lastSig){lastSig=sig;apply();safeHomeForRole()}
-  else apply();
-},300);
-
-})();
-</script>
-
-
-<style id="yardivo-overview-master-suppliers-style">
-.ov-master-summary{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin:12px 0}
-.ov-master-kpi{padding:10px;border:1px solid #20394c;border-radius:7px;background:#081622}
-.ov-master-kpi small{display:block;color:#7891a5;font-size:7px;font-weight:900}
-.ov-master-kpi strong{display:block;margin-top:4px;font-size:16px}
-.ov-master-empty{padding:13px;border:1px dashed #2a465b;border-radius:7px;background:#081521;color:#8097a9;font-size:9px}
-.ov-master-scoreline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.ov-master-score10{font-size:28px;font-weight:1000}
-.ov-master-reliability{font-size:18px;font-weight:950}
-@media(max-width:1000px){.ov-master-summary{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:600px){.ov-master-summary{grid-template-columns:repeat(2,1fr)}}
-</style>
-<script id="yardivo-overview-master-suppliers">
-(function(){
-'use strict';
-
-function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function anns(){try{return Array.isArray(announcements)?announcements:[]}catch(e){return []}}
-function incs(){try{return Array.isArray(incidents)?incidents:[]}catch(e){return []}}
-function allSupplierNames(){
-  const set=new Set();
-  try{(suppliers||[]).forEach(s=>{if(s)set.add(String(s))})}catch(e){}
-  anns().forEach(a=>{if(a?.supplier)set.add(String(a.supplier))});
-  incs().forEach(i=>{if(i?.supplier)set.add(String(i.supplier))});
-  return [...set].sort((a,b)=>a.localeCompare(b,'hr'));
-}
-function whOk(x){
-  try{return typeof whMatch==='function'?whMatch(x):true}catch(e){return true}
-}
-function actual(a){
-  try{return typeof actualDateTime==='function'?!!actualDateTime(a):!!(a.actualDate&&a.actualTime)}catch(e){return !!(a.actualDate&&a.actualTime)}
-}
-function delay(a){
-  try{const d=delayMinutes(a);return d==null?null:Number(d)}catch(e){return null}
+  return null;
 }
 function fmtDelay(n){
   if(n==null||!Number.isFinite(n))return '—';
@@ -17061,32 +16707,90 @@ function fmtDelay(n){
 function stat(a){
   try{return operationalPlanStatus(a)||normalizedPlanStatus(a)||a.status||'Najavljeno'}catch(e){return a.status||'Najavljeno'}
 }
+function statusNorm(a){return String(stat(a)||'').toLocaleUpperCase('hr-HR')}
+function isNoShow(a){return /NO.?SHOW|NIJE DOŠAO|NIJE DOSAO/.test(statusNorm(a)) || !!a?.noShow}
+function isRejected(a){return /ODBIJ/.test(statusNorm(a)) || !!a?.rejectedAt}
+function isReceived(a){return /ZAPRIM|ZAVRŠ|ZAVRS/.test(statusNorm(a)) || !!(a?.receivedAt||a?.completedAt)}
+function isUnannounced(a){return a?.arrivalType==='UNANNOUNCED'||a?.unannounced===true}
+function changeCount(a){
+  let n=Array.isArray(a?.changeHistory)?a.changeHistory.length:0;
+  if(a?.rescheduledAt&&!n)n=1;
+  if(a?.autoReplannedAt&&!n)n=1;
+  return n;
+}
+function unloadMinutes(a){
+  const start=a?.unloadStartedAt||a?.dockArrivalAt||a?.dockAt||a?.atDockAt;
+  const end=a?.receivedAt||a?.completedAt||a?.rejectedAt;
+  if(!start||!end)return null;
+  const x=new Date(start),y=new Date(end);
+  if(isNaN(x)||isNaN(y))return null;
+  const m=Math.round((y-x)/60000);return m>=0&&m<1440?m:null;
+}
+function scoreColor(p){
+  /* 0 = red, 50 = amber, 100 = green */
+  const n=Math.max(0,Math.min(100,Number(p)||0));
+  const hue=Math.round(n*1.2);
+  return `hsl(${hue} 72% ${n>70?40:45}%)`;
+}
+function scoreClass(p){return p>=80?'good':p>=55?'mid':'bad'}
+
 function supplierStat(name, allA, allI){
   const data=allA.filter(a=>a.supplier===name);
-  const arrived=data.filter(actual);
+  /* Future appointments are visible in history but never penalize reliability. */
+  const evaluated=data.filter(due);
+  const arrived=evaluated.filter(actual);
   const late=arrived.filter(a=>(delay(a)||0)>15);
   const on=Math.max(0,arrived.length-late.length);
-  const lateVals=late.map(delay).filter(v=>v!=null);
+  const lateVals=late.map(delay).filter(v=>v!=null&&Number.isFinite(v));
   const avgLate=lateVals.length?Math.round(lateVals.reduce((x,y)=>x+y,0)/lateVals.length):0;
-  const noShow=data.filter(a=>/NO.?SHOW|NIJE DOŠAO/i.test(stat(a))).length;
-  const rejected=data.filter(a=>/ODBIJ/i.test(stat(a))).length;
-  const unannounced=data.filter(a=>a.arrivalType==='UNANNOUNCED').length;
-  const incidents=allI.filter(i=>i.supplier===name).length;
-  const pallets=data.reduce((s,a)=>s+Number(a.pallets||0),0);
+  const noShow=evaluated.filter(isNoShow).length;
+  const rejected=evaluated.filter(isRejected).length;
+  const received=evaluated.filter(isReceived).length;
+  const unannounced=evaluated.filter(isUnannounced).length;
+  const incidents=allI.filter(i=>i.supplier===name && (!i.date||String(i.date)<=localToday())).length;
+  const pallets=evaluated.reduce((s,a)=>s+Number(a.pallets||0),0);
+  const changes=evaluated.reduce((s,a)=>s+changeCount(a),0);
+  const unloadVals=evaluated.map(unloadMinutes).filter(v=>v!=null);
+  const avgUnload=unloadVals.length?Math.round(unloadVals.reduce((a,b)=>a+b,0)/unloadVals.length):null;
   const punctuality=arrived.length?Math.round(on/arrived.length*100):null;
 
+  /* Reliability model, 0–100.
+     45% punctuality
+     25% delivery success (no rejected/no-show)
+     15% incident-free
+      5% announced-arrival compliance
+      5% schedule stability
+      5% completed receipt evidence
+     Additional severe-delay penalty keeps chronic long delays visible. */
   let reliability=null;
-  if(arrived.length){
-    reliability=100;
-    reliability-=Math.min(40,(late.length/arrived.length)*40);
-    reliability-=Math.min(20,(noShow/Math.max(1,data.length))*35);
-    reliability-=Math.min(15,(incidents/Math.max(1,data.length))*25);
-    reliability-=Math.min(15,(rejected/Math.max(1,data.length))*25);
-    reliability-=Math.min(10,(unannounced/Math.max(1,data.length))*20);
-    reliability=Math.max(0,Math.min(100,Math.round(reliability)));
+  if(evaluated.length){
+    const denom=Math.max(1,evaluated.length);
+    const arrivalDen=Math.max(1,arrived.length);
+
+    const punctualComponent=arrived.length?(on/arrivalDen)*45:0;
+    const failed=Math.min(denom,noShow+rejected);
+    const successComponent=(1-failed/denom)*25;
+    const incidentComponent=(1-Math.min(1,incidents/denom))*15;
+    const announcedComponent=(1-Math.min(1,unannounced/denom))*5;
+    const changeRate=Math.min(1,changes/denom);
+    const stabilityComponent=(1-changeRate)*5;
+    const completedEvidence=Math.min(denom,received+rejected);
+    const completionComponent=(completedEvidence/denom)*5;
+    const severeDelayPenalty=avgLate>30?Math.min(12,(avgLate-30)/5):0;
+
+    reliability=Math.round(
+      punctualComponent+successComponent+incidentComponent+
+      announcedComponent+stabilityComponent+completionComponent-severeDelayPenalty
+    );
+    reliability=Math.max(0,Math.min(100,reliability));
   }
-  const score10=reliability==null?null:Math.max(1,Math.min(10,Math.round(reliability/10)));
-  return {name,data,arrived:arrived.length,on,late:late.length,avgLate,noShow,rejected,unannounced,incidents,pallets,punctuality,reliability,score10};
+
+  const score10=reliability==null?null:Math.max(0,Math.min(10,Math.round(reliability/10)));
+  return {
+    name,data,evaluated:evaluated.length,arrived:arrived.length,on,late:late.length,avgLate,
+    noShow,rejected,received,unannounced,incidents,pallets,changes,avgUnload,
+    punctuality,reliability,score10
+  };
 }
 function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
 
@@ -17118,6 +16822,12 @@ function render(){
   setText('ovOnTime',arrived.length?`${Math.round(on/arrived.length*100)}%`:'0%');
   setText('ovAvgDelay',fmtDelay(avgLate));
   setText('ovIncidents',scopedI.length);
+  const scopedDue=scopedA.filter(due);
+  const totalChanges=scopedDue.reduce((s,a)=>s+changeCount(a),0);
+  const unloads=scopedDue.map(unloadMinutes).filter(v=>v!=null);
+  const avgUnloadAll=unloads.length?Math.round(unloads.reduce((a,b)=>a+b,0)/unloads.length):0;
+  setText('ovChanges',totalChanges);
+  setText('ovAvgUnload',unloads.length?`${avgUnloadAll} min`:'—');
 
   const table=document.getElementById('supplierPerformance');
   const q=(document.getElementById('overviewSearch')?.value||'').trim().toLocaleLowerCase('hr-HR');
@@ -17127,7 +16837,7 @@ function render(){
       <td><strong>${esc(s.name)}</strong></td>
       <td>${s.arrived}</td><td>${s.on}</td><td>${s.late}</td><td>${s.avgLate?fmtDelay(s.avgLate):'—'}</td>
       <td>${s.incidents}</td>
-      <td><span class="score ${s.reliability==null?'mid':s.reliability>=90?'good':s.reliability>=70?'mid':'bad'}">${s.score10==null?'—':s.score10+'/10'} · ${s.reliability==null?'—':s.reliability+'%'}</span></td>
+      <td><span class="score ${s.reliability==null?'mid':scoreClass(s.reliability)}" style="${s.reliability==null?'':`border-color:${scoreColor(s.reliability)};color:${scoreColor(s.reliability)}`}">${s.score10==null?'—':s.score10+'/10'} · ${s.reliability==null?'—':s.reliability+'%'}</span></td>
     </tr>`).join(''):'<tr><td colspan="7"><div class="overview-empty">Nema dobavljača.</div></td></tr>';
     table.querySelectorAll('[data-master-supplier]').forEach(tr=>tr.onclick=()=>{select.value=tr.dataset.masterSupplier;render()});
   }
@@ -17135,13 +16845,17 @@ function render(){
 
   const chart=document.getElementById('overviewSupplierChart');
   if(chart){
-    const chartRows=selected?stats.filter(s=>s.name===selected):stats;
+    const chartRows=(selected?stats.filter(s=>s.name===selected):stats.slice())
+      .sort((a,b)=>(b.reliability??-1)-(a.reliability??-1)||b.evaluated-a.evaluated);
     chart.innerHTML=chartRows.length?chartRows.map(s=>{
-      const r=s.reliability||0;
-      return `<div class="overview-chart-col ${selected===s.name?'selected':''}" data-master-chart="${esc(s.name)}">
-        <div class="overview-chart-value">${s.score10==null?'—':s.score10+'/10'}</div>
-        <div class="overview-chart-bar-wrap"><div class="overview-chart-bar ${s.reliability==null?'mid':s.reliability>=90?'good':s.reliability>=70?'mid':'bad'}" style="height:${Math.max(3,r)}%"></div></div>
-        <div class="overview-chart-name">${esc(s.name)}<br>${s.reliability==null?'bez podataka':s.reliability+'%'}</div>
+      const r=s.reliability==null?0:s.reliability;
+      const color=scoreColor(r);
+      return `<div class="overview-chart-col ${selected===s.name?'selected':''}" data-master-chart="${esc(s.name)}" title="${esc(s.name)} · ${s.reliability==null?'bez ocjene':s.reliability+'%'}">
+        <div class="overview-chart-value" style="color:${s.reliability==null?'#80909a':color}">${s.reliability==null?'—':s.reliability+'%'}</div>
+        <div class="overview-chart-bar-wrap">
+          <div class="overview-chart-bar" style="height:${s.reliability==null?3:Math.max(3,r)}%;background:${s.reliability==null?'#465159':color};box-shadow:0 0 12px color-mix(in srgb, ${s.reliability==null?'#465159':color} 35%, transparent)"></div>
+        </div>
+        <div class="overview-chart-name">${esc(s.name)}<br><span>${s.evaluated} obrađeno · ${s.score10==null?'—':s.score10+'/10'}</span></div>
       </div>`;
     }).join(''):'<div class="overview-empty">Nema dobavljača.</div>';
     chart.querySelectorAll('[data-master-chart]').forEach(el=>el.onclick=()=>{select.value=el.dataset.masterChart;render()});
@@ -17162,9 +16876,10 @@ function render(){
           <div><small>POUZDANOST</small><div class="ov-master-reliability">${chosen.reliability==null?'—':chosen.reliability+'%'}</div></div>
         </div>
       </div>
-      ${chosen.reliability==null?'<div class="ov-master-empty">Dobavljač je u master listi, ali još nema dovoljno evidentiranih stvarnih dolazaka za izračun Scorea i Pouzdanosti.</div>':''}
+      ${chosen.reliability==null?'<div class="ov-master-empty">Dobavljač je u master listi, ali još nema završene/dospjele operativne evidencije za izračun Scorea i Pouzdanosti.</div>':''}
       <div class="ov-master-summary">
-        <div class="ov-master-kpi"><small>DOLASCI</small><strong>${chosen.arrived}</strong></div>
+        <div class="ov-master-kpi"><small>OBRAĐENE ISPORUKE</small><strong>${chosen.evaluated}</strong></div>
+        <div class="ov-master-kpi"><small>STVARNI DOLASCI</small><strong>${chosen.arrived}</strong></div>
         <div class="ov-master-kpi"><small>NA VRIJEME</small><strong>${chosen.on}</strong></div>
         <div class="ov-master-kpi"><small>TOČNOST</small><strong>${chosen.punctuality==null?'—':chosen.punctuality+'%'}</strong></div>
         <div class="ov-master-kpi"><small>KAŠNJENJA</small><strong>${chosen.late}</strong></div>
@@ -17172,7 +16887,10 @@ function render(){
         <div class="ov-master-kpi"><small>INCIDENTI</small><strong>${chosen.incidents}</strong></div>
         <div class="ov-master-kpi"><small>NO-SHOW</small><strong>${chosen.noShow}</strong></div>
         <div class="ov-master-kpi"><small>ODBIJENO</small><strong>${chosen.rejected}</strong></div>
+        <div class="ov-master-kpi"><small>ZAPRIMLJENO</small><strong>${chosen.received}</strong></div>
         <div class="ov-master-kpi"><small>NENAJAVLJENI</small><strong>${chosen.unannounced}</strong></div>
+        <div class="ov-master-kpi"><small>PROMJENE TERMINA</small><strong>${chosen.changes}</strong></div>
+        <div class="ov-master-kpi"><small>AVG ISTOVAR</small><strong>${chosen.avgUnload==null?'—':chosen.avgUnload+' min'}</strong></div>
         <div class="ov-master-kpi"><small>PALETE</small><strong>${chosen.pallets}</strong></div>
       </div>
       <div class="supplier-detail-box"><h3>ZADNJIH 10 NAJAVA</h3>
@@ -19913,7 +19631,14 @@ function createEngine(host,mode){
  if(!window.THREE||!host)return null;
  const scene=new THREE.Scene();scene.background=new THREE.Color(0x0b0e0c);scene.fog=new THREE.FogExp2(0x0b0e0c,.009);
  const camera=new THREE.PerspectiveCamera(44,1,.1,400);
- const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
+ let renderer;
+ try{
+   renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
+ }catch(err){
+   host.insertAdjacentHTML('beforeend','<div class="y3d-webgl-error" style="position:absolute;inset:0;display:grid;place-items:center;color:#ff9c9c;font-size:10px;background:#111">WEBGL NIJE DOSTUPAN U OVOM BROWSERU</div>');
+   console.error('YARDIVO 3D WebGL:',err);
+   return null;
+ }
  renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
  renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
  host.appendChild(renderer.domElement);
@@ -19932,6 +19657,15 @@ function createEngine(host,mode){
  // gate house and gate
  box(scene,7,3.8,6,0x343a37,-34,1.9,23);box(scene,9,.25,.4,0xe5e5df,-26,.8,25,{rough:.45,metal:.1});
  const barrier=box(scene,8,.18,.22,0xdedfdc,-26,1.1,24.5,{rough:.4,metal:.1});barrier.rotation.y=.05;
+ // entrance/exit asphalt lanes — always visible even with zero announcements
+ const laneMat=new THREE.MeshBasicMaterial({color:0x39423d,transparent:true,opacity:.9});
+ for(let i=0;i<6;i++){
+   const dash=new THREE.Mesh(new THREE.PlaneGeometry(3.4,.16),laneMat);
+   dash.rotation.x=-Math.PI/2;dash.position.set(-30+i*5.4,.035,18);scene.add(dash);
+ }
+ const inMark=labelSprite('ULAZ');inMark.scale.set(4.2,.8,1);inMark.position.set(-35,2.2,16);scene.add(inMark);
+ const outMark=labelSprite('IZLAZ');outMark.scale.set(4.2,.8,1);outMark.position.set(-35,2.2,26);scene.add(outMark);
+
 
  // warehouse solid cuboid, upright
  box(scene,64,8.5,13,0xd9dcda,7,4.25,-22,{rough:.72,metal:.08});
@@ -20081,15 +19815,45 @@ document.addEventListener('click',e=>{
  if(e.target.closest('[data-view="liveYard"],[data-home-target="liveYard"]'))setTimeout(forceLive3D,180);
 },true);
 
-window.addEventListener('load',()=>setTimeout(()=>{enforceRoles();ensureLiveHost();forceLive3D()},1900));
+function bootReal3D(){
+ enforceRoles();
+ if(!window.THREE){
+   const h=document.getElementById('yardivoReal3DHost');
+   if(h&&!h.querySelector('.y3d-engine-loading')){
+     const n=document.createElement('div');n.className='y3d-engine-loading';
+     n.style.cssText='position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:10px 13px;border:1px solid #34463b;border-radius:8px;background:#111714;color:#9eb4a6;font-size:8px;z-index:8';
+     n.textContent='3D ENGINE · UČITAVANJE…';h.appendChild(n);
+   }
+   return;
+ }
+ document.querySelectorAll('.y3d-engine-loading').forEach(x=>x.remove());
+ ensureLiveHost();forceLive3D();ensureWar3D();
+}
+window.addEventListener('yardivo-three-ready',()=>setTimeout(bootReal3D,0));
+window.addEventListener('load',()=>setTimeout(bootReal3D,900));
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(()=>{updateLive();ensureWar3D()},80)});
-setInterval(()=>{enforceRoles();updateLive();ensureWar3D()},2500);
+setInterval(()=>{enforceRoles();if(window.THREE){ensureLiveHost();updateLive();ensureWar3D()}else bootReal3D()},1800);
 
 /* Existing War Room renderer rewrites #wrYardCanvas every 10s. Mutation observer remounts WebGL immediately. */
 const warObs=new MutationObserver(()=>setTimeout(ensureWar3D,0));
 window.addEventListener('load',()=>setTimeout(()=>{const c=document.getElementById('wrYardCanvas');if(c)warObs.observe(c,{childList:true})},2300));
 
 window.YardivoReal3D={refresh:updateLive,force3D:forceLive3D,war:ensureWar3D};
+})();
+</script>
+
+
+<script id="yardivo-overview-methodology-note-v2">
+(function(){
+function ensure(){
+ const chart=document.getElementById('overviewSupplierChart');if(!chart)return;
+ const panel=chart.closest('.panel');if(!panel||panel.querySelector('.overview-reliability-legend-v2'))return;
+ const x=document.createElement('div');x.className='overview-reliability-legend-v2';
+ x.innerHTML='<i></i><strong>0–100% POUZDANOST</strong><span>crveno = rizično · žuto = srednje · zeleno = pouzdano</span><span>Formula: točnost 45% · uspjeh isporuke 25% · bez incidenata 15% · najavljen dolazak 5% · stabilnost termina 5% · završena evidencija 5%</span>';
+ chart.insertAdjacentElement('beforebegin',x);
+}
+window.addEventListener('load',()=>setTimeout(ensure,900));
+document.addEventListener('click',e=>{if(e.target.closest('[data-view="overview"],[data-home-target="overview"]'))setTimeout(ensure,100)},true);
 })();
 </script>
 
