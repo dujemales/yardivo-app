@@ -5520,6 +5520,189 @@ html[data-theme="light"] .yam-busy{background:#fde7ea;color:#94404b;border-color
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="YARDIVO">
 
+
+<style id="yardivo-theme-presets-v1-style">
+/* =========================================================
+   YARDIVO THEME PRESETS v1
+   Main Light/Dark switch remains authoritative.
+   Preset is local-only and does not sync to other users.
+   ========================================================= */
+#yardivoThemePresetBox{
+  position:fixed;
+  top:62px;
+  right:18px;
+  z-index:10018;
+  min-width:152px;
+  padding:7px;
+  border:1px solid #31536b;
+  border-radius:10px;
+  background:rgba(7,23,34,.94);
+  box-shadow:0 8px 26px rgba(0,0,0,.24);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+#yardivoThemePresetBox .ytp-label{
+  display:block;
+  margin:0 0 5px;
+  padding:0 2px;
+  color:#708fa2;
+  font:900 6px/1.2 Arial,sans-serif;
+  letter-spacing:.55px;
+  text-transform:uppercase;
+}
+#yardivoThemePresetBox .ytp-options{
+  display:flex;
+  gap:4px;
+  flex-wrap:wrap;
+}
+#yardivoThemePresetBox button{
+  min-height:25px;
+  padding:0 7px;
+  border:1px solid #35586d;
+  border-radius:7px;
+  background:#0b2434;
+  color:#a9c0cc;
+  font:900 6px/1 Arial,sans-serif;
+  cursor:pointer;
+  transition:.15s ease;
+}
+#yardivoThemePresetBox button:hover{transform:translateY(-1px);border-color:#5d8093}
+#yardivoThemePresetBox button.active{
+  border-color:#75a8c4;
+  background:#15364a;
+  color:#eff9fd;
+  box-shadow:0 0 0 1px rgba(117,168,196,.13) inset;
+}
+#yardivoThemePresetBox [data-for-mode]{display:none}
+html[data-theme="light"] #yardivoThemePresetBox [data-for-mode="light"],
+html[data-theme="dark"] #yardivoThemePresetBox [data-for-mode="dark"]{display:flex}
+html[data-theme="light"] #yardivoThemePresetBox{
+  background:rgba(255,255,255,.95);
+  border-color:#c8dbe5;
+  box-shadow:0 8px 26px rgba(30,70,95,.12);
+}
+html[data-theme="light"] #yardivoThemePresetBox .ytp-label{color:#78909c}
+html[data-theme="light"] #yardivoThemePresetBox button{
+  background:#f5fafc;color:#4d6e7e;border-color:#c8dae3;
+}
+html[data-theme="light"] #yardivoThemePresetBox button.active{
+  background:#e9f4f8;color:#20485e;border-color:#83afc2;
+}
+@media(max-width:650px){
+  #yardivoThemePresetBox{top:51px;right:10px;min-width:135px;padding:6px}
+  #yardivoThemePresetBox button{padding:0 6px;font-size:5.5px}
+}
+
+/* ---------- LIGHT · WHITE ROSE ---------- */
+html[data-theme="light"][data-theme-preset="rose"] body,
+html[data-theme="light"][data-theme-preset="rose"] .app-shell,
+html[data-theme="light"][data-theme-preset="rose"] .view,
+html[data-theme="light"][data-theme-preset="rose"] main{
+  background:#fff8fa!important;
+  color:#3b2630!important;
+}
+html[data-theme="light"][data-theme-preset="rose"] .topbar,
+html[data-theme="light"][data-theme-preset="rose"] header,
+html[data-theme="light"][data-theme-preset="rose"] .sidebar,
+html[data-theme="light"][data-theme-preset="rose"] .nav-shell{
+  background:#fffafb!important;
+  border-color:#ecd4dc!important;
+}
+html[data-theme="light"][data-theme-preset="rose"] .panel,
+html[data-theme="light"][data-theme-preset="rose"] .card,
+html[data-theme="light"][data-theme-preset="rose"] .stat-card,
+html[data-theme="light"][data-theme-preset="rose"] .overview-card,
+html[data-theme="light"][data-theme-preset="rose"] .dashboard-card,
+html[data-theme="light"][data-theme-preset="rose"] .schedule-board{
+  background:#ffffff!important;
+  border-color:#ecd6de!important;
+  box-shadow:0 8px 26px rgba(153,78,104,.06)!important;
+}
+html[data-theme="light"][data-theme-preset="rose"] input,
+html[data-theme="light"][data-theme-preset="rose"] select,
+html[data-theme="light"][data-theme-preset="rose"] textarea{
+  background:#fff!important;
+  color:#412932!important;
+  border-color:#e6cbd5!important;
+}
+html[data-theme="light"][data-theme-preset="rose"] .primary,
+html[data-theme="light"][data-theme-preset="rose"] button.primary,
+html[data-theme="light"][data-theme-preset="rose"] .action.primary{
+  background:#f3dfe7!important;
+  color:#713b51!important;
+  border-color:#d9aebe!important;
+}
+html[data-theme="light"][data-theme-preset="rose"] h1,
+html[data-theme="light"][data-theme-preset="rose"] h2,
+html[data-theme="light"][data-theme-preset="rose"] h3,
+html[data-theme="light"][data-theme-preset="rose"] strong{color:#432733}
+html[data-theme="light"][data-theme-preset="rose"] .badge,
+html[data-theme="light"][data-theme-preset="rose"] .chip{
+  border-color:#e2bfcc!important;
+}
+
+/* ---------- DARK · BLACK ---------- */
+html[data-theme="dark"][data-theme-preset="black"] body,
+html[data-theme="dark"][data-theme-preset="black"] .app-shell,
+html[data-theme="dark"][data-theme-preset="black"] .view,
+html[data-theme="dark"][data-theme-preset="black"] main{background:#000!important}
+html[data-theme="dark"][data-theme-preset="black"] .topbar,
+html[data-theme="dark"][data-theme-preset="black"] header,
+html[data-theme="dark"][data-theme-preset="black"] .sidebar,
+html[data-theme="dark"][data-theme-preset="black"] .nav-shell{background:#050505!important;border-color:#202020!important}
+html[data-theme="dark"][data-theme-preset="black"] .panel,
+html[data-theme="dark"][data-theme-preset="black"] .card,
+html[data-theme="dark"][data-theme-preset="black"] .stat-card,
+html[data-theme="dark"][data-theme-preset="black"] .overview-card,
+html[data-theme="dark"][data-theme-preset="black"] .dashboard-card,
+html[data-theme="dark"][data-theme-preset="black"] .schedule-board{background:#090909!important;border-color:#262626!important}
+html[data-theme="dark"][data-theme-preset="black"] input,
+html[data-theme="dark"][data-theme-preset="black"] select,
+html[data-theme="dark"][data-theme-preset="black"] textarea{background:#050505!important;border-color:#333!important;color:#f3f3f3!important}
+
+/* ---------- DARK · DARK GRAY ---------- */
+html[data-theme="dark"][data-theme-preset="gray"] body,
+html[data-theme="dark"][data-theme-preset="gray"] .app-shell,
+html[data-theme="dark"][data-theme-preset="gray"] .view,
+html[data-theme="dark"][data-theme-preset="gray"] main{background:#171a1d!important}
+html[data-theme="dark"][data-theme-preset="gray"] .topbar,
+html[data-theme="dark"][data-theme-preset="gray"] header,
+html[data-theme="dark"][data-theme-preset="gray"] .sidebar,
+html[data-theme="dark"][data-theme-preset="gray"] .nav-shell{background:#202428!important;border-color:#3a4147!important}
+html[data-theme="dark"][data-theme-preset="gray"] .panel,
+html[data-theme="dark"][data-theme-preset="gray"] .card,
+html[data-theme="dark"][data-theme-preset="gray"] .stat-card,
+html[data-theme="dark"][data-theme-preset="gray"] .overview-card,
+html[data-theme="dark"][data-theme-preset="gray"] .dashboard-card,
+html[data-theme="dark"][data-theme-preset="gray"] .schedule-board{background:#22272b!important;border-color:#41484e!important}
+html[data-theme="dark"][data-theme-preset="gray"] input,
+html[data-theme="dark"][data-theme-preset="gray"] select,
+html[data-theme="dark"][data-theme-preset="gray"] textarea{background:#1a1e21!important;border-color:#485158!important;color:#edf1f3!important}
+
+/* ---------- DARK · GREENY ---------- */
+html[data-theme="dark"][data-theme-preset="greeny"] body,
+html[data-theme="dark"][data-theme-preset="greeny"] .app-shell,
+html[data-theme="dark"][data-theme-preset="greeny"] .view,
+html[data-theme="dark"][data-theme-preset="greeny"] main{background:#06140f!important}
+html[data-theme="dark"][data-theme-preset="greeny"] .topbar,
+html[data-theme="dark"][data-theme-preset="greeny"] header,
+html[data-theme="dark"][data-theme-preset="greeny"] .sidebar,
+html[data-theme="dark"][data-theme-preset="greeny"] .nav-shell{background:#0a1e17!important;border-color:#244c3c!important}
+html[data-theme="dark"][data-theme-preset="greeny"] .panel,
+html[data-theme="dark"][data-theme-preset="greeny"] .card,
+html[data-theme="dark"][data-theme-preset="greeny"] .stat-card,
+html[data-theme="dark"][data-theme-preset="greeny"] .overview-card,
+html[data-theme="dark"][data-theme-preset="greeny"] .dashboard-card,
+html[data-theme="dark"][data-theme-preset="greeny"] .schedule-board{background:#0b2119!important;border-color:#285442!important}
+html[data-theme="dark"][data-theme-preset="greeny"] input,
+html[data-theme="dark"][data-theme-preset="greeny"] select,
+html[data-theme="dark"][data-theme-preset="greeny"] textarea{background:#081912!important;border-color:#315d4a!important;color:#e0f5eb!important}
+html[data-theme="dark"][data-theme-preset="greeny"] .primary,
+html[data-theme="dark"][data-theme-preset="greeny"] button.primary{background:#123d2d!important;border-color:#35765a!important;color:#b2eccf!important}
+html[data-theme="dark"][data-theme-preset="greeny"] a,
+html[data-theme="dark"][data-theme-preset="greeny"] .accent{color:#70d3a2!important}
+</style>
+
 </head>
 <body>
 <button id="yardivoFullscreenBtn" type="button" aria-label="Uključi full screen" title="Full screen"><span class="fs-icon">⛶</span><span class="fs-label">FULL SCREEN</span></button>
@@ -19387,6 +19570,101 @@ document.addEventListener('click',e=>{if(e.target.closest('[data-view="announcem
 setInterval(()=>{if(canUse())ensureTools()},1800);
 
 window.YardivoAvailabilityMap={open,close,render,exportPdf};
+})();
+</script>
+
+
+<script id="yardivo-theme-presets-v1">
+(function(){
+'use strict';
+const KEY='yardivo_theme_preset_v1';
+
+function mode(){
+  return document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
+}
+function allowed(m){
+  return m==='light'?['original','rose']:['original','black','gray','greeny'];
+}
+function saved(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    const obj=raw?JSON.parse(raw):{};
+    return obj&&typeof obj==='object'?obj:{};
+  }catch(e){return{}}
+}
+function save(obj){
+  try{localStorage.setItem(KEY,JSON.stringify(obj))}catch(e){}
+}
+function current(m=mode()){
+  const s=saved(),v=s[m];
+  return allowed(m).includes(v)?v:'original';
+}
+function applyPreset(p,m=mode(),persist=true){
+  if(!allowed(m).includes(p))p='original';
+  document.documentElement.setAttribute('data-theme-preset',p);
+  if(persist){
+    const s=saved();s[m]=p;save(s);
+  }
+  renderButtons();
+  return p;
+}
+function renderButtons(){
+  const box=document.getElementById('yardivoThemePresetBox');if(!box)return;
+  const m=mode(),p=current(m);
+  box.querySelectorAll('button[data-preset]').forEach(b=>{
+    b.classList.toggle('active',b.dataset.mode===m&&b.dataset.preset===p);
+  });
+  const lab=box.querySelector('.ytp-label');
+  if(lab)lab.textContent=m==='light'?'LIGHT THEME':'DARK THEME';
+}
+function ensureBox(){
+  if(document.getElementById('yardivoThemePresetBox'))return;
+  const box=document.createElement('div');
+  box.id='yardivoThemePresetBox';
+  box.innerHTML=`
+    <span class="ytp-label">THEME</span>
+    <div class="ytp-options" data-for-mode="light">
+      <button type="button" data-mode="light" data-preset="original">ORIGINAL</button>
+      <button type="button" data-mode="light" data-preset="rose">WHITE ROSE</button>
+    </div>
+    <div class="ytp-options" data-for-mode="dark">
+      <button type="button" data-mode="dark" data-preset="original">ORIGINAL</button>
+      <button type="button" data-mode="dark" data-preset="black">BLACK</button>
+      <button type="button" data-mode="dark" data-preset="gray">DARK GRAY</button>
+      <button type="button" data-mode="dark" data-preset="greeny">GREENY</button>
+    </div>`;
+  document.body.appendChild(box);
+  box.addEventListener('click',e=>{
+    const b=e.target.closest('button[data-preset]');if(!b)return;
+    e.preventDefault();e.stopPropagation();
+    applyPreset(b.dataset.preset,b.dataset.mode,true);
+  });
+  renderButtons();
+}
+function syncWithMainTheme(){
+  const m=mode();
+  applyPreset(current(m),m,false);
+}
+window.addEventListener('load',()=>setTimeout(()=>{ensureBox();syncWithMainTheme()},250));
+document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{ensureBox();syncWithMainTheme()},40));
+
+/* Main switch changes data-theme; observe it and restore the preset chosen for that mode. */
+const obs=new MutationObserver(muts=>{
+  if(muts.some(x=>x.type==='attributes'&&x.attributeName==='data-theme')){
+    setTimeout(syncWithMainTheme,0);
+  }
+});
+obs.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+/* Older theme handlers in the app may only toggle body.light-mode. Keep presets in sync there too. */
+document.addEventListener('change',e=>{
+  if(e.target?.id==='themeToggle')setTimeout(syncWithMainTheme,0);
+},true);
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('#yardivoThemeSwitch'))setTimeout(syncWithMainTheme,0);
+},true);
+
+window.YardivoThemePresets={apply:applyPreset,current,refresh:syncWithMainTheme};
 })();
 </script>
 
