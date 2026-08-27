@@ -20046,5 +20046,78 @@ document.addEventListener('click',e=>{if(e.target.closest('[data-view="liveYard"
 })();
 </script>
 
+
+
+<!-- YARDIVO v2.8 HYBRID 2D/3D PATCH: flat yard floor + 3D warehouse/ramps/trucks -->
+<style id="yardivo-v28-hybrid-yard-style">
+/* Both Live Yard and War Room expose the same large, clickable 2D / 3D switch. */
+#yardivoFinalLiveYard .yf-toolbar,#yardivoFinalWarYard .yf-toolbar{z-index:1200!important;pointer-events:auto!important}
+#yardivoFinalLiveYard .yf-toolbar button,#yardivoFinalWarYard .yf-toolbar button{min-width:48px;height:32px;font-size:10px;pointer-events:auto!important;position:relative;z-index:1201}
+#yardivoFinalLiveYard .yf-stage,#yardivoFinalWarYard .yf-stage{perspective:none!important}
+
+/* 2D = clean operational top-down plan. */
+.yf-world.mode2d{transform:translate(-50%,-50%) scale(.88)!important;transform-style:flat!important}
+.yf-world.mode2d .yf-floor{transform-style:flat!important}
+.yf-world.mode2d .yf-building{transform:none!important;box-shadow:0 10px 22px #0008}
+.yf-world.mode2d .yf-building .roof,.yf-world.mode2d .yf-building .side{display:none!important}
+.yf-world.mode2d .yf-ramp{transform:none!important;box-shadow:0 5px 8px #0007}
+.yf-world.mode2d .yf-truck{transform:rotate(var(--truck-r,0deg))!important;filter:drop-shadow(4px 5px 4px #0008)!important}
+
+/* 3D HYBRID = FLOOR STAYS 2D. Only warehouse, ramps and trucks get volume. */
+.yf-world.mode3d{transform:translate(-50%,-50%) rotateZ(var(--yf-rz,-8deg)) scale(var(--yf-scale,.84))!important;transform-style:flat!important}
+.yf-world.mode3d .yf-floor{transform-style:flat!important;box-shadow:0 28px 55px #000c,inset 0 0 75px #0008!important}
+.yf-world.mode3d .yf-building{transform:none!important;filter:drop-shadow(18px 22px 15px #0009);z-index:8}
+.yf-world.mode3d .yf-building .front{background:linear-gradient(180deg,#e7ebe9 0 68%,#a3ada7 69% 100%)!important;box-shadow:inset 0 -22px 0 #89948e,0 14px 20px #0007!important}
+.yf-world.mode3d .yf-building .roof{display:block!important;left:-12px!important;top:-34px!important;width:704px!important;height:42px!important;transform:skewX(-28deg)!important;transform-origin:center!important;background:linear-gradient(180deg,#fafcfb,#c5cec9)!important;border:3px solid #929d97!important;box-shadow:0 8px 12px #0005!important}
+.yf-world.mode3d .yf-building .side{display:block!important;right:-31px!important;top:5px!important;width:32px!important;height:171px!important;transform:skewY(-38deg)!important;transform-origin:left top!important;background:linear-gradient(90deg,#8d9992,#626d67)!important}
+.yf-world.mode3d .yf-ramp{transform:none!important;box-shadow:7px 9px 0 #050706,10px 13px 14px #0008!important;border-bottom-width:9px!important;z-index:12}
+.yf-world.mode3d .yf-ramp:before{content:"";position:absolute;left:4px;right:-8px;top:-8px;height:8px;background:#88938d;transform:skewX(-38deg);transform-origin:left bottom;border:1px solid #606b65}
+.yf-world.mode3d .yf-truck{transform:rotate(var(--truck-r,0deg))!important;filter:drop-shadow(10px 12px 7px #000a)!important;z-index:15}
+.yf-world.mode3d .yf-trailer{box-shadow:inset -10px -8px 0 #9ea8a2,6px 7px 0 #747e78!important}
+.yf-world.mode3d .yf-trailer:before{content:"";position:absolute;left:3px;right:-6px;top:-7px;height:8px;background:linear-gradient(90deg,#fff,#d4dbd7);transform:skewX(-36deg);border:1px solid #8b9690}
+.yf-world.mode3d .yf-cab{box-shadow:5px 6px 0 #7d8882!important}
+.yf-world.mode3d .yf-cab:before{content:"";position:absolute;left:3px;right:2px;top:-6px;height:7px;background:#eef2f0;transform:skewX(-28deg);border:1px solid #8b9690}
+.yf-world.mode3d .yf-gate{box-shadow:8px 10px 0 #171d1a,12px 15px 18px #0008!important}
+.yf-world.mode3d .yf-help:after{content:" · POD OSTAJE 2D"}
+
+/* Dock pulse must not re-introduce translateZ in hybrid mode. */
+.yf-world.mode3d .yf-truck.dock{animation:yfDockPulseV28 .82s ease-in-out infinite alternate!important}
+@keyframes yfDockPulseV28{to{filter:drop-shadow(0 0 14px #45e888) drop-shadow(10px 12px 7px #000a);transform:rotate(var(--truck-r,0deg)) scale(1.025)}}
+
+/* Make switch unmistakable in War Room. */
+#yardivoFinalWarYard .yf-toolbar:after{content:"PRIKAZ";order:-1;color:#789188;font:900 8px Arial;margin-right:2px}
+@media(max-width:1050px){.yf-world.mode2d{transform:translate(-50%,-50%) scale(.66)!important}.yf-world.mode3d{transform:translate(-50%,-50%) rotateZ(var(--yf-rz,-8deg)) scale(.64)!important}}
+</style>
+<script id="yardivo-v28-mode-switch-guard">
+(function(){
+ 'use strict';
+ function syncButton(host,mode){
+   if(!host)return;
+   var world=host.querySelector('.yf-world'); if(!world)return;
+   world.classList.toggle('mode2d',mode==='2d');
+   world.classList.toggle('mode3d',mode==='3d');
+   host.dataset.yfMode=mode;
+   host.querySelectorAll('[data-yf-mode]').forEach(function(b){b.classList.toggle('active',b.dataset.yfMode===mode)});
+   var help=host.querySelector('.yf-help'); if(help)help.style.display=mode==='3d'?'block':'none';
+ }
+ document.addEventListener('click',function(e){
+   var b=e.target.closest('[data-yf-mode]'); if(!b)return;
+   var host=b.closest('#yardivoFinalLiveYard,#yardivoFinalWarYard'); if(!host)return;
+   syncButton(host,b.dataset.yfMode);
+ },true);
+ function label(){
+   ['yardivoFinalLiveYard','yardivoFinalWarYard'].forEach(function(id){
+     var h=document.getElementById(id);if(!h)return;
+     var b3=h.querySelector('[data-yf-mode="3d"]');if(b3)b3.textContent='3D';
+     var b2=h.querySelector('[data-yf-mode="2d"]');if(b2)b2.textContent='2D';
+     var meta=h.querySelector('.yf-toolbar b');if(meta&&!meta.dataset.v28){meta.dataset.v28='1';meta.title='2D tlocrt / 3D objekti na ravnom 2D podu'}
+   });
+ }
+ window.addEventListener('load',function(){setTimeout(label,1400)});
+ setInterval(label,1800);
+ window.YardivoHybridMode={set:function(where,mode){syncButton(document.getElementById(where==='war'?'yardivoFinalWarYard':'yardivoFinalLiveYard'),mode)}};
+})();
+</script>
+
 </body>
 </html>
