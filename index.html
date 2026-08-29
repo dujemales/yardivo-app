@@ -5999,6 +5999,60 @@ html[data-theme="dark"][data-theme-preset="greeny"] #yardivoWar3DHost{
 html:not(.yardivo-role-admin) #qrMobileSettingsPanel{display:none!important}
 @media(max-width:640px){.qr-mobile-setting-row{align-items:flex-start;flex-direction:column}.qr-mobile-toggle{width:100%;justify-content:space-between}.qr-mobile-toggle-label{text-align:left;order:-1}}
 </style>
+
+<style id="yardivo-v35-my-yard-brutal">
+/* V3.5 — MY YARD is the single yard view. Legacy Dvorište is removed. */
+#myYard{background:#101714!important}
+#myYard .myy-shell{background:
+ radial-gradient(circle at 50% 18%,#53605a 0,#313a36 36%,#1b221f 72%,#101512 100%)!important}
+#myYard .myy-toolbar{left:18px!important;right:18px!important;top:16px!important;flex-wrap:wrap!important;
+ background:linear-gradient(135deg,#0d1713f5,#17231df2)!important;border:1px solid #456254!important;
+ box-shadow:0 18px 45px #0008,inset 0 1px #ffffff0b!important;padding:10px 12px!important}
+#myYard .myy-toolbar strong{font-size:13px!important;letter-spacing:1.4px!important}
+#myYard .myy-date-tools{display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:wrap}
+#myYard .myy-date-tools button{min-width:34px!important}
+#myYard .myy-date-tools input{height:32px;border:1px solid #596861;border-radius:6px;background:#101b17;color:#eef6f1;
+ color-scheme:dark;padding:0 8px;font:900 9px Arial;outline:none}
+#myYard .myy-date-title{padding:5px 8px;border-radius:5px;background:#183426;border:1px solid #315e45;color:#6ee69a;font:1000 8px Arial;letter-spacing:.5px}
+#myYard .myy-stage{perspective:1450px!important;perspective-origin:50% 34%!important}
+#myYard .myy-floor{border:5px solid #4d5551!important;background:
+ linear-gradient(90deg,transparent 49.8%,#d9dfdc12 50%,transparent 50.2%),
+ repeating-linear-gradient(90deg,transparent 0 79px,#ffffff08 80px 81px),
+ repeating-linear-gradient(0deg,transparent 0 79px,#ffffff08 80px 81px),#666d69!important;
+ box-shadow:0 45px 90px #000b,inset 0 0 100px #0007!important}
+#myYard .myy-road{background:#3d4441!important;box-shadow:inset 0 8px 18px #0005,inset 0 -8px 18px #0004}
+#myYard .myy-building{left:235px!important;top:58px!important;width:710px!important;height:225px!important;transform:translateZ(58px)!important}
+#myYard .myy-front{background:
+ linear-gradient(180deg,#f9faf8 0,#e6e9e6 62%,#cdd2cf 100%)!important;
+ border:3px solid #9fa8a3!important;box-shadow:0 22px 34px #0008!important;padding-top:31px!important;
+ font-size:25px!important;letter-spacing:5px!important}
+#myYard .myy-front:before{content:"YARDIVO LOGISTICS";position:absolute;top:70px;left:0;right:0;text-align:center;
+ color:#89918d;font:900 8px Arial;letter-spacing:2px}
+#myYard .myy-front:after{content:"";position:absolute;left:24px;right:24px;bottom:18px;height:54px;
+ background:repeating-linear-gradient(90deg,#59615d 0 52px,#202522 52px 58px,#bd2929 58px 64px,#59615d 64px 82px);
+ border:2px solid #7e8782;opacity:.42}
+#myYard .myy-roof{width:710px!important;height:225px!important;background:
+ linear-gradient(135deg,#ffffff,#d8ddda 58%,#bfc6c2)!important;border-color:#9da6a1!important}
+#myYard .myy-roof:after{content:"WAREHOUSE";position:absolute;left:50%;top:45%;transform:translate(-50%,-50%) rotate(0deg);
+ color:#6b746f;font:1000 24px Arial;letter-spacing:5px}
+#myYard .myy-side{width:225px!important;height:225px!important;background:linear-gradient(90deg,#c7ccc9,#9fa7a2)!important}
+#myYard .myy-world.d3 .myy-building:after{content:"";position:absolute;left:8px;right:8px;bottom:-12px;height:12px;
+ background:#717a75;transform:rotateX(-90deg);transform-origin:top;box-shadow:0 8px 12px #0008}
+#myYard .myy-dock{top:271px!important;background:linear-gradient(90deg,#101312 0 67%,#171b19 67% 76%,#c9272d 76%)!important;
+ border:3px solid #090b0a!important;border-right-color:#e23a3f!important;box-shadow:0 10px 15px #0009!important}
+#myYard .myy-dock.busy{box-shadow:0 0 0 3px #e1373c,0 0 22px #d62c3180,0 10px 15px #000a!important}
+#myYard .myy-gate{background:linear-gradient(145deg,#f5f7f5,#aab2ad)!important;border-color:#6c7670!important}
+#myYard .myy-trailer{background:linear-gradient(#fff,#dfe4e1)!important;border-color:#727b76!important}
+#myYard .myy-cab{background:linear-gradient(135deg,#fff 0,#d6dcda 65%,#aeb7b2 100%)!important}
+#myYard .myy-label{background:#07100deb!important;border:1px solid #42564c;color:#f3f7f5!important;padding:4px 6px!important}
+#myYard .myy-empty{position:absolute;left:50%;top:72%;transform:translate(-50%,-50%) translateZ(20px);z-index:25;
+ padding:12px 18px;border-radius:8px;background:#101814e8;border:1px solid #52645b;color:#9eaaa4;font:900 9px Arial;letter-spacing:.4px}
+#myYard .myy-help{background:#0d1713ed!important;border-color:#41584c!important}
+@media(max-width:900px){
+ #myYard .myy-toolbar{right:10px!important;left:10px!important}
+ #myYard .myy-date-tools{width:100%;margin-left:0}
+}
+</style>
 </head>
 <body>
 <button id="yardivoFullscreenBtn" type="button" aria-label="Uključi full screen" title="Full screen"><span class="fs-icon">⛶</span><span class="fs-label">FULL SCREEN</span></button>
@@ -6474,7 +6528,6 @@ var currentSession=null;
         <button class="nav-btn active" data-view="dashboard"><span>▦</span> Nadzorna ploča</button>
         <button class="nav-btn" data-view="controlTower"><span>◉</span> Control Tower <b class="nav-badge" id="ctCriticalBadge" style="display:none">0</b></button>
         <button class="nav-btn" data-view="checkin"><span>▤</span> Prijava dolaska</button>
-        <button class="nav-btn" data-view="yard"><span>⌘</span> Dvorište</button>
         <button class="nav-btn" data-view="docks"><span>▥</span> Rampe</button>
         
         
@@ -6711,94 +6764,6 @@ var currentSession=null;
   </div>
 
   <div id="truckCards" class="truck-history-grid"></div>
-</section>
-
-      
-<section id="yard" class="view">
-  <div class="section-title">
-    <div>
-      <h1>DVORIŠTE</h1>
-      <p>Operativni tlocrt parkinga — kamioni se pojavljuju automatski kada Prijam postavi status U DVORIŠTU.</p>
-    </div>
-  </div>
-
-  <div class="yard-map-toolbar">
-    <div>
-      <strong id="yardMapWarehouseLabel">SKLADIŠTE</strong>
-      <small id="yardMapDateLabel"></small>
-    </div>
-    <div class="yard-map-kpis">
-      <span><b id="yardOccupiedCount">0</b> zauzeto</span>
-      <span><b id="yardFreeCount">0</b> slobodno</span>
-      <span><b id="yardWaitingCount">0</b> kamiona u dvorištu</span>
-    </div>
-  </div>
-
-  <div class="yard-map-legend">
-    <span><i style="background:#ff8b22"></i>U dvorištu</span>
-    <span><i style="background:#86ccff"></i>Smjer prema rampi</span>
-    <span><i style="background:#e8c238"></i>Na rampi</span>
-  </div>
-
-  <div class="yard-floorplan yardivo-live3d">
-    <div class="live3d-head">
-      <div>
-        <div class="live3d-kicker">● 3D OPERATIVNO DVORIŠTE</div>
-        <div class="live3d-sub">Live prikaz kamiona, parkinga, putanje i rampi</div>
-      </div>
-      <div class="live3d-view-switch"><button class="active">3D</button><button>2D</button></div><div class="live3d-camera-controls">
-  <button type="button" id="yardZoomOut" title="Umanji">−</button>
-  <span id="yardZoomLabel">100%</span>
-  <button type="button" id="yardZoomIn" title="Povećaj">+</button>
-  <button type="button" id="yardResetCamera" class="reset" title="Vrati početni pogled">RESET</button>
-</div>
-    </div>
-
-    <div class="live3d-camera-help">🖱 Povuci mišem za rotaciju 360° iz ptičje perspektive · kotačić za zoom · dvoklik za reset</div>
-    <div class="live3d-stage" id="yard3DStage">
-      <div class="live3d-camera-rig" id="yard3DCameraRig"><div class="live3d-ground" id="yard3DGround">
-        <div class="live3d-gate"><b>ULAZ / IZLAZ</b><span>→</span></div>
-        <div class="live3d-parking-title">PARKING / ČEKANJE</div>
-        <div id="yardGrid" class="live3d-parking"></div>
-        <div class="live3d-mainroad"><div class="road-dash"></div></div>
-        <div id="yardRouteLayer" class="live3d-routes"></div>
-
-        <div class="live3d-building warehouse-cuboid">
-          <div class="warehouse-face wh-front">
-            <div id="yardDockPreview" class="live3d-docks"></div>
-          </div>
-          <div class="warehouse-face wh-back"></div>
-          <div class="warehouse-face wh-left"></div>
-          <div class="warehouse-face wh-right"></div>
-          <div class="warehouse-face wh-top"><span>WAREHOUSE</span></div>
-        </div>
-      </div></div>
-
-      <aside class="live3d-ramp-panel">
-        <div class="ramp-panel-title">RAMPE · TRENUTNO STANJE</div>
-        <div id="yardRampStatePanel"></div>
-      </aside>
-    </div>
-
-    <div class="live3d-legend">
-      <span><i class="lg-yard"></i>Kamion u dvorištu</span>
-      <span><i class="lg-route"></i>Putanja do rampe</span>
-      <span><i class="lg-free"></i>Slobodna rampa</span>
-      <span><i class="lg-busy"></i>Zakačen na rampu</span>
-    </div>
-  </div></div>
-
-  <section class="panel" style="margin-top:12px">
-    <div class="panel-head">
-      <div>
-        <h2>KAMIONI TRENUTNO U DVORIŠTU</h2>
-        <small>Registracija, vozač, dobavljač, vrijeme ulaska i dodijeljena rampa.</small>
-      </div>
-    </div>
-    <div class="panel-body">
-      <div id="yardTruckList"></div>
-    </div>
-  </section>
 </section>
 
       
@@ -20598,30 +20563,106 @@ window.YardivoMyAnnouncements={render};
 #myYard .myy-world.d2 .myy-building{transform:none}.myy-world.d2 .myy-roof,.myy-world.d2 .myy-side{display:none}.myy-world.d2 .myy-dock,.myy-world.d2 .myy-gate,.myy-world.d2 .myy-bar{transform:none}.myy-world.d2 .myy-truck{transform:rotate(var(--tr,0deg))!important}
 @media(max-width:1050px){#myYard .myy-world.d2{transform:translate(-50%,-50%) scale(.66)}#myYard .myy-world.d3{transform:translate(-50%,-50%) rotateX(55deg) rotateZ(var(--rz,-10deg)) scale(.58)}}
 </style>
-<script id="yardivo-v33-my-yard">
+<script id="yardivo-v35-my-yard">
 (function(){
 'use strict';
-const st={mode:'3d',rz:-10,sc:.78,drag:false,x:0};
+const st={mode:'3d',rz:-10,sc:.78,drag:false,x:0,date:''};
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function data(){try{return Array.isArray(announcements)?announcements:[]}catch(e){return[]}}
 function wh(){try{return activeWarehouse&&activeWarehouse!=='ALL'?activeWarehouse:(currentSession?.location==='DU'?'W201':'W101')}catch(e){return'W101'}}
-function today(){return new Date().toISOString().slice(0,10)}
+function isoToday(){const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
+function addDays(s,n){const [y,m,d]=String(s).split('-').map(Number),x=new Date(y,m-1,d);x.setDate(x.getDate()+n);return [x.getFullYear(),String(x.getMonth()+1).padStart(2,'0'),String(x.getDate()).padStart(2,'0')].join('-')}
+function prettyDate(s){const [y,m,d]=String(s).split('-').map(Number);const x=new Date(y,m-1,d);return x.toLocaleDateString('hr-HR',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'}).toUpperCase()}
 function ramps(w){try{return Math.max(1,Number(YardivoRampConfig?.count?.(w)||WAREHOUSES?.[w]?.ramps||6))}catch(e){return 6}}
 function ensure(){
  if(document.getElementById('myYard'))return;
+ st.date=isoToday();
  const main=document.querySelector('.main');if(!main)return;
- const s=document.createElement('section');s.id='myYard';s.className='view';s.innerHTML='<div class="myy-shell"><div class="myy-toolbar"><i class="myy-live"></i><strong>MY YARD</strong><button data-myy="2d">2D</button><button data-myy="3d" class="active">3D</button><span class="myy-meta"></span></div><div class="myy-stage"><div class="myy-world d3"><div class="myy-floor"><div class="myy-road"></div><div class="myy-building"><div class="myy-front">WAREHOUSE</div><div class="myy-roof"></div><div class="myy-side"></div></div><div class="myy-gate"></div><div class="myy-bar"></div><div class="myy-sign">ULAZ → &nbsp;&nbsp; ← IZLAZ</div><div class="myy-docks"></div><div class="myy-trucks"></div></div></div><div class="myy-help">3D: POVUCI MIŠ = ROTACIJA · KOTAČIĆ = ZOOM</div></div>';main.appendChild(s);
- const nav=document.querySelector('.nav');if(nav&&!nav.querySelector('[data-view="myYard"]')){const b=document.createElement('button');b.className='nav-btn';b.dataset.view='myYard';b.innerHTML='<span>◆</span> MY YARD';const a=nav.querySelector('[data-view="yard"]');(a||nav.lastElementChild)?.insertAdjacentElement(a?'afterend':'beforebegin',b)}
- const world=s.querySelector('.myy-world');const apply=()=>{world.className='myy-world '+(st.mode==='3d'?'d3':'d2');world.style.setProperty('--rz',st.rz+'deg');world.style.setProperty('--sc',st.sc);s.querySelectorAll('[data-myy]').forEach(b=>b.classList.toggle('active',b.dataset.myy===st.mode));s.querySelector('.myy-help').style.display=st.mode==='3d'?'block':'none'};
- s.querySelectorAll('[data-myy]').forEach(b=>b.onclick=e=>{e.stopPropagation();st.mode=b.dataset.myy;apply()});s.addEventListener('pointerdown',e=>{if(st.mode!=='3d'||e.button!==0||e.target.closest('button'))return;st.drag=true;st.x=e.clientX});s.addEventListener('pointermove',e=>{if(!st.drag)return;st.rz+=(e.clientX-st.x)*.16;st.x=e.clientX;requestAnimationFrame(apply)});window.addEventListener('pointerup',()=>st.drag=false);s.addEventListener('wheel',e=>{if(st.mode!=='3d')return;e.preventDefault();st.sc=Math.max(.5,Math.min(1.08,st.sc-e.deltaY*.0006));requestAnimationFrame(apply)},{passive:false});apply();
+ const s=document.createElement('section');s.id='myYard';s.className='view';
+ s.innerHTML=`<div class="myy-shell">
+ <div class="myy-toolbar"><i class="myy-live"></i><strong>MY YARD</strong>
+ <button data-myy="2d">2D</button><button data-myy="3d" class="active">3D</button>
+ <span class="myy-meta"></span>
+ <div class="myy-date-tools">
+   <button type="button" data-day="-1" title="Prethodni dan">‹</button>
+   <button type="button" data-today>DANAS</button>
+   <button type="button" data-day="1" title="Sljedeći dan">›</button>
+   <input type="date" class="myy-date" aria-label="Odaberi datum">
+   <span class="myy-date-title"></span>
+ </div></div>
+ <div class="myy-stage"><div class="myy-world d3"><div class="myy-floor"><div class="myy-road"></div>
+ <div class="myy-building"><div class="myy-front">WAREHOUSE</div><div class="myy-roof"></div><div class="myy-side"></div></div>
+ <div class="myy-gate"></div><div class="myy-bar"></div><div class="myy-sign">ULAZ → &nbsp;&nbsp; ← IZLAZ</div>
+ <div class="myy-docks"></div><div class="myy-trucks"></div></div></div>
+ <div class="myy-help">3D: POVUCI MIŠ = ROTACIJA · KOTAČIĆ = ZOOM</div></div></div>`;
+ main.appendChild(s);
+ const nav=document.querySelector('.nav');
+ if(nav&&!nav.querySelector('[data-view="myYard"]')){
+   const b=document.createElement('button');b.className='nav-btn';b.dataset.view='myYard';b.innerHTML='<span>◆</span> MY YARD';
+   const docks=nav.querySelector('[data-view="docks"]');(docks||nav.lastElementChild)?.insertAdjacentElement(docks?'beforebegin':'beforebegin',b)
+ }
+ // Hard remove any legacy Dvorište button that may be recreated by old code.
+ document.querySelectorAll('[data-view="yard"]').forEach(x=>x.remove());
+ const world=s.querySelector('.myy-world');
+ const apply=()=>{world.className='myy-world '+(st.mode==='3d'?'d3':'d2');world.style.setProperty('--rz',st.rz+'deg');world.style.setProperty('--sc',st.sc);s.querySelectorAll('[data-myy]').forEach(b=>b.classList.toggle('active',b.dataset.myy===st.mode));s.querySelector('.myy-help').style.display=st.mode==='3d'?'block':'none'};
+ s.querySelectorAll('[data-myy]').forEach(b=>b.onclick=e=>{e.stopPropagation();st.mode=b.dataset.myy;apply()});
+ s.querySelectorAll('[data-day]').forEach(b=>b.onclick=e=>{e.stopPropagation();st.date=addDays(st.date||isoToday(),Number(b.dataset.day));render()});
+ s.querySelector('[data-today]').onclick=e=>{e.stopPropagation();st.date=isoToday();render()};
+ s.querySelector('.myy-date').onchange=e=>{if(e.target.value){st.date=e.target.value;render()}};
+ s.addEventListener('pointerdown',e=>{if(st.mode!=='3d'||e.button!==0||e.target.closest('button,input'))return;st.drag=true;st.x=e.clientX});
+ s.addEventListener('pointermove',e=>{if(!st.drag)return;st.rz+=(e.clientX-st.x)*.16;st.x=e.clientX;requestAnimationFrame(apply)});
+ window.addEventListener('pointerup',()=>st.drag=false);
+ s.addEventListener('wheel',e=>{if(st.mode!=='3d')return;e.preventDefault();st.sc=Math.max(.5,Math.min(1.08,st.sc-e.deltaY*.0006));requestAnimationFrame(apply)},{passive:false});
+ apply();
 }
-function stateOf(a){const s=String(a.status||'').toLowerCase();if(s.includes('odbij'))return'rejected';if(s.includes('zaprim')||s.includes('završ')||s.includes('izašao'))return'done';if(s.includes('rampi'))return'dock';if(s.includes('dvori')||s.includes('ček'))return'yard';return'incoming'}
-function pos(a,i,n){const q=stateOf(a),dock=Math.max(1,Math.min(n,Number(a.dock)||1));if(q==='dock')return{x:260+(dock-1)*Math.min(94,600/Math.max(1,n-1)),y:300,r:90};if(q==='yard')return{x:280+(i%5)*145,y:535+(i%2)*52,r:0};if(q==='rejected')return{x:25,y:590+(i%2)*42,r:180};if(q==='done')return{x:-145,y:420,r:180};return{x:-120-(i%3)*120,y:395+(i%2)*58,r:0}}
-function truck(a,i,n){const p=pos(a,i,n),q=stateOf(a);return `<div class="myy-truck ${q}" data-id="${esc(a.id)}" style="left:${p.x}px;top:${p.y}px;--tr:${p.r}deg;transform:translateZ(28px) rotate(${p.r}deg)"><div class="myy-label">${esc(a.supplier||'KAMION')} · ${esc(a.plannedPlate||a.arrivalPlate||'')}</div><div class="myy-trailer"></div><div class="myy-cab"></div><i class="myy-wheel myy-w1"></i><i class="myy-wheel myy-w2"></i><i class="myy-wheel myy-w3"></i></div>`}
-function render(){ensure();const s=document.getElementById('myYard');if(!s)return;const w=wh(),d=today(),n=ramps(w);s.querySelector('.myy-meta').textContent=`${w} · ${d} · LIVE STATUS`;const docks=s.querySelector('.myy-docks');docks.innerHTML=Array.from({length:n},(_,i)=>{const busy=data().some(a=>(a.warehouse||'W101')===w&&stateOf(a)==='dock'&&Number(a.dock)===i+1);let locked=false;try{locked=!!YardivoRampConfig?.isLocked?.(w,i+1)}catch(e){};return `<div class="myy-dock ${busy?'busy':''} ${locked?'locked':''}" style="left:${285+i*Math.min(94,600/Math.max(1,n-1))}px">R${i+1}</div>`}).join('');const list=data().filter(a=>(a.warehouse||'W101')===w&&(a.date===d||['yard','dock','done','rejected'].includes(stateOf(a)))).slice(-16);s.querySelector('.myy-trucks').innerHTML=list.map((a,i)=>truck(a,i,n)).join('')}
+function stateOf(a,selected){
+ const s=String(a.status||'').toLowerCase();
+ const today=isoToday();
+ if(selected>today && a.date===selected)return'incoming';
+ if(s.includes('odbij'))return'rejected';
+ if(s.includes('zaprim')||s.includes('završ')||s.includes('izašao'))return'done';
+ if(s.includes('rampi'))return'dock';
+ if(s.includes('dvori')||s.includes('ček'))return'yard';
+ return'incoming'
+}
+function pos(a,i,n,q){
+ const dock=Math.max(1,Math.min(n,Number(a.dock)||1));
+ if(q==='dock')return{x:250+(dock-1)*Math.min(96,620/Math.max(1,n-1)),y:310,r:90};
+ if(q==='yard')return{x:285+(i%5)*145,y:535+(i%2)*52,r:0};
+ if(q==='rejected')return{x:25,y:590+(i%2)*42,r:180};
+ if(q==='done')return{x:-145,y:420,r:180};
+ return{x:35+(i%5)*155,y:395+(i%2)*58,r:0}
+}
+function truck(a,i,n,selected){
+ const q=stateOf(a,selected),p=pos(a,i,n,q);
+ return `<div class="myy-truck ${q}" data-id="${esc(a.id)}" style="left:${p.x}px;top:${p.y}px;--tr:${p.r}deg;transform:translateZ(28px) rotate(${p.r}deg)">
+ <div class="myy-label">${esc(a.time||'--:--')} · ${esc(a.supplier||'KAMION')} · ${esc(a.plannedPlate||a.arrivalPlate||'')}</div>
+ <div class="myy-trailer"></div><div class="myy-cab"></div><i class="myy-wheel myy-w1"></i><i class="myy-wheel myy-w2"></i><i class="myy-wheel myy-w3"></i></div>`
+}
+function render(){
+ ensure();const s=document.getElementById('myYard');if(!s)return;
+ const w=wh(),d=st.date||isoToday(),n=ramps(w),today=isoToday();
+ const isToday=d===today;
+ s.querySelector('.myy-date').value=d;
+ s.querySelector('.myy-date-title').textContent=d===today?'DANAS · '+prettyDate(d):(d===addDays(today,1)?'SUTRA · ':'')+prettyDate(d);
+ const dayData=data().filter(a=>(a.warehouse||'W101')===w&&a.date===d);
+ s.querySelector('.myy-meta').textContent=`${w} · ${dayData.length} NAJAVA · ${isToday?'LIVE':'PLAN DANA'}`;
+ const docks=s.querySelector('.myy-docks');
+ docks.innerHTML=Array.from({length:n},(_,i)=>{
+   const busy=dayData.some(a=>stateOf(a,d)==='dock'&&Number(a.dock)===i+1);
+   const planned=dayData.some(a=>Number(a.dock)===i+1);
+   let locked=false;try{locked=!!YardivoRampConfig?.isLocked?.(w,i+1)}catch(e){}
+   return `<div class="myy-dock ${busy?'busy':''} ${locked?'locked':''}" style="left:${260+i*Math.min(96,620/Math.max(1,n-1))}px">R${i+1}${!isToday&&planned?' · PLAN':''}</div>`
+ }).join('');
+ const list=dayData.slice(-18);
+ const host=s.querySelector('.myy-trucks');
+ host.innerHTML=list.length?list.map((a,i)=>truck(a,i,n,d)).join(''):`<div class="myy-empty">NEMA NAJAVA ZA ${esc(prettyDate(d))}</div>`;
+}
 function show(){ensure();document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('myYard')?.classList.add('active');render()}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-view="myYard"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();show()},true);
-window.addEventListener('load',()=>setTimeout(()=>{ensure();render()},1200));setInterval(()=>{if(document.getElementById('myYard')?.classList.contains('active'))render()},1800);window.YardivoMyYard={render,show};
+window.addEventListener('load',()=>setTimeout(()=>{ensure();document.querySelectorAll('[data-view="yard"],#yard').forEach(x=>x.remove());render()},800));
+setInterval(()=>{document.querySelectorAll('[data-view="yard"],#yard').forEach(x=>x.remove());if(document.getElementById('myYard')?.classList.contains('active'))render()},1800);
+window.YardivoMyYard={render,show,setDate:function(d){st.date=d;render()}};
 })();
 </script>
 
@@ -20640,6 +20681,53 @@ window.addEventListener('load',()=>setTimeout(()=>{ensure();render()},1200));set
       }
     }catch(e){}
   },1200);
+})();
+</script>
+
+<style id="yardivo-v36-announcement-map-header-fix">
+/* Unos najave: uklanja dupli naslov RAMPA iz retka iznad vremena.
+   Lijevi stupac R1/R2/R3... ostaje nepromijenjen. */
+#announce .schedule-grid thead tr:nth-child(2) th:first-child,
+#announce .schedule-table thead tr:nth-child(2) th:first-child,
+#announce .map-grid thead tr:nth-child(2) th:first-child,
+#announce table thead tr.time-row th:first-child{
+  font-size:0!important;
+  color:transparent!important;
+}
+#announce .schedule-grid thead tr:nth-child(2) th:first-child::after,
+#announce .schedule-table thead tr:nth-child(2) th:first-child::after,
+#announce .map-grid thead tr:nth-child(2) th:first-child::after,
+#announce table thead tr.time-row th:first-child::after{
+  content:""!important;
+}
+</style>
+<script id="yardivo-v36-remove-double-rampa">
+(function(){
+ function clean(){
+   const view=document.getElementById('announce'); if(!view)return;
+   view.querySelectorAll('table thead tr').forEach(tr=>{
+     const cells=Array.from(tr.children);
+     if(cells.length<2)return;
+     const first=cells[0];
+     const txt=(first.textContent||'').trim().toUpperCase();
+     const rest=cells.slice(1).map(x=>(x.textContent||'').trim()).join(' ');
+     // Exact row from screenshot: first cell RAMPA, followed by time headers.
+     if(txt==='RAMPA' && /\b\d{2}:\d{2}\b/.test(rest)){
+       first.textContent='';
+       first.setAttribute('aria-label','');
+       first.dataset.yardivoRemovedDuplicateRampa='1';
+     }
+   });
+ }
+ window.addEventListener('load',()=>setTimeout(clean,300));
+ document.addEventListener('click',e=>{
+   if(e.target.closest('[data-view="announce"]'))setTimeout(clean,80);
+ },true);
+ const mo=new MutationObserver(()=>clean());
+ window.addEventListener('load',()=>{
+   const v=document.getElementById('announce');
+   if(v)mo.observe(v,{subtree:true,childList:true});
+ });
 })();
 </script>
 </body>
