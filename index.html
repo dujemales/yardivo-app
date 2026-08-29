@@ -5955,7 +5955,7 @@ html[data-theme="dark"][data-theme-preset="greeny"] #yardivoWar3DHost{
 .yf-wait{position:absolute;left:-122px;top:282px;width:104px;padding:7px 6px;border:1px dashed #53645b;background:#121914;color:#81958a;text-align:center;font:900 8px Arial;transform:translateZ(4px)}
 .yf-building{position:absolute;left:230px;top:52px;width:680px;height:176px;transform-style:preserve-3d;transform:translateZ(53px)}
 .yf-building .front{position:absolute;inset:0;background:linear-gradient(#dbe0dd,#a0aaa4);border:4px solid #808c85;box-sizing:border-box;box-shadow:0 17px 28px #0006}
-.yf-building .front:after{content:"YARDIVO DISTRIBUCIJSKI CENTAR";position:absolute;left:18px;top:17px;color:#2c3832;font:1000 16px Arial;letter-spacing:.8px}
+.yf-building .front:after{content:"WAREHOUSE";position:absolute;left:18px;top:17px;color:#2c3832;font:1000 16px Arial;letter-spacing:.8px}
 .yf-building .roof{position:absolute;left:0;top:-84px;width:680px;height:84px;background:linear-gradient(#f1f3f2,#b7c0bb);border:3px solid #909b95;transform-origin:bottom;transform:rotateX(90deg);box-sizing:border-box}
 .yf-building .side{position:absolute;right:-84px;top:0;width:84px;height:176px;background:linear-gradient(90deg,#8e9993,#68736d);border:3px solid #79857e;transform-origin:left;transform:rotateY(90deg);box-sizing:border-box}
 .yf-ramp{position:absolute;top:194px;width:62px;height:42px;border:3px solid #69766f;border-bottom:8px solid #090b0a;background:#0d100e;color:#69df98;text-align:center;padding-top:7px;font:1000 11px Arial;box-shadow:0 8px 12px #0007;transform:translateZ(56px)}
@@ -5976,6 +5976,29 @@ html[data-theme="dark"][data-theme-preset="greeny"] #yardivoWar3DHost{
 @media(max-width:1050px){.yf-world.mode2d{transform:translate(-50%,-50%) scale(.68)}.yf-world.mode3d{transform:translate(-50%,-51%) rotateX(61deg) rotateZ(var(--yf-rz,-18deg)) scale(.62)}}
 </style>
 
+
+<style id="yardivo-qr-mobile-admin-setting-v34">
+#qrMobileSettingsPanel{border-color:#24485a}
+.qr-mobile-setting-body{padding:16px}
+.qr-mobile-setting-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px;border:1px solid #284452;border-radius:9px;background:#091722}
+.qr-mobile-setting-copy{min-width:0}
+.qr-mobile-setting-copy strong{display:block;font-size:11px;letter-spacing:.45px}
+.qr-mobile-setting-copy small{display:block;margin-top:5px;color:#7f98a5;font-size:8px;line-height:1.5}
+.qr-mobile-toggle{position:relative;display:inline-flex;align-items:center;gap:9px;cursor:pointer;flex:0 0 auto}
+.qr-mobile-toggle input{position:absolute;opacity:0;pointer-events:none}
+.qr-mobile-switch{width:48px;height:26px;border-radius:99px;background:#263a44;border:1px solid #405965;position:relative;transition:.2s}
+.qr-mobile-switch:after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#8da0a9;transition:.2s}
+.qr-mobile-toggle input:checked + .qr-mobile-switch{background:#155e38;border-color:#31a765}
+.qr-mobile-toggle input:checked + .qr-mobile-switch:after{left:25px;background:#5ee393}
+.qr-mobile-toggle-label{min-width:72px;text-align:right;font-size:9px;font-weight:1000;letter-spacing:.45px;color:#9aabb3}
+.qr-mobile-mode{margin-top:11px;padding:11px 12px;border-radius:7px;border:1px solid #29414d;background:#08151d;color:#8aa0aa;font-size:8px;line-height:1.5}
+.qr-mobile-mode.on{border-color:#28563e;background:#0b2117;color:#73d596}
+.qr-mobile-mode.off{border-color:#704044;background:#241416;color:#e99a9a}
+.receiving-qr-lock-note{margin:0 0 8px;padding:8px 10px;border:1px solid #2b5741;background:#0b2117;border-radius:6px;color:#78d79b;font-size:8px;font-weight:800}
+.receiving-status-actions button.qr-manual-disabled{opacity:.34;cursor:not-allowed;filter:saturate(.35)}
+html:not(.yardivo-role-admin) #qrMobileSettingsPanel{display:none!important}
+@media(max-width:640px){.qr-mobile-setting-row{align-items:flex-start;flex-direction:column}.qr-mobile-toggle{width:100%;justify-content:space-between}.qr-mobile-toggle-label{text-align:left;order:-1}}
+</style>
 </head>
 <body>
 <button id="yardivoFullscreenBtn" type="button" aria-label="Uključi full screen" title="Full screen"><span class="fs-icon">⛶</span><span class="fs-label">FULL SCREEN</span></button>
@@ -6747,7 +6770,7 @@ var currentSession=null;
           <div class="warehouse-face wh-back"></div>
           <div class="warehouse-face wh-left"></div>
           <div class="warehouse-face wh-right"></div>
-          <div class="warehouse-face wh-top"><span>YARDIVO DISTRIBUCIJSKI CENTAR</span></div>
+          <div class="warehouse-face wh-top"><span>WAREHOUSE</span></div>
         </div>
       </div></div>
 
@@ -7811,6 +7834,30 @@ AUTOMATSKA PREPORUKA</small>
         </div>
 
         <div class="settings-grid">
+<section class="panel" id="qrMobileSettingsPanel">
+  <div class="panel-head">
+    <div>
+      <h2>QR / MOBILE PRIJAM</h2>
+      <small>Samo Admin · odabir načina evidentiranja statusa na rampi</small>
+    </div>
+    <span id="qrMobileSettingsBadge" class="master-sync-state ok">—</span>
+  </div>
+  <div class="qr-mobile-setting-body">
+    <div class="qr-mobile-setting-row">
+      <div class="qr-mobile-setting-copy">
+        <strong>MOBILNO QR SKENIRANJE</strong>
+        <small>Kada je uključeno, statusi NA RAMPI, ZAPRIMLJENO i ODBIJENO evidentiraju se preko mobilnog YARDIVO QR Scannera. Kada je isključeno, Prijam/Admin ih unose ručno u Prijam robe.</small>
+      </div>
+      <label class="qr-mobile-toggle">
+        <input id="qrMobileEnabledToggle" type="checkbox">
+        <span class="qr-mobile-switch" aria-hidden="true"></span>
+        <span id="qrMobileToggleLabel" class="qr-mobile-toggle-label">—</span>
+      </label>
+    </div>
+    <div id="qrMobileModeInfo" class="qr-mobile-mode">—</div>
+  </div>
+</section>
+
 <section class="panel" id="receptionRampSettings">
   <div class="panel-head">
     <div>
@@ -9476,6 +9523,47 @@ function reloadAnnouncementsFromPersistentStorage(){
 }
 
 // ===== PRIJAM ROBE — koristi isti `announcements` kao Unos najave / Dnevna / Tjedna mapa =====
+
+const YARDIVO_QR_MOBILE_SETTING_KEY='yardivo_ramp_qr_mobile_v1';
+
+function yardivoQrMobileEnabled(){
+  const raw=safeStorage.getItem(YARDIVO_QR_MOBILE_SETTING_KEY);
+  if(raw===null||raw==='')return true;
+  return raw==='1'||raw==='true'||raw==='on';
+}
+function yardivoSetQrMobileEnabled(enabled){
+  if(currentSession?.role!=='admin'){
+    alert('Samo Admin može mijenjati QR / Mobile postavku.');
+    return;
+  }
+  safeStorage.setItem(YARDIVO_QR_MOBILE_SETTING_KEY,enabled?'1':'0');
+  renderQrMobileAdminSetting();
+  if(typeof renderReceiving==='function')renderReceiving();
+}
+function renderQrMobileAdminSetting(){
+  const panel=document.getElementById('qrMobileSettingsPanel');
+  if(!panel)return;
+  const isAdmin=currentSession?.role==='admin';
+  panel.style.display=isAdmin?'':'none';
+  if(!isAdmin)return;
+  const on=yardivoQrMobileEnabled();
+  const toggle=document.getElementById('qrMobileEnabledToggle');
+  const label=document.getElementById('qrMobileToggleLabel');
+  const info=document.getElementById('qrMobileModeInfo');
+  const badge=document.getElementById('qrMobileSettingsBadge');
+  if(toggle)toggle.checked=on;
+  if(label)label.textContent=on?'UKLJUČENO':'ISKLJUČENO';
+  if(badge){badge.textContent=on?'QR / MOBILE ON':'RUČNI NAČIN';badge.className='master-sync-state '+(on?'ok':'')}
+  if(info){
+    info.className='qr-mobile-mode '+(on?'on':'off');
+    info.innerHTML=on
+      ? '<strong>QR / MOBILE NAČIN AKTIVAN.</strong> Ručni gumbi NA RAMPI, ZAPRIMLJENO i ODBIJENO u Prijam robe su zaključani. Status dolazi iz mobilnog QR Scannera.'
+      : '<strong>RUČNI NAČIN AKTIVAN.</strong> Prijam ili Admin mogu ručno odabrati NA RAMPI, ZAPRIMLJENO ili ODBIJENO u Prijam robe.';
+  }
+}
+function yardivoManualReceivingStatusAllowed(status){
+  return !yardivoQrMobileEnabled() || !['Na rampi','Zaprimljeno','Odbijen'].includes(status);
+}
 const RECEIVING_STATUS_META={
   'U dolasku':{label:'U DOLASKU',color:'#1688ff'},
   'U dvorištu':{label:'U DVORIŠTU',color:'#ff8b22'},
@@ -9511,15 +9599,25 @@ function renderReceiving(){
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
   set('receivingKpiTotal',allForDay.length);set('receivingKpiComing',counts['U dolasku']);set('receivingKpiYard',counts['U dvorištu']);set('receivingKpiDock',counts['Na rampi']);set('receivingKpiDone',counts['Zaprimljeno']);set('receivingKpiRejected',counts['Odbijen']);
   const note=document.getElementById('receivingPermissionNote');
-  if(note)note.textContent=receivingCanEdit()
-    ? `Prijam robe · ${receivingWarehouseValue()} · status možeš mijenjati ovdje. Sve promjene odmah se vide u najavama, Dnevnoj i Tjednoj mapi.`
-    : `Pregled prijama · ${receivingWarehouseValue()} · tvoja uloga može samo pregledavati statuse.`;
+  if(note){
+    if(receivingCanEdit()&&yardivoQrMobileEnabled()){
+      note.textContent=`Prijam robe · ${receivingWarehouseValue()} · QR / Mobile je UKLJUČEN. NA RAMPI, ZAPRIMLJENO i ODBIJENO dolaze iz mobilnog skenera; ostali statusi ostaju dostupni ručno.`;
+    }else if(receivingCanEdit()){
+      note.textContent=`Prijam robe · ${receivingWarehouseValue()} · RUČNI NAČIN. NA RAMPI, ZAPRIMLJENO i ODBIJENO možeš unositi ručno. Sve promjene odmah se vide u YARDIVO-u.`;
+    }else{
+      note.textContent=`Pregled prijama · ${receivingWarehouseValue()} · tvoja uloga može samo pregledavati statuse.`;
+    }
+  }
   if(!data.length){host.innerHTML='<div class="receiving-empty">Nema najava za odabrani datum, skladište i filter.</div>';return}
   host.innerHTML=data.map(a=>{
     const meta=receivingStatusMeta(a),st=receivingStatus(a);
+    const qrOn=yardivoQrMobileEnabled();
     const actions=Object.keys(RECEIVING_STATUS_META).map(s=>{
       const m=RECEIVING_STATUS_META[s];
-      return `<button type="button" ${receivingCanEdit()?'':'disabled'} class="${s===st?'active':''}" style="--status-color:${m.color}" onclick="setReceivingAnnouncementStatus(${a.id},'${s}')">${m.label}</button>`;
+      const manualAllowed=yardivoManualReceivingStatusAllowed(s);
+      const enabled=receivingCanEdit()&&manualAllowed;
+      const qrLocked=qrOn&&!manualAllowed;
+      return `<button type="button" ${enabled?'':'disabled'} class="${s===st?'active':''} ${qrLocked?'qr-manual-disabled':''}" ${qrLocked?'title="QR / Mobile način je uključen — ovaj status dolazi iz skenera."':''} style="--status-color:${m.color}" onclick="setReceivingAnnouncementStatus(${a.id},'${s}','manual')">${m.label}${qrLocked?' · QR':''}</button>`;
     }).join('');
     return `<div class="receiving-row ${st==='Odbijen'?'status-odbijen':st==='NIJE DOŠAO'?'status-nije-dosao':''}" data-receiving-announcement-id="${a.id}" role="button" tabindex="0" title="Klikni za detalje najave" style="--receiving-color:${meta.color}">
       <div class="receiving-supplier">
@@ -9547,8 +9645,12 @@ function animateYardTruckToDock(a){
   el.classList.add('to-dock');
 }
 
-window.setReceivingAnnouncementStatus=function(id,status){
+window.setReceivingAnnouncementStatus=function(id,status,source='manual'){
   if(!receivingCanEdit()){alert('Status može mijenjati samo Prijam robe ili Admin.');return}
+  if(source==='manual' && !yardivoManualReceivingStatusAllowed(status)){
+    alert('QR / Mobile skeniranje je uključeno. Ovaj status mora doći iz mobilnog YARDIVO Scannera. Admin može prebaciti sustav na RUČNI NAČIN u Postavkama.');
+    return;
+  }
   const a=announcements.find(x=>x.id===Number(id));if(!a)return;
   if(status==='Na rampi' && normalizedPlanStatus(a)==='U dvorištu')animateYardTruckToDock(a);
   a.status=status;
@@ -9577,6 +9679,26 @@ window.setReceivingAnnouncementStatus=function(id,status){
   if(typeof renderWeeklyMap==='function')renderWeeklyMap();
   if(typeof renderAnnouncementSchedule==='function')renderAnnouncementSchedule();
 };
+
+(function initQrMobileAdminSetting(){
+  const toggle=document.getElementById('qrMobileEnabledToggle');
+  if(toggle){
+    toggle.addEventListener('change',function(){
+      if(currentSession?.role!=='admin'){
+        this.checked=yardivoQrMobileEnabled();
+        alert('Samo Admin može mijenjati QR / Mobile postavku.');
+        return;
+      }
+      const next=!!this.checked;
+      const msg=next
+        ? 'Uključiti QR / Mobile način? Ručni gumbi NA RAMPI, ZAPRIMLJENO i ODBIJENO bit će zaključani.'
+        : 'Isključiti QR / Mobile način? Prijam/Admin će moći ručno unositi NA RAMPI, ZAPRIMLJENO i ODBIJENO.';
+      if(!confirm(msg)){this.checked=!next;return}
+      yardivoSetQrMobileEnabled(next);
+    });
+  }
+  setTimeout(renderQrMobileAdminSetting,0);
+})();
 (function initReceivingView(){
   const date=document.getElementById('receivingDate');
   if(date&&!date.value)date.value=new Date().toISOString().slice(0,10);
@@ -10013,7 +10135,7 @@ function applyAnnouncementSlot(mode='auto'){
     showYmsToast('success',`NAJAVA #${announcementNumber(edited)} USPJEŠNO PROMIJENJENA`,`${supplier} · ${date} ${time} · Rampa ${dock}`);
     cancelEditAnnouncement();
   }else{
-    const created={id:Date.now(),date,warehouse,supplier,pallets,sku,responsible,duration,dock,time,orderNumber,status:'U dolasku',createdAt:new Date().toISOString()};
+    const created={id:Date.now(),date,warehouse,supplier,pallets,sku,responsible,duration,dock,time,orderNumber,status:'U dolasku',createdAt:new Date().toISOString(),createdBy:(currentSession?.user||currentSession?.username||''),announcementRef:yardivoGenerateAnnouncementRef(warehouse)};
     announcements.push(created);
     saveAnnouncements();
     renderAnnouncements();
@@ -10129,6 +10251,21 @@ document.getElementById('driverAnnouncementForm')?.addEventListener('submit',e=>
 
   const savedPlate=document.getElementById('plannedPlate').value.trim().toUpperCase();
   const savedDriver=document.getElementById('plannedDriver').value.trim();
+  const savedTrailer=document.getElementById('plannedTrailer').value.trim();
+  const savedPhone=document.getElementById('plannedPhone').value.trim();
+  const oldVehicleDriver={plate:effectivePlate(a)||'',driver:effectiveDriver(a)||'',trailer:a.plannedTrailer||'',phone:a.plannedPhone||''};
+  const vehicleDriverChanged=oldVehicleDriver.plate!==savedPlate||oldVehicleDriver.driver!==savedDriver||oldVehicleDriver.trailer!==savedTrailer||oldVehicleDriver.phone!==savedPhone;
+  if(vehicleDriverChanged){
+    if(!Array.isArray(a.changeHistory))a.changeHistory=[];
+    a.changeHistory.push({
+      type:'VEHICLE_DRIVER_CHANGE',
+      changedAt:new Date().toISOString(),
+      changedBy:(currentSession?.name||currentSession?.username||currentSession?.role||'Korisnik'),
+      reason:'Dobavljač javio promjenu vozila / vozača',
+      oldVehicleDriver,
+      newVehicleDriver:{plate:savedPlate,driver:savedDriver,trailer:savedTrailer,phone:savedPhone}
+    });
+  }
 
   a.vehiclePlate=savedPlate;
   a.driverNameCanonical=savedDriver;
@@ -10140,8 +10277,8 @@ document.getElementById('driverAnnouncementForm')?.addEventListener('submit',e=>
     a.arrivalDriver=savedDriver;
   }
 
-  a.plannedTrailer=document.getElementById('plannedTrailer').value.trim();
-  a.plannedPhone=document.getElementById('plannedPhone').value.trim();
+  a.plannedTrailer=savedTrailer;
+  a.plannedPhone=savedPhone;
   a.driverDataUpdatedAt=new Date().toISOString();
 
   syncAnnouncementIdentity(a);
@@ -10189,9 +10326,17 @@ function showYmsToast(type,title,message,timeout=3600){
   ymsToastTimer=setTimeout(()=>el.classList.remove('show'),timeout);
 }
 
+function yardivoGenerateAnnouncementRef(warehouse){
+  const wh=String(warehouse||'W101').toUpperCase();
+  const used=new Set((Array.isArray(announcements)?announcements:[]).map(a=>String(a.announcementRef||'')));
+  let ref='';
+  do{ref=wh+String(Math.floor(Math.random()*99999)+1).padStart(5,'0')}while(used.has(ref));
+  return ref;
+}
 function announcementNumber(a){
-  // Stabilan, čitljiv broj najave iz ID-a.
-  return String(a?.id||'').slice(-6).padStart(6,'0');
+  if(!a)return '—';
+  if(!a.announcementRef)a.announcementRef=yardivoGenerateAnnouncementRef(a.warehouse||'W101');
+  return a.announcementRef;
 }
 
 
@@ -10360,7 +10505,7 @@ function renderAnnouncements(){
       <td>${lateHtml}</td>
       <td>${statusHtml}${changes}${savedAnnouncementMissingDriver(a)?'<br><span class="missing-driver-data">NEDOSTAJU PODACI VOZAČA</span>':''}${savedAnnouncementsMode==='history'?'<br><span class="history-chip">POVIJEST</span>':''}</td>
       <td class="actions">
-        ${canAnnounceDriverData()?`<button class="action" onclick="openDriverAnnouncement(${a.id})">${effectivePlate(a)||effectiveDriver(a)?'UREDI TABLICE / VOZAČA':'NAJAVI TABLICE I VOZAČA'}</button>`:''}
+        ${canAnnounceDriverData()?`<button class="action" onclick="openDriverAnnouncement(${a.id})">${effectivePlate(a)||effectiveDriver(a)?'PROMIJENI PODATKE':'UNESI VOZILO / VOZAČA'}</button>`:''}
         <button class="action" onclick="startEditAnnouncement(${a.id})">UREDI TERMIN</button>
         <button class="action" onclick="recordArrival(${a.id})">${a.actualDate?'PROMIJENI DOLAZAK':'EVIDENTIRAJ DOLAZAK'}</button>
         <button class="action danger" onclick="deleteAnnouncement(${a.id})">OBRIŠI NAJAVU</button>
@@ -18519,7 +18664,7 @@ window.addEventListener('load',()=>setTimeout(()=>{known=new Set((announcements|
 })();
 </script>
 
-<script id="yardivo-live-yard-digital-twin-v1">
+<script id="yardivo-live-yard-digital-twin-v1" type="text/plain" data-disabled-by="yardivo-v30">
 (function(){
 'use strict';
 let lyMode='live',lyView='2d',lyFilter='all',selectedId=null;
@@ -19087,7 +19232,7 @@ window.YardivoRampHeaderFix={refresh};
 
 
 
-<script id="yardivo-live-yard-tv-v5">
+<script id="yardivo-live-yard-tv-v5" type="text/plain" data-disabled-by="yardivo-v30">
 (function(){
 'use strict';
 let selectedId=null,lastState=new Map();
@@ -19266,7 +19411,7 @@ window.YardivoLiveTruckModal={open,close};
 </script>
 
 
-<script id="yardivo-live-yard-v5-4-dock-clean">
+<script id="yardivo-live-yard-v5-4-dock-clean" type="text/plain" data-disabled-by="yardivo-v30">
 (function(){
 'use strict';
 
@@ -19617,7 +19762,7 @@ window.YardivoThemePresets={apply:applyPreset,current,refresh:syncWithMainTheme}
 </script>
 
 
-<script id="yardivo-real-webgl-yard-v1">
+<script id="yardivo-real-webgl-yard-v1" type="text/plain" data-disabled-by="yardivo-v30">
 (function(){
 'use strict';
 
@@ -19948,7 +20093,7 @@ document.addEventListener('click',e=>{if(e.target.closest('[data-view="overview"
 </script>
 
 
-<script id="yardivo-native-yard-v3">
+<script id="yardivo-native-yard-v3" type="text/plain" data-disabled-by="yardivo-v30">
 (function(){
 'use strict';
 const states=new WeakMap();
@@ -20119,5 +20264,383 @@ document.addEventListener('click',e=>{if(e.target.closest('[data-view="liveYard"
 })();
 </script>
 
+
+<style id="yardivo-v29-cubic-stable-3d">
+/* V2.9 — Same final renderer in Live Yard + War Room.
+   Floor remains 2D. Warehouse/ramps/trucks are volumetric-looking and stable. */
+
+/* Avoid black flashing/repaint artifacts while rotating. */
+#yardivoFinalLiveYard,#yardivoFinalWarYard,
+#yardivoFinalLiveYard .yf-stage,#yardivoFinalWarYard .yf-stage,
+#yardivoFinalLiveYard .yf-world,#yardivoFinalWarYard .yf-world{
+  background-color:#0b100d!important;
+  backface-visibility:hidden!important;
+  -webkit-backface-visibility:hidden!important;
+}
+#yardivoFinalLiveYard .yf-world,#yardivoFinalWarYard .yf-world{
+  will-change:transform;
+  transition:none!important;
+  contain:layout paint style;
+}
+#yardivoFinalLiveYard .yf-floor,#yardivoFinalWarYard .yf-floor{
+  backface-visibility:hidden!important;
+  -webkit-backface-visibility:hidden!important;
+  transform:translate3d(0,0,0)!important;
+}
+
+/* Keep the entire yard floor flat. Rotation is plan rotation only. */
+.yf-world.mode3d{
+  transform:translate(-50%,-50%) rotateZ(var(--yf-rz,-8deg)) scale(var(--yf-scale,.84)) translateZ(0)!important;
+  transform-style:flat!important;
+}
+
+/* Make warehouse clearly BOX/CUBOID, not a long flat slab. */
+.yf-building{
+  width:610px!important;
+  height:185px!important;
+  left:250px!important;
+  top:70px!important;
+  overflow:visible!important;
+}
+.yf-building .front{
+  width:610px!important;
+  height:185px!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  padding-top:18px!important;
+  background:linear-gradient(180deg,#e7ebe9 0 58%,#aab4ae 59% 100%)!important;
+  border:3px solid #8d9892!important;
+  box-shadow:inset 0 -32px 0 rgba(77,88,82,.26),0 18px 24px #0007!important;
+  color:#26322c!important;
+  font:1000 18px Arial!important;
+  letter-spacing:1.8px!important;
+}
+.yf-building .front:after{
+  content:"WAREHOUSE";
+  color:#26322c;
+  font:1000 18px Arial;
+  letter-spacing:2px;
+}
+.yf-building .front>*{visibility:hidden!important}
+
+/* Strong visible roof = actual height perception. */
+.yf-world.mode3d .yf-building .roof{
+  display:block!important;
+  position:absolute!important;
+  left:17px!important;
+  top:-57px!important;
+  width:610px!important;
+  height:60px!important;
+  background:linear-gradient(180deg,#f9fbfa,#bac4be)!important;
+  border:3px solid #8d9892!important;
+  transform:skewX(-29deg)!important;
+  transform-origin:left bottom!important;
+  box-shadow:0 9px 16px #0006!important;
+}
+.yf-world.mode3d .yf-building .side{
+  display:block!important;
+  position:absolute!important;
+  right:-48px!important;
+  top:-24px!important;
+  width:49px!important;
+  height:185px!important;
+  background:linear-gradient(90deg,#8e9993,#59635e)!important;
+  border:2px solid #68736d!important;
+  transform:skewY(-29deg)!important;
+  transform-origin:left top!important;
+  box-shadow:7px 8px 15px #0007!important;
+}
+/* Give left edge thickness too. */
+.yf-world.mode3d .yf-building:before{
+  content:"";
+  position:absolute;
+  left:-20px;
+  top:-24px;
+  width:21px;
+  height:185px;
+  background:linear-gradient(90deg,#a8b2ac,#77827c);
+  transform:skewY(29deg);
+  transform-origin:right top;
+  border:2px solid #707b75;
+  z-index:-1;
+}
+
+/* Ramps read as short dock boxes protruding from warehouse. */
+.yf-world.mode3d .yf-ramp{
+  min-height:44px!important;
+  background:linear-gradient(180deg,#181d1a,#080a09)!important;
+  border:2px solid #66736c!important;
+  border-bottom:10px solid #030504!important;
+  box-shadow:7px 10px 0 #050706,10px 14px 16px #0009!important;
+}
+.yf-world.mode3d .yf-ramp:before{
+  height:10px!important;
+  top:-10px!important;
+  right:-9px!important;
+  background:linear-gradient(90deg,#98a39d,#68736d)!important;
+}
+
+/* Truck = white box trailer + box cab, more obvious volume. */
+.yf-world.mode3d .yf-trailer{
+  background:linear-gradient(180deg,#fff 0 62%,#b7c0bb 63% 100%)!important;
+  border:2px solid #79847e!important;
+  box-shadow:7px 8px 0 #7d8882,11px 13px 12px #0008!important;
+}
+.yf-world.mode3d .yf-trailer:before{
+  height:9px!important;
+  top:-9px!important;
+  right:-7px!important;
+  background:linear-gradient(90deg,#fff,#cbd3cf)!important;
+}
+.yf-world.mode3d .yf-cab{
+  background:linear-gradient(145deg,#fbfdfc,#bbc5bf)!important;
+  border:2px solid #747f79!important;
+  box-shadow:5px 7px 0 #77827c,9px 10px 10px #0008!important;
+}
+
+/* The 2D mode stays simple and truly top-down. */
+.yf-world.mode2d .yf-building{width:610px!important;height:150px!important;left:250px!important;top:82px!important}
+.yf-world.mode2d .yf-building .front{height:150px!important}
+.yf-world.mode2d .yf-building .roof,
+.yf-world.mode2d .yf-building .side,
+.yf-world.mode2d .yf-building:before{display:none!important}
+
+/* GPU compositing only for moving trucks, avoids full-yard flicker. */
+.yf-truck{
+  will-change:left,top,opacity,transform;
+  backface-visibility:hidden!important;
+  -webkit-backface-visibility:hidden!important;
+}
+</style>
+
+<script id="yardivo-v29-stable-rotation">
+(function(){
+'use strict';
+/* Throttle 3D camera visual updates to animation frames.
+   This prevents rapid DOM repainting that caused black blinking. */
+let raf=0;
+function stabilize(){
+  document.querySelectorAll('#yardivoFinalLiveYard .yf-world,#yardivoFinalWarYard .yf-world').forEach(function(w){
+    w.style.transition='none';
+    w.style.webkitBackfaceVisibility='hidden';
+    w.style.backfaceVisibility='hidden';
+  });
+}
+document.addEventListener('pointermove',function(){
+  if(raf)return;
+  raf=requestAnimationFrame(function(){raf=0;stabilize()});
+},true);
+window.addEventListener('load',function(){setTimeout(stabilize,1200)});
+setInterval(stabilize,2200);
+})();
+</script>
+
+
+<style id="yardivo-v30-single-yard-engine">
+/* ONE OWNER: final Live Yard renderer. War Room is the SAME yard, only larger/wider. */
+#lyCanvas,#yardivoReal3DHost,#yardivoNative3D,#yardivoV25Live,#yardivoV26,
+#yardivoWar3DHost,#yardivoNativeWar3D,#yardivoV25War{display:none!important;visibility:hidden!important;pointer-events:none!important}
+
+#liveYardStage{position:relative!important;overflow:hidden!important;min-height:620px!important;background:#07100c!important}
+#yardivoFinalLiveYard{display:block!important;position:absolute!important;inset:42px 0 0!important;z-index:900!important;background:#07100c!important}
+#yardivoFinalWarYard{display:block!important;position:absolute!important;inset:0!important;z-index:900!important;background:#07100c!important}
+
+/* Same map geometry. Live Yard gets normal operational framing. */
+#yardivoFinalLiveYard .yf-world.mode2d{transform:translate(-50%,-50%) scale(.86)!important}
+#yardivoFinalLiveYard .yf-world.mode3d{transform:translate(-50%,-50%) rotateZ(var(--yf-rz,-8deg)) scale(var(--yf-scale,.82)) translateZ(0)!important}
+
+/* War Room = exact same renderer/data/layout, simply enlarged and wider. */
+#yardivoFinalWarYard .yf-stage{inset:0!important}
+#yardivoFinalWarYard .yf-world{width:1120px!important;height:690px!important;top:52%!important}
+#yardivoFinalWarYard .yf-world.mode2d{transform:translate(-50%,-50%) scale(1.02)!important}
+#yardivoFinalWarYard .yf-world.mode3d{transform:translate(-50%,-50%) rotateZ(var(--yf-rz,-8deg)) scale(calc(var(--yf-scale,.82) * 1.12)) translateZ(0)!important}
+#yardivoFinalWarYard .yf-toolbar{left:18px!important;top:16px!important;transform:scale(1.08);transform-origin:left top}
+#yardivoFinalWarYard .yf-help{right:18px!important;bottom:16px!important;font-size:9px!important}
+
+/* Keep the floor a stable 2D plane; only objects carry visual depth. */
+#yardivoFinalLiveYard .yf-floor,#yardivoFinalWarYard .yf-floor{
+ transform:none!important;transform-style:flat!important;backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important;
+}
+#yardivoFinalLiveYard .yf-world,#yardivoFinalWarYard .yf-world{
+ transform-style:flat!important;transition:none!important;backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important;
+}
+
+/* Cubic warehouse shared identically by both views. */
+#yardivoFinalLiveYard .yf-building,#yardivoFinalWarYard .yf-building{width:610px!important;height:185px!important;left:250px!important;top:70px!important;overflow:visible!important}
+#yardivoFinalLiveYard .yf-building .front,#yardivoFinalWarYard .yf-building .front{
+ width:610px!important;height:185px!important;background:linear-gradient(180deg,#e7ebe9 0 58%,#aab4ae 59% 100%)!important;
+ border:3px solid #8d9892!important;box-shadow:inset 0 -32px 0 rgba(77,88,82,.26),0 18px 24px #0007!important
+}
+#yardivoFinalLiveYard .yf-building .front:after,#yardivoFinalWarYard .yf-building .front:after{content:"WAREHOUSE"!important;left:50%!important;top:18px!important;transform:translateX(-50%);font-size:18px!important;letter-spacing:2px!important;white-space:nowrap}
+#yardivoFinalLiveYard .yf-world.mode3d .yf-building .roof,#yardivoFinalWarYard .yf-world.mode3d .yf-building .roof{
+ display:block!important;left:17px!important;top:-57px!important;width:610px!important;height:60px!important;transform:skewX(-29deg)!important;
+ transform-origin:left bottom!important;background:linear-gradient(180deg,#f9fbfa,#bac4be)!important;border:3px solid #8d9892!important;box-shadow:0 9px 16px #0006!important
+}
+#yardivoFinalLiveYard .yf-world.mode3d .yf-building .side,#yardivoFinalWarYard .yf-world.mode3d .yf-building .side{
+ display:block!important;right:-48px!important;top:-24px!important;width:49px!important;height:185px!important;transform:skewY(-29deg)!important;
+ transform-origin:left top!important;background:linear-gradient(90deg,#8e9993,#59635e)!important;border:2px solid #68736d!important;box-shadow:7px 8px 15px #0007!important
+}
+#yardivoFinalLiveYard .yf-world.mode3d .yf-building:before,#yardivoFinalWarYard .yf-world.mode3d .yf-building:before{
+ content:"";position:absolute;left:-20px;top:-24px;width:21px;height:185px;background:linear-gradient(90deg,#a8b2ac,#77827c);
+ transform:skewY(29deg);transform-origin:right top;border:2px solid #707b75;z-index:-1
+}
+
+/* Same 2D/3D controls in both places. */
+#yardivoFinalLiveYard [data-yf-mode],#yardivoFinalWarYard [data-yf-mode]{display:inline-flex!important;align-items:center;justify-content:center!important;min-width:52px!important;pointer-events:auto!important}
+
+/* Prevent old animations from changing the whole transform and causing flicker. */
+#yardivoFinalLiveYard .yf-truck.dock,#yardivoFinalWarYard .yf-truck.dock{animation:yfDockGlowV30 .9s ease-in-out infinite alternate!important}
+@keyframes yfDockGlowV30{to{filter:drop-shadow(0 0 13px #45e888) drop-shadow(8px 10px 7px #000a)}}
+</style>
+<script id="yardivo-v30-single-owner-guard">
+(function(){
+ 'use strict';
+ const legacy=['lyCanvas','yardivoReal3DHost','yardivoNative3D','yardivoV25Live','yardivoV26','yardivoWar3DHost','yardivoNativeWar3D','yardivoV25War'];
+ function killLegacy(){legacy.forEach(id=>{const e=document.getElementById(id);if(e){e.style.setProperty('display','none','important');e.style.setProperty('visibility','hidden','important')}})}
+ function refresh(){killLegacy();try{window.YardivoFinalYard?.live?.();window.YardivoFinalYard?.war?.()}catch(e){console.warn('YARDIVO final yard refresh',e)}}
+ document.addEventListener('click',e=>{
+   if(e.target.closest('[data-view="liveYard"],[data-home-target="liveYard"],#yardivoWarButton'))setTimeout(refresh,80);
+ },true);
+ window.addEventListener('load',()=>setTimeout(refresh,1300));
+ setInterval(killLegacy,2500);
+ window.YardivoSingleYardEngine={refresh};
+})();
+</script>
+
+
+<style id="yardivo-v31-change-vehicle-driver-style">
+#driverAnnouncementDialog .yardivo-change-data-note{margin:0 0 12px;padding:10px 12px;border:1px solid #31536d;border-radius:7px;background:#091a28;color:#9db4c6;font-size:9px;line-height:1.5}
+#driverAnnouncementDialog .yardivo-change-data-note strong{color:#fff}
+</style>
+<script id="yardivo-v31-change-vehicle-driver">
+(function(){
+'use strict';
+function enhance(){
+ const dlg=document.getElementById('driverAnnouncementDialog');if(!dlg)return;
+ const form=document.getElementById('driverAnnouncementForm');if(!form)return;
+ if(!dlg.querySelector('.yardivo-change-data-note')){
+   const note=document.createElement('div');note.className='yardivo-change-data-note';
+   note.innerHTML='<strong>PROMJENA VOZILA / VOZAČA</strong><br>Ako dobavljač naknadno javi drugo vozilo, registraciju ili drugog vozača, ovdje promijeni podatke i spremi. Promjena se evidentira u povijesti najave.';
+   const info=document.getElementById('driverAnnouncementInfo');
+   if(info)info.insertAdjacentElement('afterend',note); else form.prepend(note);
+ }
+ const title=dlg.querySelector('h2,h3,.dialog-title');
+ if(title && /tablic|voza/i.test(title.textContent||''))title.textContent='PROMIJENI PODATKE VOZILA / VOZAČA';
+ const save=form.querySelector('button[type="submit"]');if(save)save.textContent='SPREMI PROMJENU PODATAKA';
+}
+window.addEventListener('load',()=>setTimeout(enhance,800));
+document.addEventListener('click',e=>{if(e.target.closest('[onclick*="openDriverAnnouncement"],#ctxDriverAnnouncement'))setTimeout(enhance,0)},true);
+})();
+</script>
+
+
+<style id="yardivo-v32-my-announcements-style">
+#yardivoMyAnnouncements .yma-tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+#yardivoMyAnnouncements .yma-tabs button{border:1px solid #345166;background:#0d1922;color:#9fb3c2;border-radius:7px;padding:8px 12px;font-size:9px;font-weight:900;cursor:pointer}
+#yardivoMyAnnouncements .yma-tabs button.active{background:#164b34;border-color:#39865c;color:#e7fff1}
+#yardivoMyAnnouncements .yma-ref{font-weight:1000;color:#72e3a0;white-space:nowrap}
+#yardivoMyAnnouncements .yma-empty{padding:35px;text-align:center;color:#8499a8}
+</style>
+<script id="yardivo-v32-my-announcements">
+(function(){
+'use strict';
+let mode='mine';
+function role(){try{return String(currentSession?.role||window.currentSession?.role||'').toLowerCase()}catch(e){return''}}
+function user(){try{return String(currentSession?.user||currentSession?.username||'').trim()}catch(e){return''}}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function ensureRefs(){let changed=false;(Array.isArray(announcements)?announcements:[]).forEach(a=>{if(!a.announcementRef){a.announcementRef=yardivoGenerateAnnouncementRef(a.warehouse||'W101');changed=true}});if(changed)try{saveAnnouncements()}catch(e){}}
+function ensureView(){
+ if(document.getElementById('yardivoMyAnnouncements'))return;
+ const main=document.querySelector('.main');if(!main)return;
+ const s=document.createElement('section');s.id='yardivoMyAnnouncements';s.className='view';s.innerHTML=`<section class="panel"><div class="panel-head"><div><h2>MOJE NAJAVE</h2><small>Najave korisnika zaliha i povijest svih najava</small></div></div><div style="padding:14px"><div class="yma-tabs"><button data-yma="mine" class="active">MOJE NAJAVE</button><button data-yma="history">POVIJEST SVIH NAJAVA</button></div><div class="data-wrap"><table><thead><tr><th>Broj najave</th><th>Datum</th><th>Skladište</th><th>Dobavljač</th><th>Rampa</th><th>Termin</th><th>Status</th><th>Kreirao</th></tr></thead><tbody id="ymaBody"></tbody></table></div></div></section>`;main.appendChild(s);
+ const nav=document.querySelector('.nav');const anchor=nav?.querySelector('[data-view="announcements"]');if(nav&&anchor){const b=document.createElement('button');b.className='nav-btn';b.dataset.view='yardivoMyAnnouncements';b.innerHTML='<span>▤</span> Moje najave';anchor.insertAdjacentElement('afterend',b)}
+ s.addEventListener('click',e=>{const b=e.target.closest('[data-yma]');if(!b)return;mode=b.dataset.yma;s.querySelectorAll('[data-yma]').forEach(x=>x.classList.toggle('active',x===b));render()});
+}
+function render(){
+ ensureRefs();const body=document.getElementById('ymaBody');if(!body)return;let a=[...(Array.isArray(announcements)?announcements:[])];
+ if(mode==='mine'){const u=user();a=a.filter(x=>String(x.createdBy||'')===u)}
+ else a=a.filter(x=>['Zaprimljeno','Završeno','Izašao','Odbijen','NIJE DOŠAO','NO-SHOW'].includes(String(x.status||''))||new Date(String(x.date||'1970-01-01')+'T23:59:59')<new Date());
+ a.sort((x,y)=>String(y.createdAt||y.date||'').localeCompare(String(x.createdAt||x.date||'')));
+ body.innerHTML=a.length?a.map(x=>`<tr><td class="yma-ref">NAJAVA ${esc(announcementNumber(x))}</td><td>${esc(x.date||'—')}</td><td>${esc(x.warehouse||'W101')}</td><td><strong>${esc(x.supplier||'—')}</strong></td><td>${x.dock?'Rampa '+esc(x.dock):'—'}</td><td>${esc(x.time||'—')}</td><td>${esc(x.status||'U dolasku')}</td><td>${esc(x.createdBy||'—')}</td></tr>`).join(''):`<tr><td colspan="8"><div class="yma-empty">${mode==='mine'?'Još nema najava koje je kreirao ovaj korisnik.':'Nema povijesnih najava.'}</div></td></tr>`;
+}
+function access(){ensureView();const ok=role()==='inventory';document.querySelectorAll('[data-view="yardivoMyAnnouncements"]')?.forEach(b=>b.style.setProperty('display',ok?'flex':'none','important'));if(ok&&document.getElementById('yardivoMyAnnouncements')?.classList.contains('active'))render()}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-view="yardivoMyAnnouncements"]');if(!b)return;e.preventDefault();if(role()!=='inventory')return;document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('yardivoMyAnnouncements')?.classList.add('active');document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x===b));render()},true);
+window.addEventListener('load',()=>setTimeout(access,1000));setInterval(access,2000);
+window.YardivoMyAnnouncements={render};
+})();
+</script>
+
+
+<style id="yardivo-v33-my-yard-style">
+#myYard{padding:0!important;overflow:hidden!important;background:#18201d!important}
+#myYard .myy-shell{position:relative;height:calc(100vh - 74px);min-height:650px;overflow:hidden;background:linear-gradient(#35403b,#252d29)}
+#myYard .myy-toolbar{position:absolute;z-index:40;left:16px;top:15px;display:flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid #52615a;border-radius:9px;background:#17201cdd;box-shadow:0 8px 24px #0006}
+#myYard .myy-toolbar strong{color:#f3f6f4;font-size:11px;letter-spacing:.7px}.myy-live{width:8px;height:8px;border-radius:50%;background:#40d77b;box-shadow:0 0 10px #40d77b}
+#myYard .myy-toolbar button{height:32px;min-width:50px;border:1px solid #596861;border-radius:6px;background:#222d28;color:#aab8b1;font:900 9px Arial;cursor:pointer}#myYard .myy-toolbar button.active{background:#24553b;border-color:#4aa66e;color:#fff}
+#myYard .myy-meta{color:#92a29a;font:800 8px Arial}.myy-help{position:absolute;right:15px;bottom:14px;z-index:30;background:#17201ce8;border:1px solid #52615a;border-radius:7px;color:#a2afa9;padding:8px 10px;font:800 8px Arial}
+#myYard .myy-stage{position:absolute;inset:0;overflow:hidden;perspective:1300px;perspective-origin:50% 38%}
+#myYard .myy-world{position:absolute;left:50%;top:51%;width:1120px;height:690px;transform-origin:center;transform-style:preserve-3d;will-change:transform}
+#myYard .myy-world.d2{transform:translate(-50%,-50%) scale(.9)}
+#myYard .myy-world.d3{transform:translate(-50%,-50%) rotateX(55deg) rotateZ(var(--rz,-10deg)) scale(var(--sc,.78));transform-style:preserve-3d}
+#myYard .myy-floor{position:absolute;inset:0;border:4px solid #555d59;background:repeating-linear-gradient(90deg,transparent 0 79px,#ffffff0b 80px 81px),repeating-linear-gradient(0deg,transparent 0 79px,#ffffff0b 80px 81px),#676d69;box-shadow:0 35px 70px #0009,inset 0 0 70px #0005;transform-style:preserve-3d}
+#myYard .myy-road{position:absolute;left:55px;right:55px;top:365px;height:145px;background:#454a47;border-top:3px dashed #d7d9d8;border-bottom:3px dashed #d7d9d8;transform:translateZ(2px)}#myYard .myy-road:after{content:"";position:absolute;left:0;right:0;top:70px;border-top:2px dashed #d7d9d880}
+#myYard .myy-building{position:absolute;left:270px;top:78px;width:650px;height:205px;transform-style:preserve-3d;transform:translateZ(42px);z-index:7}
+#myYard .myy-front{position:absolute;inset:0;background:linear-gradient(#fff,#dfe3e1);border:3px solid #a8afab;box-shadow:0 16px 25px #0006;display:flex;justify-content:center;padding-top:24px;box-sizing:border-box;color:#333b37;font:1000 22px Arial;letter-spacing:3px}
+#myYard .myy-roof{position:absolute;left:0;top:0;width:650px;height:205px;background:linear-gradient(135deg,#fff,#d6dbd8);border:3px solid #a8afab;box-sizing:border-box;transform-origin:top;transform:rotateX(90deg);backface-visibility:hidden}
+#myYard .myy-side{position:absolute;right:0;top:0;width:205px;height:205px;background:#b7bdb9;border:3px solid #909893;box-sizing:border-box;transform-origin:right;transform:rotateY(90deg)}
+#myYard .myy-dock{position:absolute;top:260px;width:72px;height:55px;background:linear-gradient(90deg,#181818 0 72%,#a91919 73%);border:3px solid #0c0c0c;border-right-color:#df3030;box-shadow:0 8px 10px #0008;transform:translateZ(15px);color:#fff;font:1000 10px Arial;text-align:center;padding-top:17px;box-sizing:border-box;z-index:12}.myy-dock.locked{opacity:.45}.myy-dock.busy{box-shadow:0 0 0 3px #d52727,0 8px 12px #0009}
+#myYard .myy-gate{position:absolute;left:62px;top:505px;width:125px;height:95px;background:linear-gradient(145deg,#f1f3f2,#9ea7a2);border:3px solid #606964;box-shadow:9px 11px 15px #0007;transform:translateZ(24px);z-index:10}.myy-gate:before{content:"ULAZNA RAMPA";position:absolute;left:4px;right:4px;top:35px;text-align:center;color:#242b27;font:1000 9px Arial}.myy-bar{position:absolute;left:115px;top:542px;width:105px;height:8px;background:repeating-linear-gradient(90deg,#d51f25 0 16px,#fff 16px 32px);border:1px solid #555;transform-origin:left;transform:translateZ(34px) rotate(-8deg);z-index:15}
+#myYard .myy-sign{position:absolute;left:54px;top:445px;padding:5px 8px;background:#202724;border:1px solid #88928d;color:#fff;font:900 9px Arial;transform:translateZ(7px)}
+#myYard .myy-truck{position:absolute;width:115px;height:38px;transform-origin:center;transform-style:preserve-3d;transition:left 1.2s ease,top 1.2s ease,opacity .9s ease,transform 1.2s ease;z-index:20}.myy-trailer{position:absolute;left:0;top:2px;width:80px;height:34px;background:#fff;border:2px solid #7c8580;box-shadow:5px 7px 0 #aeb5b1,8px 10px 9px #0007;box-sizing:border-box}.myy-cab{position:absolute;right:0;top:5px;width:36px;height:29px;background:linear-gradient(135deg,#fff,#c9cfcc);border:2px solid #747d78;box-shadow:4px 5px 0 #969f9a;box-sizing:border-box}.myy-cab:after{content:"";position:absolute;right:3px;top:4px;width:8px;height:15px;background:#31434a}.myy-wheel{position:absolute;bottom:-4px;width:10px;height:10px;border-radius:50%;background:#111;border:2px solid #555}.myy-w1{left:15px}.myy-w2{left:65px}.myy-w3{right:8px}
+#myYard .myy-truck.dock{filter:drop-shadow(0 0 9px #ef3434)}#myYard .myy-truck.rejected{opacity:.45;filter:grayscale(.6)}#myYard .myy-truck.done{opacity:0}
+#myYard .myy-label{position:absolute;left:4px;top:-18px;white-space:nowrap;padding:3px 5px;border-radius:4px;background:#171d1acc;color:#fff;font:800 8px Arial}
+#myYard .myy-world.d2 .myy-building{transform:none}.myy-world.d2 .myy-roof,.myy-world.d2 .myy-side{display:none}.myy-world.d2 .myy-dock,.myy-world.d2 .myy-gate,.myy-world.d2 .myy-bar{transform:none}.myy-world.d2 .myy-truck{transform:rotate(var(--tr,0deg))!important}
+@media(max-width:1050px){#myYard .myy-world.d2{transform:translate(-50%,-50%) scale(.66)}#myYard .myy-world.d3{transform:translate(-50%,-50%) rotateX(55deg) rotateZ(var(--rz,-10deg)) scale(.58)}}
+</style>
+<script id="yardivo-v33-my-yard">
+(function(){
+'use strict';
+const st={mode:'3d',rz:-10,sc:.78,drag:false,x:0};
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function data(){try{return Array.isArray(announcements)?announcements:[]}catch(e){return[]}}
+function wh(){try{return activeWarehouse&&activeWarehouse!=='ALL'?activeWarehouse:(currentSession?.location==='DU'?'W201':'W101')}catch(e){return'W101'}}
+function today(){return new Date().toISOString().slice(0,10)}
+function ramps(w){try{return Math.max(1,Number(YardivoRampConfig?.count?.(w)||WAREHOUSES?.[w]?.ramps||6))}catch(e){return 6}}
+function ensure(){
+ if(document.getElementById('myYard'))return;
+ const main=document.querySelector('.main');if(!main)return;
+ const s=document.createElement('section');s.id='myYard';s.className='view';s.innerHTML='<div class="myy-shell"><div class="myy-toolbar"><i class="myy-live"></i><strong>MY YARD</strong><button data-myy="2d">2D</button><button data-myy="3d" class="active">3D</button><span class="myy-meta"></span></div><div class="myy-stage"><div class="myy-world d3"><div class="myy-floor"><div class="myy-road"></div><div class="myy-building"><div class="myy-front">WAREHOUSE</div><div class="myy-roof"></div><div class="myy-side"></div></div><div class="myy-gate"></div><div class="myy-bar"></div><div class="myy-sign">ULAZ → &nbsp;&nbsp; ← IZLAZ</div><div class="myy-docks"></div><div class="myy-trucks"></div></div></div><div class="myy-help">3D: POVUCI MIŠ = ROTACIJA · KOTAČIĆ = ZOOM</div></div>';main.appendChild(s);
+ const nav=document.querySelector('.nav');if(nav&&!nav.querySelector('[data-view="myYard"]')){const b=document.createElement('button');b.className='nav-btn';b.dataset.view='myYard';b.innerHTML='<span>◆</span> MY YARD';const a=nav.querySelector('[data-view="yard"]');(a||nav.lastElementChild)?.insertAdjacentElement(a?'afterend':'beforebegin',b)}
+ const world=s.querySelector('.myy-world');const apply=()=>{world.className='myy-world '+(st.mode==='3d'?'d3':'d2');world.style.setProperty('--rz',st.rz+'deg');world.style.setProperty('--sc',st.sc);s.querySelectorAll('[data-myy]').forEach(b=>b.classList.toggle('active',b.dataset.myy===st.mode));s.querySelector('.myy-help').style.display=st.mode==='3d'?'block':'none'};
+ s.querySelectorAll('[data-myy]').forEach(b=>b.onclick=e=>{e.stopPropagation();st.mode=b.dataset.myy;apply()});s.addEventListener('pointerdown',e=>{if(st.mode!=='3d'||e.button!==0||e.target.closest('button'))return;st.drag=true;st.x=e.clientX});s.addEventListener('pointermove',e=>{if(!st.drag)return;st.rz+=(e.clientX-st.x)*.16;st.x=e.clientX;requestAnimationFrame(apply)});window.addEventListener('pointerup',()=>st.drag=false);s.addEventListener('wheel',e=>{if(st.mode!=='3d')return;e.preventDefault();st.sc=Math.max(.5,Math.min(1.08,st.sc-e.deltaY*.0006));requestAnimationFrame(apply)},{passive:false});apply();
+}
+function stateOf(a){const s=String(a.status||'').toLowerCase();if(s.includes('odbij'))return'rejected';if(s.includes('zaprim')||s.includes('završ')||s.includes('izašao'))return'done';if(s.includes('rampi'))return'dock';if(s.includes('dvori')||s.includes('ček'))return'yard';return'incoming'}
+function pos(a,i,n){const q=stateOf(a),dock=Math.max(1,Math.min(n,Number(a.dock)||1));if(q==='dock')return{x:260+(dock-1)*Math.min(94,600/Math.max(1,n-1)),y:300,r:90};if(q==='yard')return{x:280+(i%5)*145,y:535+(i%2)*52,r:0};if(q==='rejected')return{x:25,y:590+(i%2)*42,r:180};if(q==='done')return{x:-145,y:420,r:180};return{x:-120-(i%3)*120,y:395+(i%2)*58,r:0}}
+function truck(a,i,n){const p=pos(a,i,n),q=stateOf(a);return `<div class="myy-truck ${q}" data-id="${esc(a.id)}" style="left:${p.x}px;top:${p.y}px;--tr:${p.r}deg;transform:translateZ(28px) rotate(${p.r}deg)"><div class="myy-label">${esc(a.supplier||'KAMION')} · ${esc(a.plannedPlate||a.arrivalPlate||'')}</div><div class="myy-trailer"></div><div class="myy-cab"></div><i class="myy-wheel myy-w1"></i><i class="myy-wheel myy-w2"></i><i class="myy-wheel myy-w3"></i></div>`}
+function render(){ensure();const s=document.getElementById('myYard');if(!s)return;const w=wh(),d=today(),n=ramps(w);s.querySelector('.myy-meta').textContent=`${w} · ${d} · LIVE STATUS`;const docks=s.querySelector('.myy-docks');docks.innerHTML=Array.from({length:n},(_,i)=>{const busy=data().some(a=>(a.warehouse||'W101')===w&&stateOf(a)==='dock'&&Number(a.dock)===i+1);let locked=false;try{locked=!!YardivoRampConfig?.isLocked?.(w,i+1)}catch(e){};return `<div class="myy-dock ${busy?'busy':''} ${locked?'locked':''}" style="left:${285+i*Math.min(94,600/Math.max(1,n-1))}px">R${i+1}</div>`}).join('');const list=data().filter(a=>(a.warehouse||'W101')===w&&(a.date===d||['yard','dock','done','rejected'].includes(stateOf(a)))).slice(-16);s.querySelector('.myy-trucks').innerHTML=list.map((a,i)=>truck(a,i,n)).join('')}
+function show(){ensure();document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('myYard')?.classList.add('active');render()}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-view="myYard"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();show()},true);
+window.addEventListener('load',()=>setTimeout(()=>{ensure();render()},1200));setInterval(()=>{if(document.getElementById('myYard')?.classList.contains('active'))render()},1800);window.YardivoMyYard={render,show};
+})();
+</script>
+
+
+<script id="yardivo-qr-mobile-setting-runtime-v34">
+(function(){
+  let lastRole='',lastValue='';
+  setInterval(function(){
+    try{
+      const role=String(window.currentSession?.role||currentSession?.role||'');
+      const val=(typeof yardivoQrMobileEnabled==='function'?(yardivoQrMobileEnabled()?'1':'0'):'');
+      if(role!==lastRole||val!==lastValue){
+        lastRole=role;lastValue=val;
+        if(typeof renderQrMobileAdminSetting==='function')renderQrMobileAdminSetting();
+        if(typeof renderReceiving==='function'&&document.getElementById('receiving')?.classList.contains('active'))renderReceiving();
+      }
+    }catch(e){}
+  },1200);
+})();
+</script>
 </body>
 </html>
