@@ -18322,7 +18322,7 @@ window.YardivoLiveYard={render};
 'use strict';
 
 const LOG_KEY='yardivo_auto_replan_log_v1';
-const CFG_KEY='yardivo_auto_replan_cfg_v1';
+const CFG_KEY='yardivo_replanning_config_v1';
 const NOTIF_KEY='yardivo_live_notifications_v1';
 const DEFAULT_CFG={enabled:true,mode:'AUTO_SAFE',lateThreshold:20,horizonMinutes:240,maxShiftMinutes:240,scanSeconds:30};
 let selectedLogId=null,lastScanAt=0,scanBusy=false,lastSignature='';
@@ -18454,7 +18454,7 @@ function applyReplan(a,problem,c){
 }
 function alertStack(){let s=document.getElementById('yardivoAutoReplanAlertStack');if(!s){s=document.createElement('div');s.id='yardivoAutoReplanAlertStack';document.body.appendChild(s)}return s}
 function showAlert(log){
- if(!currentSession?.role||!canView())return;
+ if(!currentSession?.role||!canView()||!loadCfg().enabled)return;
  const s=alertStack(),x=document.createElement('div');x.className='srp-alert '+(log.problemType==='RAMP_CLOSED'?'critical':log.problemType==='LATE'?'warn':'');
  x.dataset.logId=log.id;
  x.innerHTML=`<h3>⚡ YARDIVO AUTOMATSKI REPLANNING</h3><p><strong>${esc(log.supplier)}</strong> · ${esc(log.reason)}</p>
@@ -18496,7 +18496,14 @@ function scan(force=false){
  }finally{scanBusy=false;lastSignature=signature();renderSection()}
 }
 function inject(){
- if(!canView())return;
+ const cfg=loadCfg();
+ if(!canView()||!cfg.enabled){
+   document.querySelectorAll('.nav-btn[data-view="smartReplanning"]').forEach(x=>x.remove());
+   document.getElementById('smartReplanning')?.remove();
+   document.getElementById('yardivoAutoReplanAlertStack')?.remove();
+   if(typeof activeView!=='undefined'&&activeView==='smartReplanning'){try{openAppView?.('homeMenu')}catch(e){}}
+   return;
+ }
  if(!document.querySelector('.nav-btn[data-view="smartReplanning"]')){
    const y=document.querySelector('.nav-btn[data-view="liveYard"]')||document.querySelector('.nav-btn[data-view="controlTower"]');
    y?.insertAdjacentHTML('afterend','<button class="nav-btn" data-view="smartReplanning"><span>⚡</span> YARDIVO automatske preporuke</button>');
@@ -18566,13 +18573,13 @@ setInterval(()=>{
  const sig=signature();if(sig!==lastSignature){lastSignature=sig;scan(true)}else scan(false);
 },5000);
 
-window.YardivoSmartReplanning={scanNow:()=>scan(true),render:renderSection,logs};
+window.YardivoSmartReplanning={scanNow:()=>scan(true),render:renderSection,logs,syncVisibility:inject};
 })();
 </script>
 <script id="yardivo-war-room-v1">
 (function(){
 'use strict';
-const SRP_CFG='yardivo_auto_replan_cfg_v1',SRP_LOG='yardivo_auto_replan_log_v1';
+const SRP_CFG='yardivo_replanning_config_v1',SRP_LOG='yardivo_auto_replan_log_v1';
 let wrTimer=null,wrWarehouse=null;
 
 function role(){let r='';try{r=String(currentSession?.role||'').toLowerCase().trim()}catch(e){}if(r==='zalihe')r='inventory';return r}
@@ -18595,7 +18602,7 @@ function injectAdminSetting(){
  const settings=document.getElementById('settings');if(!settings||document.getElementById('srpAdminSettingsCard'))return;
  settings.insertAdjacentHTML('beforeend',`<div id="srpAdminSettingsCard"><h3>⚡ YARDIVO SMART REPLANNING</h3><p>Admin određuje smije li YARDIVO automatski primjenjivati sigurne promjene termina i rampi. Kad je isključeno, engine je pauziran i ne radi automatske promjene.</p><div class="srp-setting-line"><div><strong>AUTO SAFE MODE</strong><small>Kašnjenja, zatvorene rampe, blokade i konflikti → automatski izračun i sigurna promjena.</small></div><label class="srp-toggle"><input type="checkbox" id="srpAdminAutoSafe"><span></span></label></div></div>`);
  const cb=document.getElementById('srpAdminAutoSafe');cb.checked=!!cfg().enabled;
- cb.addEventListener('change',()=>{const c=cfg();c.enabled=cb.checked;c.mode=cb.checked?'AUTO_SAFE':'PAUSED';saveCfg(c);try{YardivoSmartReplanning?.render?.()}catch(e){};try{showYmsToast?.('info','SMART REPLANNING',cb.checked?'AUTO SAFE je uključen.':'AUTO SAFE je pauziran.')}catch(e){}});
+ cb.addEventListener('change',()=>{const c=cfg();c.enabled=cb.checked;c.mode=cb.checked?'AUTO_SAFE':'PAUSED';saveCfg(c);try{putCloudState?.(SRP_CFG,JSON.stringify(c))}catch(e){};try{YardivoSmartReplanning?.syncVisibility?.()}catch(e){};try{YardivoSmartReplanning?.render?.()}catch(e){};try{showYmsToast?.('info','SMART REPLANNING',cb.checked?'AUTO SAFE je uključen za Admin, Zalihe i Prijam.':'Automatske preporuke su isključene za sve korisnike.')}catch(e){}});
 }
 function enforceAdminControl(){
  const mode=document.getElementById('srpMode');if(mode){mode.disabled=!admin();mode.title=admin()?'':'AUTO SAFE može mijenjati samo Admin u Postavkama.'}
@@ -20287,57 +20294,25 @@ window.YARDIVO_ROLE_VIEWS_V3101=ROLE;window.yardivoApplyAuthoritativeRoles=apply
 const old=window.applyRoleAccess;window.applyRoleAccess=function(){try{old?.apply(this,arguments)}catch(e){}apply()};
 window.addEventListener('load',()=>setTimeout(apply,100));document.addEventListener('click',()=>setTimeout(apply,0),true);setInterval(apply,2000);
 })();</script>
-<style id="yardivo-v3102-qr-visibility-fix">
-/* QR/Mobile sidebar visibility is deterministic: OFF = hidden, ON = visible. */
-body.yardivo-qr-mobile-off .sidebar .yardivo-qr-mobile-nav{display:none!important}
-body.yardivo-qr-mobile-on .sidebar .yardivo-qr-mobile-nav{display:flex!important}
-</style>
-<script id="yardivo-v3102-qr-visibility-fix">
+<script id="yardivo-v3102-recommendations-switch-guard">
 (function(){
-  const KEY='yardivo_ramp_qr_mobile_v1';
-  let stable=null;
-  function read(){
-    try{
-      const raw=(window.safeStorage&&safeStorage.getItem)?safeStorage.getItem(KEY):localStorage.getItem(KEY);
-      return raw===null||raw===''||raw==='1'||raw==='true'||raw==='on';
-    }catch(e){return true}
-  }
-  function markNav(){
-    document.querySelectorAll('.sidebar .nav-btn').forEach(btn=>{
-      const txt=(btn.textContent||'').toLowerCase();
-      if(/qr|scanner|mobile/.test(txt))btn.classList.add('yardivo-qr-mobile-nav');
-    });
-  }
-  function apply(force){
-    if(force===true||force===false)stable=force;
-    if(stable===null)stable=read();
-    markNav();
-    document.body?.classList.toggle('yardivo-qr-mobile-on',!!stable);
-    document.body?.classList.toggle('yardivo-qr-mobile-off',!stable);
-    document.querySelectorAll('.sidebar .yardivo-qr-mobile-nav').forEach(el=>{
-      el.hidden=!stable;
-      el.style.setProperty('display',stable?'flex':'none','important');
-    });
-  }
-  const oldSet=window.yardivoSetQrMobileEnabled;
-  if(typeof oldSet==='function'){
-    window.yardivoSetQrMobileEnabled=function(enabled){
-      const r=oldSet.apply(this,arguments);
-      stable=!!enabled; apply(stable); return r;
-    };
-  }
-  const oldGet=window.yardivoQrMobileEnabled;
-  window.yardivoQrMobileEnabled=function(){
-    if(stable===null)stable=typeof oldGet==='function'?!!oldGet():read();
-    return !!stable;
-  };
-  window.addEventListener('storage',e=>{if(e.key===KEY){stable=read();apply(stable)}});
-  const mo=new MutationObserver(()=>apply());
-  function init(){apply();const sb=document.querySelector('.sidebar');if(sb)mo.observe(sb,{childList:true,subtree:true});}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
-  window.YardivoQrVisibility={apply,isOn:()=>!!stable};
+'use strict';
+const K='yardivo_replanning_config_v1';
+function cfg(){try{return {enabled:true,...JSON.parse(localStorage.getItem(K)||'{}')}}catch(e){return {enabled:true}}}
+function role(){let r='';try{r=String(currentSession?.role||'').toLowerCase()}catch(e){};if(r==='zalihe'||r==='upravljanje zalihama')r='inventory';if(r==='prijam')r='reception';if(r==='porta'||r==='portir')r='gate';return r}
+function apply(){
+ const on=!!cfg().enabled, allowed=['admin','inventory','reception'].includes(role());
+ if(!on||!allowed){
+   document.querySelectorAll('.nav-btn[data-view="smartReplanning"]').forEach(x=>x.remove());
+   document.getElementById('smartReplanning')?.remove();
+   document.getElementById('yardivoAutoReplanAlertStack')?.remove();
+ } else { try{window.YardivoSmartReplanning?.syncVisibility?.()}catch(e){} }
+}
+window.addEventListener('storage',e=>{if(e.key===K)setTimeout(apply,0)});
+window.addEventListener('load',()=>setTimeout(apply,2300));
+setInterval(apply,1200);
+window.YardivoRecommendationsVisibility={apply,cfg};
 })();
 </script>
-
 </body>
 </html>
