@@ -20287,47 +20287,57 @@ window.YARDIVO_ROLE_VIEWS_V3101=ROLE;window.yardivoApplyAuthoritativeRoles=apply
 const old=window.applyRoleAccess;window.applyRoleAccess=function(){try{old?.apply(this,arguments)}catch(e){}apply()};
 window.addEventListener('load',()=>setTimeout(apply,100));document.addEventListener('click',()=>setTimeout(apply,0),true);setInterval(apply,2000);
 })();</script>
-
-<!-- YARDIVO V3.10.2 — SMART PREPORUKE VISIBILITY FIX -->
-<script id="yardivo-v3102-smart-visibility-fix">
+<style id="yardivo-v3102-qr-visibility-fix">
+/* QR/Mobile sidebar visibility is deterministic: OFF = hidden, ON = visible. */
+body.yardivo-qr-mobile-off .sidebar .yardivo-qr-mobile-nav{display:none!important}
+body.yardivo-qr-mobile-on .sidebar .yardivo-qr-mobile-nav{display:flex!important}
+</style>
+<script id="yardivo-v3102-qr-visibility-fix">
 (function(){
-'use strict';
-const CFG_KEY='yardivo_auto_replan_cfg_v1';
-function cfg(){try{return {enabled:true,...JSON.parse(localStorage.getItem(CFG_KEY)||'{}')}}catch(e){return {enabled:true}}}
-function enabled(){return cfg().enabled!==false}
-function apply(){
-  const on=enabled();
-  document.querySelectorAll('.nav-btn[data-view="smartReplanning"]').forEach(b=>{
-    b.style.display=on?'':'none';
-    b.classList.toggle('role-hidden',!on);
-    b.setAttribute('aria-hidden',on?'false':'true');
-  });
-  const section=document.getElementById('smartReplanning');
-  if(section){
-    section.style.display=on?'':'none';
-    section.setAttribute('aria-hidden',on?'false':'true');
-    if(!on && section.classList.contains('active')){
-      section.classList.remove('active');
-      const home=document.getElementById('homeMenu')||document.getElementById('dashboard')||document.querySelector('.view');
-      if(home)home.classList.add('active');
-      document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
-      const hb=document.querySelector('.nav-btn[data-view="homeMenu"],.nav-btn[data-view="dashboard"]');
-      if(hb)hb.classList.add('active');
-    }
+  const KEY='yardivo_ramp_qr_mobile_v1';
+  let stable=null;
+  function read(){
+    try{
+      const raw=(window.safeStorage&&safeStorage.getItem)?safeStorage.getItem(KEY):localStorage.getItem(KEY);
+      return raw===null||raw===''||raw==='1'||raw==='true'||raw==='on';
+    }catch(e){return true}
   }
-  // SMART preporuke u War Roomu se također ne prikazuju kada je funkcija ugašena.
-  const warPanel=document.getElementById('wrReplans')?.closest('.wr-panel');
-  if(warPanel)warPanel.style.display=on?'':'none';
-}
-const oldSet=Storage.prototype.setItem;
-if(!window.__yardivoSmartVisibilityStorageHook){
-  window.__yardivoSmartVisibilityStorageHook=true;
-  Storage.prototype.setItem=function(k,v){const r=oldSet.apply(this,arguments);if(String(k)===CFG_KEY)setTimeout(apply,0);return r};
-}
-window.YardivoSmartVisibility={apply,enabled};
-window.addEventListener('load',()=>setTimeout(apply,100));
-setInterval(apply,1200);
+  function markNav(){
+    document.querySelectorAll('.sidebar .nav-btn').forEach(btn=>{
+      const txt=(btn.textContent||'').toLowerCase();
+      if(/qr|scanner|mobile/.test(txt))btn.classList.add('yardivo-qr-mobile-nav');
+    });
+  }
+  function apply(force){
+    if(force===true||force===false)stable=force;
+    if(stable===null)stable=read();
+    markNav();
+    document.body?.classList.toggle('yardivo-qr-mobile-on',!!stable);
+    document.body?.classList.toggle('yardivo-qr-mobile-off',!stable);
+    document.querySelectorAll('.sidebar .yardivo-qr-mobile-nav').forEach(el=>{
+      el.hidden=!stable;
+      el.style.setProperty('display',stable?'flex':'none','important');
+    });
+  }
+  const oldSet=window.yardivoSetQrMobileEnabled;
+  if(typeof oldSet==='function'){
+    window.yardivoSetQrMobileEnabled=function(enabled){
+      const r=oldSet.apply(this,arguments);
+      stable=!!enabled; apply(stable); return r;
+    };
+  }
+  const oldGet=window.yardivoQrMobileEnabled;
+  window.yardivoQrMobileEnabled=function(){
+    if(stable===null)stable=typeof oldGet==='function'?!!oldGet():read();
+    return !!stable;
+  };
+  window.addEventListener('storage',e=>{if(e.key===KEY){stable=read();apply(stable)}});
+  const mo=new MutationObserver(()=>apply());
+  function init(){apply();const sb=document.querySelector('.sidebar');if(sb)mo.observe(sb,{childList:true,subtree:true});}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+  window.YardivoQrVisibility={apply,isOn:()=>!!stable};
 })();
 </script>
+
 </body>
 </html>
