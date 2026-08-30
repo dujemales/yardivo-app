@@ -2411,22 +2411,25 @@ body:not(.home-menu-mode)>section.view.active{
 .overview-chart-legend i{width:9px;height:9px;border-radius:2px}
 .overview-chart-legend i.good{background:#4fd27a}.overview-chart-legend i.mid{background:#e1b547}.overview-chart-legend i.bad{background:#e55c68}
 .overview-supplier-chart{
-  min-height:255px;
-  padding:14px 12px 10px;
+  min-height:330px;
+  padding:18px 16px 12px;
   display:flex;
   align-items:flex-end;
-  gap:5px;
+  gap:12px;
   overflow-x:auto;
+  overflow-y:hidden;
+  scroll-behavior:smooth;
+  scrollbar-gutter:stable;
   border-top:1px solid #1d3749;
   background:
     linear-gradient(to top,rgba(255,255,255,.025) 1px,transparent 1px);
   background-size:100% 25%;
 }
 .overview-chart-col{
-  flex:1 0 34px;
-  min-width:34px;
-  max-width:70px;
-  height:220px;
+  flex:0 0 76px;
+  min-width:76px;
+  max-width:76px;
+  height:285px;
   display:flex;
   flex-direction:column;
   justify-content:flex-end;
@@ -2434,10 +2437,10 @@ body:not(.home-menu-mode)>section.view.active{
   gap:5px;
   cursor:pointer;
 }
-.overview-chart-value{font-size:6px;font-weight:1000;color:#dce7ed}
+.overview-chart-value{font-size:10px;font-weight:1000;color:#f4f8fb;letter-spacing:.2px}
 .overview-chart-bar-wrap{
-  width:72%;
-  height:160px;
+  width:58px;
+  height:205px;
   display:flex;
   align-items:flex-end;
   border-bottom:1px solid #355064;
@@ -2454,9 +2457,10 @@ body:not(.home-menu-mode)>section.view.active{
 .overview-chart-col:hover .overview-chart-bar{filter:brightness(1.18);transform:scaleX(1.08)}
 .overview-chart-name{
   width:100%;
-  min-height:42px;
-  font-size:5px;
-  line-height:1.25;
+  min-height:48px;
+  font-size:8px;
+  line-height:1.2;
+  font-weight:850;
   color:#8098a8;
   text-align:center;
   overflow:hidden;
@@ -5941,6 +5945,7 @@ html:not(.yardivo-role-admin) #qrMobileSettingsPanel{display:none!important}
 #yardivoAnnouncementInfoModal .yai-status{display:inline-flex;padding:5px 8px;border-radius:99px;border:1px solid #3c694d;background:#10261a;color:#69dc93}
 @media(max-width:620px){#yardivoAnnouncementInfoModal .yai-grid{grid-template-columns:1fr}#yardivoAnnouncementInfoModal .yai-card{width:100%}}
 </style>
+<meta name="yardivo-build" content="V3.10.2 OVERVIEW CLEAN">
 </head>
 <body>
 <button aria-label="Uključi full screen" id="yardivoFullscreenBtn" title="Full screen" type="button"><span class="fs-icon">⛶</span><span class="fs-label">FULL SCREEN</span></button>
@@ -7113,8 +7118,8 @@ AUTOMATSKA PREPORUKA</small>
 <section class="panel overview-main-chart">
 <div class="panel-head">
 <div>
-<h2>ANALITIČKI PREGLED DOBAVLJAČA</h2>
-<small>Pouzdanost svih dobavljača — graf se automatski puni iz evidencije najava, dolazaka, no-showa i incidenata.</small>
+<h2>OCJENA SVIH DOBAVLJAČA</h2>
+<small>Svaki stupac je jedan dobavljač · viši stupac = bolja ocjena · listaj lijevo/desno za cijelu listu.</small>
 </div>
 <div class="overview-chart-legend">
 <span><i class="good"></i>90–100%</span>
@@ -9154,9 +9159,17 @@ function renderOverview(){
 function renderChangeHistory(){
   const body=document.getElementById('changeHistoryTable');if(!body)return;
   const rows=[];
-  announcements.filter(whMatch).forEach(a=>(a.changeHistory||[]).forEach(c=>rows.push({supplier:a.supplier,...c})));
+  const validText=v=>v!==undefined&&v!==null&&String(v).trim()!==''&&String(v).trim().toLowerCase()!=='undefined';
+  const validChange=c=>c&&validText(c.oldWarehouse)&&validText(c.newWarehouse)&&validText(c.oldDate)&&validText(c.newDate)&&validText(c.oldTime)&&validText(c.newTime)&&validText(c.oldDock)&&validText(c.newDock)&&validText(c.changedAt);
+  announcements.filter(whMatch).forEach(a=>{
+    if(!a||!validText(a.supplier))return;
+    (Array.isArray(a.changeHistory)?a.changeHistory:[]).forEach(c=>{
+      // Overview prikazuje samo stvarne, kompletne promjene termina. Stari/oštećeni zapisi s "undefined" se ignoriraju.
+      if(validChange(c))rows.push({supplier:a.supplier,...c});
+    });
+  });
   rows.sort((a,b)=>String(b.changedAt).localeCompare(String(a.changedAt)));
-  body.innerHTML=rows.length?rows.map(c=>`<tr><td><strong>${c.supplier}</strong></td><td>${c.oldWarehouse} → ${c.newWarehouse}</td><td>${c.oldDate} ${c.oldTime} · R${c.oldDock}</td><td>${c.newDate} ${c.newTime} · R${c.newDock}</td><td>${c.reason}${c.note?`<br><small>${c.note}</small>`:''}</td><td>${new Date(c.changedAt).toLocaleString('hr-HR')}</td><td><span class="${c.countsAsLate?'change-negative':'change-neutral'}">${c.countsAsLate?'NO-SHOW / negativno':'Najavljeno unaprijed / neutralno'}</span></td></tr>`).join(''):'<tr><td colspan="7"><div class="overview-empty">Nema evidentiranih promjena najava.</div></td></tr>';
+  body.innerHTML=rows.length?rows.map(c=>`<tr><td><strong>${c.supplier}</strong></td><td>${c.oldWarehouse} → ${c.newWarehouse}</td><td>${c.oldDate} ${c.oldTime} · R${c.oldDock}</td><td>${c.newDate} ${c.newTime} · R${c.newDock}</td><td>${c.reason||'Promjena termina'}${c.note?`<br><small>${c.note}</small>`:''}</td><td>${new Date(c.changedAt).toLocaleString('hr-HR')}</td><td><span class="${c.countsAsLate?'change-negative':'change-neutral'}">${c.countsAsLate?'NO-SHOW / negativno':'Najavljeno unaprijed / neutralno'}</span></td></tr>`).join(''):'<tr><td colspan="7"><div class="overview-empty">Nema evidentiranih valjanih promjena najava.</div></td></tr>';
 }
 
 function renderIncidents(){
@@ -18322,7 +18335,7 @@ window.YardivoLiveYard={render};
 'use strict';
 
 const LOG_KEY='yardivo_auto_replan_log_v1';
-const CFG_KEY='yardivo_replanning_config_v1';
+const CFG_KEY='yardivo_auto_replan_cfg_v1';
 const NOTIF_KEY='yardivo_live_notifications_v1';
 const DEFAULT_CFG={enabled:true,mode:'AUTO_SAFE',lateThreshold:20,horizonMinutes:240,maxShiftMinutes:240,scanSeconds:30};
 let selectedLogId=null,lastScanAt=0,scanBusy=false,lastSignature='';
@@ -18454,7 +18467,7 @@ function applyReplan(a,problem,c){
 }
 function alertStack(){let s=document.getElementById('yardivoAutoReplanAlertStack');if(!s){s=document.createElement('div');s.id='yardivoAutoReplanAlertStack';document.body.appendChild(s)}return s}
 function showAlert(log){
- if(!currentSession?.role||!canView()||!loadCfg().enabled)return;
+ if(!currentSession?.role||!canView())return;
  const s=alertStack(),x=document.createElement('div');x.className='srp-alert '+(log.problemType==='RAMP_CLOSED'?'critical':log.problemType==='LATE'?'warn':'');
  x.dataset.logId=log.id;
  x.innerHTML=`<h3>⚡ YARDIVO AUTOMATSKI REPLANNING</h3><p><strong>${esc(log.supplier)}</strong> · ${esc(log.reason)}</p>
@@ -18496,14 +18509,7 @@ function scan(force=false){
  }finally{scanBusy=false;lastSignature=signature();renderSection()}
 }
 function inject(){
- const cfg=loadCfg();
- if(!canView()||!cfg.enabled){
-   document.querySelectorAll('.nav-btn[data-view="smartReplanning"]').forEach(x=>x.remove());
-   document.getElementById('smartReplanning')?.remove();
-   document.getElementById('yardivoAutoReplanAlertStack')?.remove();
-   if(typeof activeView!=='undefined'&&activeView==='smartReplanning'){try{openAppView?.('homeMenu')}catch(e){}}
-   return;
- }
+ if(!canView())return;
  if(!document.querySelector('.nav-btn[data-view="smartReplanning"]')){
    const y=document.querySelector('.nav-btn[data-view="liveYard"]')||document.querySelector('.nav-btn[data-view="controlTower"]');
    y?.insertAdjacentHTML('afterend','<button class="nav-btn" data-view="smartReplanning"><span>⚡</span> YARDIVO automatske preporuke</button>');
@@ -18573,13 +18579,13 @@ setInterval(()=>{
  const sig=signature();if(sig!==lastSignature){lastSignature=sig;scan(true)}else scan(false);
 },5000);
 
-window.YardivoSmartReplanning={scanNow:()=>scan(true),render:renderSection,logs,syncVisibility:inject};
+window.YardivoSmartReplanning={scanNow:()=>scan(true),render:renderSection,logs};
 })();
 </script>
 <script id="yardivo-war-room-v1">
 (function(){
 'use strict';
-const SRP_CFG='yardivo_replanning_config_v1',SRP_LOG='yardivo_auto_replan_log_v1';
+const SRP_CFG='yardivo_auto_replan_cfg_v1',SRP_LOG='yardivo_auto_replan_log_v1';
 let wrTimer=null,wrWarehouse=null;
 
 function role(){let r='';try{r=String(currentSession?.role||'').toLowerCase().trim()}catch(e){}if(r==='zalihe')r='inventory';return r}
@@ -18602,7 +18608,7 @@ function injectAdminSetting(){
  const settings=document.getElementById('settings');if(!settings||document.getElementById('srpAdminSettingsCard'))return;
  settings.insertAdjacentHTML('beforeend',`<div id="srpAdminSettingsCard"><h3>⚡ YARDIVO SMART REPLANNING</h3><p>Admin određuje smije li YARDIVO automatski primjenjivati sigurne promjene termina i rampi. Kad je isključeno, engine je pauziran i ne radi automatske promjene.</p><div class="srp-setting-line"><div><strong>AUTO SAFE MODE</strong><small>Kašnjenja, zatvorene rampe, blokade i konflikti → automatski izračun i sigurna promjena.</small></div><label class="srp-toggle"><input type="checkbox" id="srpAdminAutoSafe"><span></span></label></div></div>`);
  const cb=document.getElementById('srpAdminAutoSafe');cb.checked=!!cfg().enabled;
- cb.addEventListener('change',()=>{const c=cfg();c.enabled=cb.checked;c.mode=cb.checked?'AUTO_SAFE':'PAUSED';saveCfg(c);try{putCloudState?.(SRP_CFG,JSON.stringify(c))}catch(e){};try{YardivoSmartReplanning?.syncVisibility?.()}catch(e){};try{YardivoSmartReplanning?.render?.()}catch(e){};try{showYmsToast?.('info','SMART REPLANNING',cb.checked?'AUTO SAFE je uključen za Admin, Zalihe i Prijam.':'Automatske preporuke su isključene za sve korisnike.')}catch(e){}});
+ cb.addEventListener('change',()=>{const c=cfg();c.enabled=cb.checked;c.mode=cb.checked?'AUTO_SAFE':'PAUSED';saveCfg(c);try{YardivoSmartReplanning?.render?.()}catch(e){};try{showYmsToast?.('info','SMART REPLANNING',cb.checked?'AUTO SAFE je uključen.':'AUTO SAFE je pauziran.')}catch(e){}});
 }
 function enforceAdminControl(){
  const mode=document.getElementById('srpMode');if(mode){mode.disabled=!admin();mode.title=admin()?'':'AUTO SAFE može mijenjati samo Admin u Postavkama.'}
@@ -20293,26 +20299,5 @@ function apply(){
 window.YARDIVO_ROLE_VIEWS_V3101=ROLE;window.yardivoApplyAuthoritativeRoles=apply;
 const old=window.applyRoleAccess;window.applyRoleAccess=function(){try{old?.apply(this,arguments)}catch(e){}apply()};
 window.addEventListener('load',()=>setTimeout(apply,100));document.addEventListener('click',()=>setTimeout(apply,0),true);setInterval(apply,2000);
-})();</script>
-<script id="yardivo-v3102-recommendations-switch-guard">
-(function(){
-'use strict';
-const K='yardivo_replanning_config_v1';
-function cfg(){try{return {enabled:true,...JSON.parse(localStorage.getItem(K)||'{}')}}catch(e){return {enabled:true}}}
-function role(){let r='';try{r=String(currentSession?.role||'').toLowerCase()}catch(e){};if(r==='zalihe'||r==='upravljanje zalihama')r='inventory';if(r==='prijam')r='reception';if(r==='porta'||r==='portir')r='gate';return r}
-function apply(){
- const on=!!cfg().enabled, allowed=['admin','inventory','reception'].includes(role());
- if(!on||!allowed){
-   document.querySelectorAll('.nav-btn[data-view="smartReplanning"]').forEach(x=>x.remove());
-   document.getElementById('smartReplanning')?.remove();
-   document.getElementById('yardivoAutoReplanAlertStack')?.remove();
- } else { try{window.YardivoSmartReplanning?.syncVisibility?.()}catch(e){} }
-}
-window.addEventListener('storage',e=>{if(e.key===K)setTimeout(apply,0)});
-window.addEventListener('load',()=>setTimeout(apply,2300));
-setInterval(apply,1200);
-window.YardivoRecommendationsVisibility={apply,cfg};
-})();
-</script>
-</body>
+})();</script></body>
 </html>
