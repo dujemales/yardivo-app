@@ -11547,8 +11547,8 @@ function roleLabel(role){
 function allowedViewsForRole(role){
   const map={
     admin:[],
-    inventory:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','announcements','weeklyDeliveries','overview','suppliers','calendar','heatmap','controltower','controlTower','plannerPro','incidents','incidentArchive','reports','settings','unannounced','epal','orderSearch'],
-    reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','docks','operations','incidents','incidentArchive','plannerPro','controltower','controlTower','settings','unannounced','epal','orderSearch'],
+    inventory:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','announcements','weeklyDeliveries','overview','suppliers','calendar','heatmap','controltower','controlTower','plannerPro','incidents','incidentArchive','reports','settings','unannounced','epal','orderSearch','smartReplanning'],
+    reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','docks','operations','incidents','incidentArchive','plannerPro','controltower','controlTower','settings','unannounced','epal','orderSearch','smartReplanning'],
     gate:['homeMenu','checkin','unannounced','docks','myYard'],
     management:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','overview','reports','calendar','heatmap','controltower','controlTower','suppliers','incidents','incidentArchive','settings']
   };
@@ -12374,9 +12374,9 @@ const LS=window.safeStorage||localStorage;
 const K={users:'yardivo_master_users_v1',font:'yardivo_master_font_v1',report:'yardivo_master_report_v1',sheets:'yardivo_master_sheets_v1',notes:'yardivo_master_notifications_v1'};
 const ROLE_LABEL={admin:'Admin',inventory:'Upravljanje zalihama',reception:'Prijam',gate:'Porta',management:'Voditelj'};
 const ROLE_VIEWS={
- admin:['homeMenu','dashboard','receiving','weeklyMap','dailyMap','settings','checkin','myYard','docks','trucks','suppliers','announcements','weeklyDeliveries','overview','incidents','incidentArchive','shipments','operations','reports','plannerPro','controltower','calendar','heatmap'],
- inventory:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','announcements','weeklyDeliveries','overview','suppliers','calendar','heatmap','controltower','controlTower','plannerPro','incidents','incidentArchive','reports','settings','unannounced','epal','orderSearch'],
- reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','plannerPro','controltower','controlTower','settings','unannounced','epal','orderSearch'],
+ admin:['homeMenu','dashboard','receiving','weeklyMap','dailyMap','settings','checkin','myYard','docks','trucks','suppliers','announcements','weeklyDeliveries','overview','incidents','incidentArchive','shipments','operations','reports','plannerPro','controltower','calendar','heatmap','smartReplanning'],
+ inventory:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','announcements','weeklyDeliveries','overview','suppliers','calendar','heatmap','controltower','controlTower','plannerPro','incidents','incidentArchive','reports','settings','unannounced','epal','orderSearch','smartReplanning'],
+ reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','plannerPro','controltower','controlTower','settings','unannounced','epal','orderSearch','smartReplanning'],
  gate:['homeMenu','checkin','unannounced','docks','myYard'],
  management:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','overview','reports','calendar','heatmap','controltower','suppliers','incidents','incidentArchive','settings']
 };
@@ -12408,7 +12408,7 @@ function addSettings(){const grid=document.querySelector('#settings .settings-gr
 <section class="panel"><div class="panel-head"><div><h2>VELIČINA TEKSTA U POLJIMA I TABLICAMA</h2><small>Postavka ostaje spremljena na uređaju</small></div></div><div class="master-settings-body"><div style="display:flex;align-items:center;gap:8px"><button class="secondary" id="fontMinus">A−</button><input id="fontRange" type="range" min="80" max="150" step="5" style="flex:1"><button class="secondary" id="fontPlus">A+</button><button class="secondary" id="fontReset">100%</button><strong id="fontPct">100%</strong></div><div class="font-demo">Primjer teksta u ćelijama i poljima</div></div></section>
 <section class="panel"><div class="panel-head"><div><h2>AUTOMATSKI DNEVNI IZVJEŠTAJ</h2><small>Slanje nakon 14:00 preko Google Apps Script integracije</small></div></div><div class="master-settings-body"><div class="form-grid"><label>E-mail primatelja<input id="repEmail" type="email" placeholder="voditelj@tvrtka.hr"></label><label>Vrijeme slanja<input id="repTime" type="time" value="14:05"></label></div><div class="master-perms" id="repItems"></div><div style="display:flex;gap:8px;margin-top:10px"><button class="primary" id="repSave" type="button">SPREMI POSTAVKE</button><button class="secondary" id="repPreview" type="button">PREGLEDAJ IZVJEŠTAJ</button></div><div class="master-note warn" style="margin-top:10px">Za slanje i kada preglednik nije otvoren, vremenski trigger mora biti postavljen u Google Apps Scriptu. HTML sprema konfiguraciju i može je sinkronizirati.</div></div></section>
 <section class="panel"><div class="panel-head"><div><h2>GOOGLE SHEETS · CENTRALNA BAZA</h2><small>Apps Script Web App endpoint</small></div><span id="sheetState" class="master-sync-state warn">NIJE POVEZANO</span></div><div class="master-settings-body"><label>Apps Script Web App URL<input id="sheetUrl" placeholder="https://script.google.com/macros/s/.../exec"></label><div style="display:flex;gap:8px;margin-top:10px"><button class="primary" id="sheetSave" type="button">SPREMI POVEZNICU</button><button class="secondary" id="sheetTest" type="button">TEST VEZE</button><button class="secondary" id="sheetPush" type="button">SINKRONIZIRAJ SADA</button></div><div class="master-note" style="margin-top:10px">Sinkronizacija šalje najave, incidente i korisnike centralnom endpointu. Endpoint mora implementirati spremanje u Google Sheets i autorizaciju.</div></div></section>`);setupSettings();}
-function setupSettings(){const perms=document.getElementById('muPerms');const views=['dashboard','overview','announcements','checkin','yard','docks','incidents','incidentArchive','reports','settings'];perms.innerHTML=views.map(v=>`<label><input type="checkbox" value="${v}">${v}</label>`).join('');const items=['Dnevni sažetak','Broj kamiona','Palete','Kašnjenja','No-show','Stanje rampi','Dobavljači','Incidenti'];document.getElementById('repItems').innerHTML=items.map(x=>`<label><input type="checkbox" value="${x}" checked>${x}</label>`).join('');document.getElementById('muSave').onclick=createUser;renderUsers();let fp=Number(LS.getItem(K.font)||100);applyFont(fp);document.getElementById('fontRange').value=fp;document.getElementById('fontMinus').onclick=()=>applyFont(Math.max(80,Number(LS.getItem(K.font)||100)-5));document.getElementById('fontPlus').onclick=()=>applyFont(Math.min(150,Number(LS.getItem(K.font)||100)+5));document.getElementById('fontReset').onclick=()=>applyFont(100);document.getElementById('fontRange').oninput=e=>applyFont(Number(e.target.value));const r=jget(K.report,{email:'',time:'14:05',items});document.getElementById('repEmail').value=r.email||'';document.getElementById('repTime').value=r.time||'14:05';document.getElementById('repSave').onclick=()=>{jset(K.report,{email:repEmail.value.trim(),time:repTime.value,items:[...document.querySelectorAll('#repItems input:checked')].map(x=>x.value)});toast('success','IZVJEŠTAJ','Postavke dnevnog izvještaja su spremljene.')};document.getElementById('repPreview').onclick=()=>{if(typeof openAppView==='function')openAppView('reports');if(typeof renderDailyReport==='function')renderDailyReport()};const sh=jget(K.sheets,{url:''});document.getElementById('sheetUrl').value=sh.url||'';setSheetState(!!sh.url);document.getElementById('sheetSave').onclick=()=>{jset(K.sheets,{url:sheetUrl.value.trim()});setSheetState(!!sheetUrl.value.trim());toast('success','GOOGLE SHEETS','Poveznica je spremljena.')};document.getElementById('sheetTest').onclick=()=>sheetCall('ping');document.getElementById('sheetPush').onclick=()=>sheetCall('sync');}
+function setupSettings(){const perms=document.getElementById('muPerms');const views=['dashboard','overview','announcements','checkin','myYard','docks','incidents','incidentArchive','reports','settings'];perms.innerHTML=views.map(v=>`<label><input type="checkbox" value="${v}">${v}</label>`).join('');const items=['Dnevni sažetak','Broj kamiona','Palete','Kašnjenja','No-show','Stanje rampi','Dobavljači','Incidenti'];document.getElementById('repItems').innerHTML=items.map(x=>`<label><input type="checkbox" value="${x}" checked>${x}</label>`).join('');document.getElementById('muSave').onclick=createUser;renderUsers();let fp=Number(LS.getItem(K.font)||100);applyFont(fp);document.getElementById('fontRange').value=fp;document.getElementById('fontMinus').onclick=()=>applyFont(Math.max(80,Number(LS.getItem(K.font)||100)-5));document.getElementById('fontPlus').onclick=()=>applyFont(Math.min(150,Number(LS.getItem(K.font)||100)+5));document.getElementById('fontReset').onclick=()=>applyFont(100);document.getElementById('fontRange').oninput=e=>applyFont(Number(e.target.value));const r=jget(K.report,{email:'',time:'14:05',items});document.getElementById('repEmail').value=r.email||'';document.getElementById('repTime').value=r.time||'14:05';document.getElementById('repSave').onclick=()=>{jset(K.report,{email:repEmail.value.trim(),time:repTime.value,items:[...document.querySelectorAll('#repItems input:checked')].map(x=>x.value)});toast('success','IZVJEŠTAJ','Postavke dnevnog izvještaja su spremljene.')};document.getElementById('repPreview').onclick=()=>{if(typeof openAppView==='function')openAppView('reports');if(typeof renderDailyReport==='function')renderDailyReport()};const sh=jget(K.sheets,{url:''});document.getElementById('sheetUrl').value=sh.url||'';setSheetState(!!sh.url);document.getElementById('sheetSave').onclick=()=>{jset(K.sheets,{url:sheetUrl.value.trim()});setSheetState(!!sheetUrl.value.trim());toast('success','GOOGLE SHEETS','Poveznica je spremljena.')};document.getElementById('sheetTest').onclick=()=>sheetCall('ping');document.getElementById('sheetPush').onclick=()=>sheetCall('sync');}
 function applyFont(p){LS.setItem(K.font,String(p));document.body.style.setProperty('--yardivo-cell-font',(10*p/100).toFixed(1)+'px');const r=document.getElementById('fontRange'),l=document.getElementById('fontPct');if(r)r.value=p;if(l)l.textContent=p+'%'}
 async function createUser(){if(String(currentSession?.role||'').toLowerCase()!=='admin'){toast('error','PRISTUP','Samo Admin može kreirati korisnike.');return}const username=muUser.value.trim().toLowerCase(),pass=muPass.value;if(!username||pass.length<4){toast('error','KORISNIK','Upiši username i lozinku od najmanje 4 znaka.');return}let a=users();if(a.some(x=>x.username===username)){toast('error','KORISNIK','Username već postoji.');return}a.push({id:Date.now(),name:muName.value.trim()||username,username,passwordHash:await sha256(pass),role:muRole.value,location:muLocation.value,status:muStatus.value,permissions:[...document.querySelectorAll('#muPerms input:checked')].map(x=>x.value),createdAt:new Date().toISOString()});saveUsers(a);muName.value=muUser.value=muPass.value='';renderUsers();toast('success','KORISNIK','Novi korisnik je spremljen.')}
 function renderUsers(){const h=document.getElementById('masterUserList');if(!h)return;const a=users();h.innerHTML='<div class="master-user-row"><strong>Korisnik</strong><strong>Rola</strong><strong>Lokacija</strong><strong>Status</strong><strong>Akcije</strong></div>'+a.map(u=>`<div class="master-user-row"><div><strong>${u.name}</strong><br><small>${u.username}</small></div><div>${ROLE_LABEL[u.role]||u.role}</div><div>${u.location}</div><div>${u.status==='active'?'AKTIVAN':'DEAKTIVIRAN'}</div><div><button class="action" data-toggle-user="${u.id}">${u.status==='active'?'DEAKT.':'AKTIV.'}</button> <button class="action danger" data-del-user="${u.id}">OBRIŠI</button></div></div>`).join('');h.querySelectorAll('[data-toggle-user]').forEach(b=>b.onclick=()=>{let a=users(),u=a.find(x=>x.id==b.dataset.toggleUser);if(u){u.status=u.status==='active'?'disabled':'active';saveUsers(a);renderUsers()}});h.querySelectorAll('[data-del-user]').forEach(b=>b.onclick=()=>{if(confirm('Obrisati korisnika?')){saveUsers(users().filter(x=>x.id!=b.dataset.delUser));renderUsers()}})}
@@ -13975,7 +13975,9 @@ window.YardivoCleanCore={load,save,role,applyHome,driverOpen,driverSave,gateFind
  document.addEventListener('click',e=>{if(e.target.closest('[data-view="yard"],[data-home-target="yard"]'))setTimeout(decorateYard,80)},true);
 
  function forecast(){
-   const all=load().filter(a=>String(a.date||'')===date());
+   const loc=document.getElementById('homeLocationSelect')?.value||'';
+   if(!['VG','DU'].includes(loc))return {total:0,pallets:0,late:0,noShow:0,inYard:0,peak:'—',locationMissing:true};
+   const all=load().filter(a=>String(a.date||'')===date() && (loc==='DU'?String(a.warehouse||'').startsWith('W2'):String(a.warehouse||'').startsWith('W1')));
    const arrivals=all.filter(a=>a.actualTime||a.yardArrivalAt||a.gateCheckedAt);
    const late=arrivals.filter(a=>{
      if(!a.time||!a.actualTime)return false;
@@ -13991,6 +13993,8 @@ window.YardivoCleanCore={load,save,role,applyHome,driverOpen,driverSave,gateFind
  }
  function showForecast(force=false){
    if(!['admin','reception'].includes(role()))return;
+   const selectedLoc=document.getElementById('homeLocationSelect')?.value||'';
+   if(!['VG','DU'].includes(selectedLoc))return;
    const key=SEEN+date()+'_'+role();if(!force&&sessionStorage.getItem(key))return;
    const f=forecast();let ov=document.getElementById('yardivoForecastOverlay');
    if(!ov){ov=document.createElement('div');ov.id='yardivoForecastOverlay';ov.innerHTML=`<div id="yardivoForecastCard"></div>`;document.body.appendChild(ov)}
@@ -14006,13 +14010,10 @@ window.YardivoCleanCore={load,save,role,applyHome,driverOpen,driverSave,gateFind
  window.YardivoDailyForecast={show:()=>showForecast(true),data:forecast};
 
  // Login/session changes can be implemented differently in this single-file app; detect an authenticated Admin/Reception once.
- let last='';
- setInterval(()=>{
-   const r=role();let u='';try{u=String(currentSession?.username||currentSession?.user||currentSession?.name||'')}catch(e){}
-   const sig=r+'|'+u;
-   if(sig!==last){last=sig;if(['admin','reception'].includes(r))setTimeout(()=>showForecast(false),250)}
- },700);
- window.addEventListener('load',()=>setTimeout(()=>showForecast(false),500));
+ const locationSelect=document.getElementById('homeLocationSelect');
+ if(locationSelect){
+   locationSelect.addEventListener('change',()=>{if(['VG','DU'].includes(locationSelect.value))setTimeout(()=>showForecast(false),180)});
+ }
 })();
 </script>
 <style id="yardivo-map-announcement-info-style">
@@ -15143,7 +15144,8 @@ function shouldSync(k){
     'studenac_yms_announcements',
     'yardivo_yms_announcements_v1',
     'yardivo_live_notifications_v1',
-    'yardivo_master_notifications_v1'
+    'yardivo_master_notifications_v1',
+    'yardivo_master_users_v1'
   ]);
   if(sharedExact.has(k))return true;
 
@@ -20286,5 +20288,19 @@ function apply(){
 window.YARDIVO_ROLE_VIEWS_V3101=ROLE;window.yardivoApplyAuthoritativeRoles=apply;
 const old=window.applyRoleAccess;window.applyRoleAccess=function(){try{old?.apply(this,arguments)}catch(e){}apply()};
 window.addEventListener('load',()=>setTimeout(apply,100));document.addEventListener('click',()=>setTimeout(apply,0),true);setInterval(apply,2000);
-})();</script></body>
+})();</script>
+<style id="yardivo-v3102-stability">
+/* V3.10.2: recommendation navigation is persistent; section visibility is controlled only by .view.active. */
+.nav-btn[data-view="smartReplanning"]{visibility:visible!important}
+#smartReplanning.view.active{display:block!important}
+</style>
+<script id="yardivo-v3102-user-safety">
+(function(){
+ const USER_KEY='yardivo_master_users_v1';
+ function refreshUsers(){try{if(typeof renderUsers==='function')renderUsers()}catch(e){}}
+ window.addEventListener('storage',e=>{if(e.key===USER_KEY)refreshUsers()});
+ document.addEventListener('yardivo:supabase-applied',e=>{if(e?.detail?.key===USER_KEY)refreshUsers()});
+})();
+</script>
+</body>
 </html>
