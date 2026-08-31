@@ -7,7 +7,7 @@ Designed & Developed by Duje Maleš
 
 <html lang="hr">
 <head>
-<meta name="yardivo-build" content="PROD-MYYARD-WARROOM-WEBGL-V3-2026-08-31">
+<meta name="yardivo-build" content="PROD-PROFESSIONAL-UX-V1-2026-08-31">
 <script id="yardivo-rbac-session-migration">
 (function(){
   try{
@@ -23218,6 +23218,127 @@ function patch(){
 }
 window.addEventListener('load',()=>setTimeout(patch,1200));
 setInterval(()=>{patch();if(document.getElementById('myYard')?.classList.contains('active'))apply()},1500);
+})();
+</script>
+
+
+<style id="yardivo-professional-redesign-v1-20260831">
+:root{
+ --yv-bg:#f3f6f4;--yv-surface:#fff;--yv-surface2:#f8faf9;--yv-line:#dce5df;
+ --yv-text:#17231d;--yv-muted:#6c7c73;--yv-brand:#167a4a;--yv-brand2:#0e6239;
+ --yv-soft:#eaf5ee;--yv-danger:#c84049;--yv-warn:#b87917;
+ --yv-shadow:0 10px 30px rgba(24,50,36,.07);--yv-shadow-lg:0 24px 60px rgba(19,44,30,.12);
+ --yv-r:12px;--yv-rs:8px;
+}
+body{background:var(--yv-bg)!important;color:var(--yv-text)!important;font-family:Inter,"SF Pro Display","Segoe UI",Arial,sans-serif!important;letter-spacing:-.008em}
+body:not(.light-mode){--yv-bg:#101612;--yv-surface:#171f1a;--yv-surface2:#1c2620;--yv-line:#2a3930;--yv-text:#edf4ef;--yv-muted:#95a59b;--yv-brand:#42b879;--yv-brand2:#67cc94;--yv-soft:#183326;--yv-shadow:0 12px 34px #0004;--yv-shadow-lg:0 24px 60px #0006}
+body.yardivo-dark-graphite:not(.light-mode){--yv-bg:#111312;--yv-surface:#1a1d1b;--yv-surface2:#202421;--yv-line:#313632;--yv-text:#f1f3f1;--yv-muted:#a0a6a2;--yv-brand:#64b785;--yv-soft:#213129}
+
+/* Shell */
+.sidebar,#sidebar{background:var(--yv-surface)!important;border-right:1px solid var(--yv-line)!important;box-shadow:none!important}
+.topbar,.top-bar,#topbar{background:color-mix(in srgb,var(--yv-surface) 94%,transparent)!important;border-bottom:1px solid var(--yv-line)!important;box-shadow:0 4px 18px rgba(18,45,30,.035)!important;backdrop-filter:blur(18px)}
+.main,.main-content,#mainContent{background:var(--yv-bg)!important}
+.logo,.brand,.sidebar-brand{letter-spacing:-.04em!important;font-weight:950!important}
+.sidebar .nav-item,.sidebar [data-view],.sidebar [data-home-target],nav [data-view]{
+ border-radius:8px!important;margin:2px 8px!important;min-height:38px!important;padding:9px 11px!important;
+ color:var(--yv-muted)!important;font-weight:760!important;transition:.16s ease!important;border:1px solid transparent!important
+}
+.sidebar .nav-item:hover,.sidebar [data-view]:hover,.sidebar [data-home-target]:hover,nav [data-view]:hover{
+ background:var(--yv-surface2)!important;color:var(--yv-text)!important;transform:translateX(1px)
+}
+.sidebar .active,.sidebar [data-view].active,.sidebar [data-home-target].active,nav [data-view].active{
+ background:var(--yv-soft)!important;color:var(--yv-brand)!important;border-color:color-mix(in srgb,var(--yv-brand) 18%,transparent)!important;box-shadow:none!important
+}
+
+/* Typography */
+.page-title,.view-title,h1{font-weight:900!important;letter-spacing:-.035em!important}
+h2,h3,.panel-title,.card-title{letter-spacing:-.02em!important}
+.page-subtitle,.subtitle,.muted,.text-muted{color:var(--yv-muted)!important}
+
+/* Universal surfaces */
+.card,.panel,.section-card,.settings-card,.kpi-card,.metric-card,.summary-card,.report-card,.overview-card,
+[class*="kpi-card"],[class*="metric-card"],[class*="summary-card"]{
+ background:var(--yv-surface)!important;border:1px solid var(--yv-line)!important;border-radius:var(--yv-r)!important;
+ box-shadow:var(--yv-shadow)!important
+}
+.panel-head,.card-head,.section-head{border-bottom:1px solid var(--yv-line)!important;background:transparent!important}
+.kpi-value,.metric-value,.stat-value{font-weight:920!important;letter-spacing:-.035em!important}
+
+/* Buttons */
+button,.btn,[role="button"]{font-family:inherit}
+.btn,button:not(.nav-item):not(.icon-btn){
+ border-radius:8px!important;font-weight:820!important;letter-spacing:-.01em!important;transition:transform .14s ease,box-shadow .14s ease,background .14s ease!important
+}
+.btn:hover,button:not(.nav-item):not(.icon-btn):hover{transform:translateY(-1px)}
+.btn-primary,.primary,.btn-save,[class*="btn-primary"]{background:var(--yv-brand)!important;border-color:var(--yv-brand)!important;color:#fff!important;box-shadow:0 6px 16px color-mix(in srgb,var(--yv-brand) 22%,transparent)!important}
+.btn-secondary,.secondary{background:var(--yv-surface)!important;color:var(--yv-text)!important;border:1px solid var(--yv-line)!important}
+.logout-btn,[class*="logout"]{background:transparent!important;color:var(--yv-danger)!important;border:1px solid color-mix(in srgb,var(--yv-danger) 30%,var(--yv-line))!important}
+
+/* Forms */
+input,select,textarea{
+ background:var(--yv-surface)!important;color:var(--yv-text)!important;border:1px solid var(--yv-line)!important;
+ border-radius:8px!important;box-shadow:none!important;min-height:40px
+}
+input:focus,select:focus,textarea:focus{outline:none!important;border-color:var(--yv-brand)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--yv-brand) 12%,transparent)!important}
+label{color:var(--yv-muted)!important;font-weight:760!important}
+
+/* Tables */
+table{border-collapse:separate!important;border-spacing:0!important;background:var(--yv-surface)!important;border:1px solid var(--yv-line)!important;border-radius:10px!important;overflow:hidden}
+thead th{background:var(--yv-surface2)!important;color:var(--yv-muted)!important;text-transform:uppercase!important;font-size:10px!important;letter-spacing:.055em!important;border-bottom:1px solid var(--yv-line)!important}
+tbody td{border-bottom:1px solid var(--yv-line)!important}
+tbody tr:hover td{background:color-mix(in srgb,var(--yv-brand) 4%,var(--yv-surface))!important}
+
+/* Chips and status */
+.badge,.chip,.pill,[class*="status-chip"],[class*="status-pill"]{border-radius:999px!important;font-weight:820!important;box-shadow:none!important}
+.warehouse-badge,.location-badge,.user-chip{background:var(--yv-surface2)!important;color:var(--yv-text)!important;border:1px solid var(--yv-line)!important;border-radius:999px!important}
+
+/* Modals */
+.modal,.modal-content,.dialog,.drawer,.side-panel{background:var(--yv-surface)!important;color:var(--yv-text)!important;border:1px solid var(--yv-line)!important;border-radius:14px!important;box-shadow:var(--yv-shadow-lg)!important}
+
+/* Home/dashboard */
+.home-card,.menu-card,[data-home-target]{border-radius:12px!important}
+.dashboard-grid,.kpi-grid{gap:12px!important}
+
+/* Operational recommendations: clean professional green */
+.notice-result,.recommendation-card,.smart-recommendation,[class*="recommendation"]{
+ border-radius:10px!important;box-shadow:none!important
+}
+
+/* My Yard / War Room framed as premium digital-twin modules */
+#myYard .myy-shell,#yardivoWarRoom .war-room-shell,#yardivoWarRoom{
+ border-radius:14px!important;border:1px solid var(--yv-line)!important;box-shadow:var(--yv-shadow-lg)!important;overflow:hidden
+}
+#yardivoMyYardWebGL,#yardivoWarRoomWebGL{border-radius:10px!important}
+#yardivoMyYardWebGL .my3-hud,#yardivoWarRoomWebGL .wr3-hud{
+ border-radius:999px!important;box-shadow:0 8px 24px rgba(0,0,0,.12)!important
+}
+
+/* Scrollbars */
+*{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--yv-muted) 35%,transparent) transparent}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--yv-muted) 32%,transparent);border-radius:20px}
+
+/* Professional spacing */
+.view,.app-view,.page-section{animation:yvViewIn .18s ease both}
+@keyframes yvViewIn{from{opacity:.5;transform:translateY(3px)}to{opacity:1;transform:none}}
+@media(max-width:900px){
+ .sidebar .nav-item,.sidebar [data-view],.sidebar [data-home-target]{margin:1px 5px!important}
+ .card,.panel,.section-card{border-radius:10px!important}
+}
+@media(prefers-reduced-motion:reduce){.view,.app-view,.page-section{animation:none!important}}
+
+/* Login refinement without changing workflow */
+#loginOverlay{backdrop-filter:blur(18px)}
+#loginOverlay .login-card,#loginOverlay>div>div{
+ border-radius:16px!important;border:1px solid var(--yv-line)!important;box-shadow:var(--yv-shadow-lg)!important
+}
+</style>
+<script id="yardivo-professional-redesign-v1-js">
+(function(){
+ document.documentElement.dataset.yardivoDesign='professional-v1';
+ function polish(){
+   document.querySelectorAll('button').forEach(b=>{if(!b.title&&b.textContent.trim().length<3)b.setAttribute('aria-label',b.textContent.trim()||'Akcija')});
+ }
+ window.addEventListener('load',polish);
 })();
 </script>
 
