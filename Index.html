@@ -7,7 +7,7 @@ Designed & Developed by Duje Maleš
 
 <html lang="hr">
 <head>
-<meta name="yardivo-build" content="PROD-QA-THEME-LOGOUT-CLEAN-2026-08-31">
+<meta name="yardivo-build" content="PROD-QA-MY-ANNOUNCEMENTS-OWNER-LOCK-2026-08-31">
 <script id="yardivo-rbac-session-migration">
 (function(){
   try{
@@ -19534,29 +19534,141 @@ document.addEventListener('click',e=>{if(e.target.closest('[onclick*="openDriver
 <script id="yardivo-v32-my-announcements">
 (function(){
 'use strict';
-let mode='mine';
-function role(){try{return String(currentSession?.role||window.currentSession?.role||'').toLowerCase()}catch(e){return''}}
-function user(){try{return String(currentSession?.user||currentSession?.username||'').trim()}catch(e){return''}}
-function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function ensureRefs(){let changed=false;(Array.isArray(announcements)?announcements:[]).forEach(a=>{if(!a.announcementRef){a.announcementRef=yardivoGenerateAnnouncementRef(a.warehouse||'W101');changed=true}});if(changed)try{saveAnnouncements()}catch(e){}}
+
+function normRole(r){
+  r=String(r||'').toLowerCase().trim();
+  if(r==='zalihe'||r.includes('zalih'))return'inventory';
+  if(r==='prijam')return'reception';
+  if(r==='porta'||r==='portir')return'gate';
+  return r;
+}
+function role(){
+  try{return normRole(window.currentSession?.role||currentSession?.role||'')}catch(e){return''}
+}
+function user(){
+  try{return String(window.currentSession?.user||window.currentSession?.username||currentSession?.user||currentSession?.username||'').trim().toLowerCase()}catch(e){return''}
+}
+function esc(v){
+  return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))
+}
+function isMine(a){
+  const u=user();
+  if(!u)return false;
+  return String(a?.createdBy||'').trim().toLowerCase()===u;
+}
+function ensureRefs(){
+  let changed=false;
+  (Array.isArray(window.announcements)?window.announcements:(typeof announcements!=='undefined'&&Array.isArray(announcements)?announcements:[])).forEach(a=>{
+    if(!a.announcementRef && typeof yardivoGenerateAnnouncementRef==='function'){
+      a.announcementRef=yardivoGenerateAnnouncementRef(a.warehouse||'W101');
+      changed=true;
+    }
+  });
+  if(changed)try{saveAnnouncements?.()}catch(e){}
+}
 function ensureView(){
- if(document.getElementById('yardivoMyAnnouncements'))return;
- const main=document.querySelector('.main');if(!main)return;
- const s=document.createElement('section');s.id='yardivoMyAnnouncements';s.className='view';s.innerHTML=`<section class="panel"><div class="panel-head"><div><h2>MOJE NAJAVE</h2><small>Najave korisnika zaliha i povijest svih najava</small></div></div><div style="padding:14px"><div class="yma-tabs"><button data-yma="mine" class="active">MOJE NAJAVE</button><button data-yma="history">POVIJEST SVIH NAJAVA</button></div><div class="data-wrap"><table><thead><tr><th>Broj najave</th><th>Datum</th><th>Skladište</th><th>Dobavljač</th><th>Rampa</th><th>Termin</th><th>Status</th><th>Kreirao</th></tr></thead><tbody id="ymaBody"></tbody></table></div></div></section>`;main.appendChild(s);
- const nav=document.querySelector('.nav');const anchor=nav?.querySelector('[data-view="announcements"]');if(nav&&anchor){const b=document.createElement('button');b.className='nav-btn';b.dataset.view='yardivoMyAnnouncements';b.innerHTML='<span>▤</span> Moje najave';anchor.insertAdjacentElement('afterend',b)}
- s.addEventListener('click',e=>{const b=e.target.closest('[data-yma]');if(!b)return;mode=b.dataset.yma;s.querySelectorAll('[data-yma]').forEach(x=>x.classList.toggle('active',x===b));render()});
+  let view=document.getElementById('yardivoMyAnnouncements');
+  if(!view){
+    const main=document.querySelector('.main');if(!main)return null;
+    view=document.createElement('section');
+    view.id='yardivoMyAnnouncements';
+    view.className='view';
+    view.innerHTML=`<section class="panel">
+      <div class="panel-head">
+        <div><h2>MOJE NAJAVE</h2><small id="ymaOwnerNote">Samo najave prijavljenog korisnika</small></div>
+      </div>
+      <div style="padding:14px">
+        <div class="data-wrap"><table>
+          <thead><tr><th>Broj najave</th><th>Datum</th><th>Skladište</th><th>Dobavljač</th><th>Rampa</th><th>Termin</th><th>Status</th><th>Kreirao</th></tr></thead>
+          <tbody id="ymaBody"></tbody>
+        </table></div>
+      </div>
+    </section>`;
+    main.appendChild(view);
+  }
+
+  let navBtn=document.querySelector('.nav-btn[data-view="yardivoMyAnnouncements"]');
+  if(!navBtn){
+    const nav=document.querySelector('.nav');
+    const anchor=nav?.querySelector('[data-view="announcements"]');
+    if(nav){
+      navBtn=document.createElement('button');
+      navBtn.type='button';
+      navBtn.className='nav-btn';
+      navBtn.dataset.view='yardivoMyAnnouncements';
+      navBtn.innerHTML='<span>▤</span> Moje najave';
+      if(anchor)anchor.insertAdjacentElement('afterend',navBtn);
+      else nav.appendChild(navBtn);
+    }
+  }
+  return view;
 }
 function render(){
- ensureRefs();const body=document.getElementById('ymaBody');if(!body)return;let a=[...(Array.isArray(announcements)?announcements:[])];
- if(mode==='mine'){const u=user();a=a.filter(x=>String(x.createdBy||'')===u)}
- else a=a.filter(x=>['Zaprimljeno','Završeno','Izašao','Odbijen','NIJE DOŠAO','NO-SHOW'].includes(String(x.status||''))||new Date(String(x.date||'1970-01-01')+'T23:59:59')<new Date());
- a.sort((x,y)=>String(y.createdAt||y.date||'').localeCompare(String(x.createdAt||x.date||'')));
- body.innerHTML=a.length?a.map(x=>`<tr><td class="yma-ref">NAJAVA ${esc(announcementNumber(x))}</td><td>${esc(x.date||'—')}</td><td>${esc(x.warehouse||'W101')}</td><td><strong>${esc(x.supplier||'—')}</strong></td><td>${x.dock?'Rampa '+esc(x.dock):'—'}</td><td>${esc(x.time||'—')}</td><td>${esc(x.status||'U dolasku')}</td><td>${esc(x.createdBy||'—')}</td></tr>`).join(''):`<tr><td colspan="8"><div class="yma-empty">${mode==='mine'?'Još nema najava koje je kreirao ovaj korisnik.':'Nema povijesnih najava.'}</div></td></tr>`;
+  if(role()!=='inventory')return;
+  ensureRefs();
+  const body=document.getElementById('ymaBody');if(!body)return;
+  const all=(Array.isArray(window.announcements)?window.announcements:(typeof announcements!=='undefined'&&Array.isArray(announcements)?announcements:[]));
+  const a=[...all].filter(isMine).sort((x,y)=>String(y.createdAt||y.date||'').localeCompare(String(x.createdAt||x.date||'')));
+  const note=document.getElementById('ymaOwnerNote');
+  if(note)note.textContent=`Samo najave korisnika: ${user()||'—'}`;
+  body.innerHTML=a.length
+    ? a.map(x=>`<tr>
+        <td class="yma-ref">NAJAVA ${esc(typeof announcementNumber==='function'?announcementNumber(x):(x.announcementRef||x.id||'—'))}</td>
+        <td>${esc(x.date||'—')}</td><td>${esc(x.warehouse||'W101')}</td>
+        <td><strong>${esc(x.supplier||'—')}</strong></td>
+        <td>${x.dock?'Rampa '+esc(x.dock):'—'}</td><td>${esc(x.time||'—')}</td>
+        <td>${esc(x.status||'U dolasku')}</td><td>${esc(x.createdBy||'—')}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="8"><div class="yma-empty">Još nema najava koje je kreirao ovaj korisnik.</div></td></tr>';
 }
-function access(){ensureView();const ok=role()==='inventory';document.querySelectorAll('[data-view="yardivoMyAnnouncements"]')?.forEach(b=>b.style.setProperty('display',ok?'flex':'none','important'));if(ok&&document.getElementById('yardivoMyAnnouncements')?.classList.contains('active'))render()}
-document.addEventListener('click',e=>{const b=e.target.closest('[data-view="yardivoMyAnnouncements"]');if(!b)return;e.preventDefault();if(role()!=='inventory')return;document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('yardivoMyAnnouncements')?.classList.add('active');document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x===b));render()},true);
-window.addEventListener('load',()=>setTimeout(access,1000));setInterval(access,2000);
-window.YardivoMyAnnouncements={render};
+function apply(){
+  const view=ensureView();
+  const btn=document.querySelector('.nav-btn[data-view="yardivoMyAnnouncements"]');
+  const ok=role()==='inventory';
+
+  if(btn){
+    btn.classList.toggle('role-hidden',!ok);
+    btn.style.setProperty('display',ok?'flex':'none','important');
+    btn.style.setProperty('visibility',ok?'visible':'hidden','important');
+    btn.style.setProperty('opacity',ok?'1':'0','important');
+    btn.style.setProperty('pointer-events',ok?'auto':'none','important');
+  }
+  if(view){
+    if(!ok){
+      view.classList.remove('active');
+      view.style.setProperty('display','none','important');
+    }else{
+      view.style.removeProperty('display');
+      if(view.classList.contains('active'))render();
+    }
+  }
+}
+function open(){
+  if(role()!=='inventory')return false;
+  ensureView();
+  document.body.classList.remove('home-menu-mode');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('yardivoMyAnnouncements')?.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.view==='yardivoMyAnnouncements'));
+  const pt=document.getElementById('pageTitle');if(pt)pt.textContent='MOJE NAJAVE';
+  const sub=document.getElementById('pageSubtitle');if(sub)sub.textContent='Najave prijavljenog korisnika zaliha';
+  render();
+  return true;
+}
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-view="yardivoMyAnnouncements"]');
+  if(!b)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  open();
+},true);
+
+window.addEventListener('yardivo:login',()=>{ensureView();apply();render()});
+window.addEventListener('load',()=>setTimeout(()=>{ensureView();apply()},80));
+
+/* No interval toggling: role changes are handled by the final RBAC/login events.
+   This prevents the old appear/disappear flicker. */
+window.YardivoMyAnnouncements={render,apply,open,isMine};
 })();
 </script>
 <style id="yardivo-v33-my-yard-style">
@@ -20090,7 +20202,7 @@ const MATRIX={
 };
 const norm=r=>{r=String(r||'').toLowerCase().trim();if(r==='porta'||r==='portir')return'gate';if(r==='prijam')return'reception';if(r==='zalihe'||r.includes('zalih'))return'inventory';return r};
 function role(){return norm(window.currentSession?.role)}
-function allowed(v){const r=role();return r==='admin'||MATRIX[r]?.has(v)}
+function allowed(v){const r=role();if(v==='yardivoMyAnnouncements')return r==='inventory';return r==='admin'||MATRIX[r]?.has(v)}
 function setRoleMarker(){
  const r=role();if(!r)return;
  document.body.dataset.yardivoRole=r;
@@ -20468,6 +20580,58 @@ function cleanup(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',cleanup,{once:true});else cleanup();
 window.addEventListener('load',cleanup);
+})();
+</script>
+
+
+<style id="yardivo-final-my-announcements-rbac-20260831">
+/* MOJE NAJAVE is strictly inventory-only. */
+html:not([data-yardivo-role="inventory"]) [data-view="yardivoMyAnnouncements"],
+body:not([data-yardivo-role="inventory"]) [data-view="yardivoMyAnnouncements"]{
+  display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;
+}
+html[data-yardivo-role="inventory"] [data-view="yardivoMyAnnouncements"],
+body[data-yardivo-role="inventory"] [data-view="yardivoMyAnnouncements"]{
+  display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;
+}
+body:not([data-yardivo-role="inventory"]) #yardivoMyAnnouncements{
+  display:none!important;
+}
+</style>
+<script id="yardivo-final-my-announcements-role-lock-20260831">
+(function(){
+'use strict';
+function norm(r){
+ r=String(r||'').toLowerCase().trim();
+ if(r==='zalihe'||r.includes('zalih'))return'inventory';
+ if(r==='prijam')return'reception';
+ if(r==='porta'||r==='portir')return'gate';
+ return r;
+}
+function lock(){
+ const r=norm(window.currentSession?.role);
+ if(!r)return;
+ document.documentElement.dataset.yardivoRole=r;
+ document.body.dataset.yardivoRole=r;
+ const ok=r==='inventory';
+ const btn=document.querySelector('[data-view="yardivoMyAnnouncements"]');
+ if(btn){
+   btn.style.setProperty('display',ok?'flex':'none','important');
+   btn.style.setProperty('visibility',ok?'visible':'hidden','important');
+   btn.classList.toggle('role-hidden',!ok);
+ }
+ if(!ok){
+   const v=document.getElementById('yardivoMyAnnouncements');
+   v?.classList.remove('active');
+   v?.style.setProperty('display','none','important');
+ }
+ try{window.YardivoMyAnnouncements?.apply?.()}catch(e){}
+}
+window.addEventListener('yardivo:login',()=>queueMicrotask(lock));
+window.addEventListener('load',()=>setTimeout(lock,100));
+document.addEventListener('click',e=>{
+ if(e.target.closest('[data-view="yardivoMyAnnouncements"]'))queueMicrotask(lock);
+},true);
 })();
 </script>
 
