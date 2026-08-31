@@ -23893,37 +23893,7 @@ html[data-yardivo-dark-look="original"] body:not(.light-mode) input,
 html[data-yardivo-dark-look="original"] body:not(.light-mode) select,
 html[data-yardivo-dark-look="original"] body:not(.light-mode) textarea{background:#192a38!important;color:#eef5fb!important;border-color:#345268!important}
 </style>
-<script id="yardivo-dark-original-third-option-v1-20260831-js">
-(function(){
-'use strict';
-const KEY='yardivo_dark_look_v2';
-function get(){return localStorage.getItem(KEY)||'graphite'}
-function apply(v){
- v=['blue','graphite','original'].includes(v)?v:'graphite';
- localStorage.setItem(KEY,v);
- document.documentElement.dataset.yardivoDarkLook=v;
- // Reuse existing dark appearance classes where possible.
- document.body.classList.toggle('yardivo-dark-graphite',v==='graphite');
- document.body.classList.toggle('yardivo-dark-blue',v==='blue');
- document.querySelectorAll('#yardivoOriginalDarkOption [data-dark-look]').forEach(b=>b.classList.toggle('active',b.dataset.darkLook===v));
-}
-function inject(){
- const settings=document.getElementById('settings');if(!settings||document.getElementById('yardivoOriginalDarkOption'))return;
- const candidates=[...settings.querySelectorAll('.settings-card,.card,.panel')];
- const parent=candidates.find(x=>/dark|izgled|appearance|tema|plavi|crno/i.test(x.textContent||''))||candidates[0]||settings;
- const box=document.createElement('div');box.id='yardivoOriginalDarkOption';
- box.innerHTML='<div class="ydo-label">DARK MODE IZGLED</div><div class="ydo-row"><button type="button" data-dark-look="blue">PLAVI DARK</button><button type="button" data-dark-look="graphite">CRNO-SIVI DARK</button><button type="button" data-dark-look="original">ORIGINAL</button></div><div style="margin-top:7px;font-size:9px;opacity:.68">ORIGINAL vraća plavkasti originalni YARDIVO Dark izgled.</div>';
- parent.appendChild(box);
- box.onclick=e=>{const b=e.target.closest('[data-dark-look]');if(b)apply(b.dataset.darkLook)};
- apply(get());
-}
-apply(get());
-window.addEventListener('load',()=>setTimeout(inject,450));
-document.addEventListener('click',e=>{if(e.target.closest('[data-view="settings"],[data-home-target="settings"]'))setTimeout(inject,120)},true);
-new MutationObserver(()=>{if(document.getElementById('settings'))inject()}).observe(document.documentElement,{childList:true,subtree:true});
-window.YardivoDarkLook={apply,get};
-})();
-</script>
+<script id="yardivo-dark-original-third-option-v1-20260831-js" type="application/x-yardivo-disabled">/* superseded by YARDIVO Theme System v2 */</script>
 
 <style id="yardivo-myyard-flicker-fix-v1-20260831">
 /* One stable visual owner for My Yard. JS no longer alternates scene brightness. */
@@ -24015,5 +23985,149 @@ setInterval(()=>{
 window.YardivoWarRoomBlankRepair={repair,watch};
 })();
 </script>
+
+<style id="yardivo-theme-switch-clean-v2-20260831">
+html[data-yardivo-main-theme="light"] body,body.light-mode{
+  --yv-bg:#f6f8f7!important;--yv-surface:#fff!important;--yv-surface2:#fff!important;
+  --yv-line:#dfe6e2!important;--yv-text:#18211c!important;--yv-muted:#6c7971!important;
+  --yv-brand:#267a4b!important;--yv-brand2:#1f6840!important;--yv-soft:#eef4f0!important;
+  background:#f6f8f7!important;color:#18211c!important}
+html[data-yardivo-main-theme="light"] body .sidebar,
+html[data-yardivo-main-theme="light"] body #sidebar,
+html[data-yardivo-main-theme="light"] body .topbar,
+html[data-yardivo-main-theme="light"] body .top-bar,
+html[data-yardivo-main-theme="light"] body #topbar,
+html[data-yardivo-main-theme="light"] body .card,
+html[data-yardivo-main-theme="light"] body .panel,
+html[data-yardivo-main-theme="light"] body .section-card,
+html[data-yardivo-main-theme="light"] body .settings-card,
+html[data-yardivo-main-theme="light"] body .modal-content,
+body.light-mode .sidebar,body.light-mode #sidebar,body.light-mode .topbar,body.light-mode .top-bar,
+body.light-mode #topbar,body.light-mode .card,body.light-mode .panel,body.light-mode .section-card,
+body.light-mode .settings-card,body.light-mode .modal-content{
+  background:#fff!important;color:#18211c!important;border-color:#dfe6e2!important}
+html[data-yardivo-main-theme="light"] body .main,
+html[data-yardivo-main-theme="light"] body .main-content,
+html[data-yardivo-main-theme="light"] body #mainContent,
+html[data-yardivo-main-theme="light"] body .view,
+html[data-yardivo-main-theme="light"] body .app-view,
+body.light-mode .main,body.light-mode .main-content,body.light-mode #mainContent,
+body.light-mode .view,body.light-mode .app-view{background:#f6f8f7!important}
+html[data-yardivo-main-theme="light"] body table,body.light-mode table{background:#fff!important;border-color:#dfe6e2!important}
+html[data-yardivo-main-theme="light"] body thead th,body.light-mode thead th{background:#f1f5f2!important;color:#58675f!important;border-color:#dfe6e2!important}
+html[data-yardivo-main-theme="light"] body tbody td,body.light-mode tbody td{background:#fff!important;color:#18211c!important;border-color:#dfe6e2!important}
+html[data-yardivo-main-theme="light"] body input,
+html[data-yardivo-main-theme="light"] body select,
+html[data-yardivo-main-theme="light"] body textarea,
+body.light-mode input,body.light-mode select,body.light-mode textarea{
+  background:#fff!important;color:#18211c!important;border-color:#ccd7d1!important}
+
+/* maps remain green in Light mode */
+html[data-yardivo-main-theme="light"] body #myYard .myy-stage,
+html[data-yardivo-main-theme="light"] body #yardivoMyYardWebGL,
+html[data-yardivo-main-theme="light"] body #yardivoWarRoom #wrYardCanvas,
+html[data-yardivo-main-theme="light"] body #yardivoWarRoomMyYardMirror,
+html[data-yardivo-main-theme="light"] body #weeklyMap,
+html[data-yardivo-main-theme="light"] body #dailyMap,
+html[data-yardivo-main-theme="light"] body #heatmap,
+body.light-mode #myYard .myy-stage,body.light-mode #yardivoMyYardWebGL,
+body.light-mode #yardivoWarRoom #wrYardCanvas,body.light-mode #yardivoWarRoomMyYardMirror,
+body.light-mode #weeklyMap,body.light-mode #dailyMap,body.light-mode #heatmap{
+  background:#d8e7dd!important;border-color:#9eb9a8!important}
+
+/* dark palettes */
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] body{
+  --yv-bg:#111412!important;--yv-surface:#191d1a!important;--yv-surface2:#202522!important;
+  --yv-line:#303733!important;--yv-text:#f0f3f1!important;--yv-muted:#9aa49e!important;
+  --yv-brand:#5baf7d!important;--yv-brand2:#397d58!important;--yv-soft:#222d27!important;
+  background:#111412!important;color:#f0f3f1!important}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="blue"] body{
+  --yv-bg:#0b131b!important;--yv-surface:#111d28!important;--yv-surface2:#172736!important;
+  --yv-line:#263d50!important;--yv-text:#eef5fb!important;--yv-muted:#90a6b8!important;
+  --yv-brand:#4f9bd1!important;--yv-brand2:#2d6e9b!important;--yv-soft:#142938!important;
+  background:#0b131b!important;color:#eef5fb!important}
+/* original first YARDIVO dark-blue */
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body{
+  --yv-bg:#07131f!important;--yv-surface:#0d2031!important;--yv-surface2:#122b40!important;
+  --yv-line:#21415c!important;--yv-text:#edf6ff!important;--yv-muted:#8fa9bf!important;
+  --yv-brand:#3e8fc8!important;--yv-brand2:#236b9d!important;--yv-soft:#10273a!important;
+  background:#07131f!important;color:#edf6ff!important}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body .sidebar,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body #sidebar,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body .topbar,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body .top-bar,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body #topbar,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body .card,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body .panel,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body .section-card,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body .settings-card,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body .modal-content{
+  background:#0d2031!important;color:#edf6ff!important;border-color:#21415c!important}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body .main,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body .main-content,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body #mainContent,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body .view,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body .app-view{background:#07131f!important}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body table{background:#0d2031!important;border-color:#21415c!important}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body thead th{background:#122b40!important;color:#a9bfd1!important;border-color:#21415c!important}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body tbody td{background:#0d2031!important;color:#e9f2fa!important;border-color:#21415c!important}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body input,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body select,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body textarea{
+  background:#122b40!important;color:#edf6ff!important;border-color:#2c506d!important}
+
+#yardivoThemeSettingsV2{margin-top:12px;padding-top:12px;border-top:1px solid var(--yv-line,#dfe6e2)}
+#yardivoThemeSettingsV2 .yt-title{font-size:9px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;margin-bottom:8px}
+#yardivoThemeSettingsV2 .yt-row{display:flex;gap:7px;flex-wrap:wrap}
+#yardivoThemeSettingsV2 button{min-height:35px;padding:7px 11px;border-radius:8px;border:1px solid var(--yv-line,#ccd7d1);background:var(--yv-surface,#fff);color:var(--yv-text,#18211c);font-weight:850}
+#yardivoThemeSettingsV2 button.active{border-color:#4088ba!important;box-shadow:0 0 0 2px rgba(64,136,186,.15)!important}
+#yardivoThemeSettingsV2 .yt-note{margin-top:7px;font-size:9px;opacity:.68}
+</style>
+
+<script id="yardivo-theme-switch-clean-v2-20260831-js">
+(function(){
+'use strict';
+const MAIN='yardivo_main_theme_v2', DARK='yardivo_dark_look_v2';
+function main(){const s=localStorage.getItem(MAIN);return s==='light'||s==='dark'?s:(document.body.classList.contains('light-mode')?'light':'dark')}
+function dark(){const s=localStorage.getItem(DARK);return ['graphite','blue','original'].includes(s)?s:'original'}
+function scene(){
+ try{
+  const e=window.__YARDIVO_MYYARD_ENGINE__,T=window.__YARDIVO_THREE_MODULE__;if(!e||!T)return;
+  const l=main()==='light',c=l?0xd8e7dd:(dark()==='original'?0x173348:0x263c31);
+  e.scene.background=new T.Color(c);e.scene.fog=new T.FogExp2(c,.0065);e.renderer.toneMappingExposure=l?1.18:1.14;
+ }catch(_){}
+}
+function sync(){
+ const m=main(),d=dark();
+ document.documentElement.dataset.yardivoMainTheme=m;document.documentElement.dataset.yardivoDarkLook=d;
+ document.body.classList.toggle('light-mode',m==='light');document.body.classList.toggle('dark-mode',m==='dark');
+ document.querySelectorAll('[data-yv-main-theme]').forEach(b=>b.classList.toggle('active',b.dataset.yvMainTheme===m));
+ document.querySelectorAll('#yardivoThemeSettingsV2 [data-dark-look]').forEach(b=>b.classList.toggle('active',b.dataset.darkLook===d));
+}
+function setMain(m){m=m==='light'?'light':'dark';localStorage.setItem(MAIN,m);sync();scene()}
+function setDark(d){d=['graphite','blue','original'].includes(d)?d:'original';localStorage.setItem(DARK,d);sync();scene()}
+function settings(){
+ const s=document.getElementById('settings');if(!s||document.getElementById('yardivoThemeSettingsV2'))return;
+ const cards=[...s.querySelectorAll('.settings-card,.card,.panel')];
+ const parent=cards.find(x=>/izgled|appearance|tema|dark|light/i.test(x.textContent||''))||cards[0]||s;
+ const box=document.createElement('div');box.id='yardivoThemeSettingsV2';
+ box.innerHTML='<div class="yt-title">DARK MODE THEME</div><div class="yt-row"><button type="button" data-dark-look="graphite">CRNO-SIVI</button><button type="button" data-dark-look="blue">PLAVI</button><button type="button" data-dark-look="original">ORIGINAL THEME</button></div><div class="yt-note">ORIGINAL THEME vraća prvotni tamno-plavi YARDIVO izgled. Opcije vrijede samo u Dark Modeu.</div>';
+ parent.appendChild(box);box.onclick=e=>{const b=e.target.closest('[data-dark-look]');if(b)setDark(b.dataset.darkLook)};sync()
+}
+function hook(){
+ document.querySelectorAll('button,[role="button"]').forEach(b=>{
+  const t=((b.textContent||'')+' '+(b.title||'')+' '+(b.getAttribute('aria-label')||'')).trim();
+  if(!b.dataset.yvMainTheme&&/☀|sun|light/i.test(t)){b.dataset.yvMainTheme='light';b.addEventListener('click',()=>setMain('light'),true)}
+  if(!b.dataset.yvMainTheme&&/🌙|moon|dark/i.test(t)){b.dataset.yvMainTheme='dark';b.addEventListener('click',()=>setMain('dark'),true)}
+ });sync()
+}
+sync();
+window.addEventListener('load',()=>setTimeout(()=>{hook();settings();scene()},500));
+document.addEventListener('click',e=>{if(e.target.closest('[data-view="settings"],[data-home-target="settings"]'))setTimeout(settings,120)},true);
+new MutationObserver(()=>{hook();settings()}).observe(document.documentElement,{childList:true,subtree:true});
+window.YardivoThemeV2={setMain,setDark,main,dark,scene};
+})();
+</script>
+
 </body>
 </html>
