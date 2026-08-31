@@ -7,7 +7,7 @@ Designed & Developed by Duje Maleš
 
 <html lang="hr">
 <head>
-<meta name="yardivo-build" content="PROD-QA-GLOBAL-FONT-SCALE-2026-08-31">
+<meta name="yardivo-build" content="PROD-QA-LOGIN-CHANGE-PASSWORD-2026-08-31">
 <script id="yardivo-rbac-session-migration">
 (function(){
   try{
@@ -6246,6 +6246,7 @@ var currentSession=null;
 </label>
 <label class="remember-me-row"><input id="rememberMe" type="checkbox"/><span>Zapamti me na ovom uređaju</span></label>
 <button id="loginSubmitBtn" type="button">PRIJAVA</button>
+<button id="loginChangePasswordBtn" type="button" class="login-change-password-btn">PROMIJENI LOZINKU</button>
 <div class="login-note" id="loginError">PRIJAVA — upiši korisničko ime, lozinku i odaberi rolu koju ti je dodijelio Admin.</div>
 </form>
 </div>
@@ -20694,6 +20695,138 @@ function apply(){
 }
 apply();
 window.addEventListener('load',apply);
+})();
+</script>
+
+
+<style id="yardivo-login-change-password-style-20260831">
+#loginChangePasswordBtn{
+  width:100%;margin-top:8px;padding:10px 12px;border-radius:7px;
+  border:1px solid rgba(115,160,200,.45);background:rgba(7,24,40,.72);
+  color:#b9d5ed;font-weight:800;letter-spacing:.25px;cursor:pointer;
+}
+#loginChangePasswordBtn:hover{border-color:#3d91d8;color:#fff;background:#0b2944}
+#yardivoChangePasswordDialog{width:min(440px,calc(100vw - 28px));z-index:100000}
+#yardivoChangePasswordDialog .ycp-form{padding:20px;display:grid;gap:12px}
+#yardivoChangePasswordDialog .ycp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+#yardivoChangePasswordDialog .ycp-head h2{margin:0 0 4px;font-size:17px}
+#yardivoChangePasswordDialog .ycp-head small{color:#91a8bc}
+#yardivoChangePasswordDialog label{display:grid;gap:5px}
+#yardivoChangePasswordDialog input{width:100%}
+#yardivoChangePasswordDialog .ycp-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+#yardivoChangePasswordDialog .ycp-msg{display:none;border:1px solid #31485c;border-radius:6px;padding:9px 10px;font-size:11px;line-height:1.45}
+#yardivoChangePasswordDialog .ycp-msg.error{display:block;color:#ffacb0;border-color:#7d343a;background:#291216}
+#yardivoChangePasswordDialog .ycp-msg.ok{display:block;color:#91efb0;border-color:#286a43;background:#10251a}
+</style>
+<dialog id="yardivoChangePasswordDialog">
+  <form class="ycp-form" method="dialog" onsubmit="return false">
+    <div class="ycp-head">
+      <div>
+        <h2>PROMIJENI LOZINKU</h2>
+        <small>Potvrdi trenutnu lozinku i postavi novu.</small>
+      </div>
+      <button type="button" class="icon-btn" id="ycpClose" aria-label="Zatvori">×</button>
+    </div>
+    <label>Korisničko ime
+      <input id="ycpUser" autocomplete="username" placeholder="Korisničko ime"/>
+    </label>
+    <label>Trenutna lozinka
+      <input id="ycpCurrent" type="password" autocomplete="current-password" placeholder="••••••••"/>
+    </label>
+    <label>Nova lozinka
+      <input id="ycpNew" type="password" autocomplete="new-password" placeholder="Najmanje 10 znakova"/>
+    </label>
+    <label>Ponovi novu lozinku
+      <input id="ycpConfirm" type="password" autocomplete="new-password" placeholder="Ponovi novu lozinku"/>
+    </label>
+    <div id="ycpMsg" class="ycp-msg"></div>
+    <div class="ycp-actions">
+      <button type="button" class="secondary" id="ycpCancel">ODUSTANI</button>
+      <button type="button" class="primary" id="ycpSave">SPREMI NOVU LOZINKU</button>
+    </div>
+  </form>
+</dialog>
+<script id="yardivo-login-change-password-20260831">
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+function msg(text,type){
+ const el=$('ycpMsg');if(!el)return;
+ el.textContent=text||'';
+ el.className='ycp-msg'+(type?' '+type:'');
+}
+function open(){
+ const d=$('yardivoChangePasswordDialog');if(!d)return;
+ $('ycpUser').value=($('loginUser')?.value||'').trim();
+ $('ycpCurrent').value=$('loginPass')?.value||'';
+ $('ycpNew').value='';$('ycpConfirm').value='';msg('');
+ try{d.showModal()}catch(e){d.setAttribute('open','')}
+ setTimeout(()=>($('ycpUser').value?$('ycpNew'):$('ycpUser'))?.focus(),30);
+}
+function close(){
+ const d=$('yardivoChangePasswordDialog');if(!d)return;
+ try{d.close()}catch(e){d.removeAttribute('open')}
+}
+async function save(){
+ const username=($('ycpUser')?.value||'').trim().toLowerCase();
+ const current=$('ycpCurrent')?.value||'';
+ const next=$('ycpNew')?.value||'';
+ const confirm=$('ycpConfirm')?.value||'';
+ const btn=$('ycpSave');
+
+ if(!/^[a-z0-9._-]{3,40}$/.test(username)){msg('Upiši valjano korisničko ime.','error');return}
+ if(!current){msg('Upiši trenutnu lozinku.','error');return}
+ if(next.length<10){msg('Nova lozinka mora imati najmanje 10 znakova.','error');return}
+ if(next!==confirm){msg('Nova lozinka i potvrda nisu iste.','error');return}
+ if(next===current){msg('Nova lozinka mora biti različita od trenutne.','error');return}
+
+ btn.disabled=true;msg('Provjera korisnika i promjena lozinke...');
+ try{
+   if(typeof authClient!=='function')throw new Error('Supabase Auth nije spreman.');
+   const c=await authClient();
+
+   // We deliberately re-authenticate with the current password before changing it.
+   await c.auth.signOut({scope:'local'}).catch(()=>{});
+   const {data:loginData,error:loginError}=await c.auth.signInWithPassword({
+     email:`${username}@yardivo.local`,
+     password:current
+   });
+   if(loginError||!loginData?.session)throw new Error('Trenutna lozinka nije ispravna.');
+
+   // Verify the authenticated account maps to the entered YARDIVO username.
+   if(typeof loadServerProfile==='function'){
+     const profile=await loadServerProfile(c);
+     if(String(profile?.username||'').trim().toLowerCase()!==username){
+       throw new Error('Korisnički račun nije valjan.');
+     }
+   }
+
+   const currentMeta=loginData.user?.user_metadata||{};
+   const {data:updateData,error:updateError}=await c.auth.updateUser({
+     password:next,
+     data:{...currentMeta,yardivo_password_rotated:true}
+   });
+   if(updateError||!updateData?.user)throw updateError||new Error('Promjena lozinke nije uspjela.');
+
+   await c.auth.signOut({scope:'local'}).catch(()=>{});
+   $('loginPass').value='';
+   msg('Lozinka je uspješno promijenjena. Prijavi se novom lozinkom.','ok');
+   setTimeout(()=>{close();const le=$('loginError');if(le){le.textContent='Lozinka je promijenjena. Prijavi se novom lozinkom.';} $('loginPass')?.focus();},900);
+ }catch(err){
+   try{
+     if(typeof authClient==='function'){const c=await authClient();await c.auth.signOut({scope:'local'}).catch(()=>{})}
+   }catch(_){}
+   msg(err?.message||'Promjena lozinke nije uspjela.','error');
+ }finally{
+   btn.disabled=false;
+ }
+}
+document.addEventListener('click',e=>{
+ if(e.target.closest('#loginChangePasswordBtn')){e.preventDefault();open()}
+ if(e.target.closest('#ycpClose,#ycpCancel')){e.preventDefault();close()}
+ if(e.target.closest('#ycpSave')){e.preventDefault();save()}
+});
+$('yardivoChangePasswordDialog')?.addEventListener('cancel',e=>{e.preventDefault();close()});
 })();
 </script>
 
