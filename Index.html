@@ -7,7 +7,7 @@ Designed & Developed by Duje Maleš
 
 <html lang="hr">
 <head>
-<meta name="yardivo-build" content="PROD-QA-LIGHT-GREEN-WHITE-CHOICE-2026-08-31">
+<meta name="yardivo-build" content="PROD-MYYARD-DIGITAL-TWIN-V2-2026-08-31">
 <script id="yardivo-rbac-session-migration">
 (function(){
   try{
@@ -11473,7 +11473,7 @@ function doLogin(){
   const role=document.getElementById('loginRole')?.value||'admin';
   const err=document.getElementById('loginError');
 
-  if(user.toLowerCase()!=='dujemales'||pass!=='__LEGACY_LOGIN_DISABLED__'){
+  if(true){
     if(err){
       err.innerHTML='Pogrešni podaci. Korisničko ime je <strong>dujemales</strong>, a lozinka više nije lokalna.';
       err.style.borderColor='#7b3138';
@@ -12293,7 +12293,7 @@ function patchRoles(){const old=window.applyRoleAccess;window.applyRoleAccess=fu
       ...Array.from(document.querySelectorAll('[data-home-target]')).map(v=>v.dataset.homeTarget).filter(Boolean)
     ])]
   : [...(ROLE_VIEWS[currentSession.role]||[])];const u=users().find(x=>x.username===currentSession.user);if(u?.permissions)allowed=[...new Set([...allowed,...u.permissions])];document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('role-hidden',!allowed.includes(b.dataset.view)));document.querySelectorAll('[data-home-target]').forEach(c=>c.style.display=allowed.includes(c.dataset.homeTarget)?'block':'none');const form=document.getElementById('incidentForm');if(form){const _r=String(currentSession.role||'').toLowerCase();const canCreate=_r==='admin'||_r==='reception'||_r==='prijam';form.querySelectorAll('input,select,textarea,button').forEach(x=>x.disabled=!canCreate);form.style.opacity=canCreate?'1':'.55'}const admin=document.getElementById('masterUserAdmin');if(admin)admin.style.display=String(currentSession.role||'').toLowerCase()==='admin'?'block':'none';};}
-async function customLogin(){const user=document.getElementById('loginUser')?.value.trim().toLowerCase()||'',pass=document.getElementById('loginPass')?.value||'',err=document.getElementById('loginError');let rec=users().find(x=>x.username===user);let ok=false,role='admin',location=null;if(rec){ok=rec.status==='active'&&rec.passwordHash===await sha256(pass);role=rec.role;location=rec.location}else if(user==='dujemales'&&pass==='__LEGACY_LOGIN_DISABLED__'){ok=true;role='admin';location=LS.getItem('yardivo_last_location')||'DU'}if(!ok){if(err){err.textContent='Pogrešno korisničko ime/lozinka ili je račun deaktiviran.';err.style.color='#ff9ba0'}return}currentSession={user,role,location,loginAt:new Date().toISOString(),rememberMe:!!document.getElementById('rememberMe')?.checked};try{window.currentSession=currentSession}catch(e){};try{safeSessionStorage.setItem('studenac_demo_session',JSON.stringify(currentSession));if(currentSession.rememberMe)LS.setItem('yardivo_remembered_session',JSON.stringify(currentSession))}catch(e){}if(typeof enterApp==='function')enterApp();}
+async function customLogin(){const user=document.getElementById('loginUser')?.value.trim().toLowerCase()||'',pass=document.getElementById('loginPass')?.value||'',err=document.getElementById('loginError');let rec=users().find(x=>x.username===user);let ok=false,role='admin',location=null;if(rec){ok=rec.status==='active'&&rec.passwordHash===await sha256(pass);role=rec.role;location=rec.location}if(!ok){if(err){err.textContent='Pogrešno korisničko ime/lozinka ili je račun deaktiviran.';err.style.color='#ff9ba0'}return}currentSession={user,role,location,loginAt:new Date().toISOString(),rememberMe:!!document.getElementById('rememberMe')?.checked};try{window.currentSession=currentSession}catch(e){};try{safeSessionStorage.setItem('studenac_demo_session',JSON.stringify(currentSession));if(currentSession.rememberMe)LS.setItem('yardivo_remembered_session',JSON.stringify(currentSession))}catch(e){}if(typeof enterApp==='function')enterApp();}
 function patchLogin(){const role=document.getElementById('loginRole');if(role){role.closest('label')?.classList.add('login-role-hidden');role.disabled=true}const note=document.querySelector('.login-note');if(note)note.textContent='PRIJAVA — upiši korisničko ime, lozinku i odaberi rolu koju ti je dodijelio Admin.';}
 function incidentNotifications(){let last=Number(LS.getItem('yardivo_last_incident_notice')||0);const arr=(Array.isArray(incidents)?incidents:[]).filter(i=>Number(i.id)>last);if(!arr.length)return;let notes=jget(K.notes,[]);arr.forEach(i=>notes.unshift({id:'inc-'+i.id,type:'incident',title:`Novi incident · ${i.severity}`,text:`${i.supplier} · ${i.type}`,roles:['admin','inventory','reception'],incidentId:i.id,createdAt:new Date().toISOString()}));jset(K.notes,notes.slice(0,200));LS.setItem('yardivo_last_incident_notice',String(Math.max(...arr.map(i=>Number(i.id)))));}
 function init(){addNavAndView();addSettings();patchRoles();patchLogin();applyFont(Number(LS.getItem(K.font)||100));try{applyRoleAccess()}catch(e){}renderArchive();setInterval(incidentNotifications,1500);}
@@ -12947,7 +12947,7 @@ async function forcePasswordRotation(c,user){
   let next='';
   while(true){
     next=window.prompt('SIGURNOSNA NADOGRADNJA\nPostavi novu YARDIVO lozinku (najmanje 10 znakova). Privremena/stara lozinka više se neće koristiti.')||'';
-    if(next.length>=10 && next!=='__LEGACY_PASSWORD__')break;
+    if(next.length>=10)break;
     if(!next)throw new Error('Promjena lozinke je obavezna prije ulaska u YARDIVO.');
     alert('Nova lozinka mora imati najmanje 10 znakova.');
   }
@@ -14848,7 +14848,136 @@ function enqueue(op,key,value,expectedRevision){
   if(q.length>300)q=q.slice(-300);
   writeQueue(q);
 }
+
+/* ===== PRODUCTION NORMALIZED TRANSPORT V1 =====
+   Announcements/incidents are row-based in Supabase.
+   localStorage arrays remain only as the compatibility API for the existing UI. */
+const YARDIVO_NORMALIZED_ANN_KEYS=new Set(['studenac_yms_announcements','yardivo_yms_announcements_v1']);
+const YARDIVO_NORMALIZED_INC_KEYS=new Set(['studenac_yms_incidents']);
+const normalizedRowRevisions=new Map();
+function normalizedKind(key){
+  if(YARDIVO_NORMALIZED_ANN_KEYS.has(key))return'announcement';
+  if(YARDIVO_NORMALIZED_INC_KEYS.has(key))return'incident';
+  return'';
+}
+function normalizedCanonical(key){
+  const k=normalizedKind(key);
+  return k==='announcement'?'yardivo_yms_announcements_v1':k==='incident'?'studenac_yms_incidents':key;
+}
+function normalizedAliases(key){
+  return normalizedKind(key)==='announcement'
+    ?['studenac_yms_announcements','yardivo_yms_announcements_v1']
+    :normalizedKind(key)==='incident'?['studenac_yms_incidents']:[key];
+}
+function normalizedSpec(key){
+  const k=normalizedKind(key);
+  if(k==='announcement')return{table:'yardivo_announcements',id:'announcement_id',upsert:'yardivo_upsert_announcement_cas',del:'yardivo_delete_announcement_cas'};
+  if(k==='incident')return{table:'yardivo_incidents',id:'incident_id',upsert:'yardivo_upsert_incident_cas',del:'yardivo_delete_incident_cas'};
+  return null;
+}
+function normalizedItemId(x){
+  return String(x?.id??x?.announcement_id??x?.incident_id??'').trim();
+}
+function jsonStable(x){try{return JSON.stringify(x)}catch(_){return''}}
+async function normalizedRows(key){
+  const spec=normalizedSpec(key);if(!spec)return[];
+  const c=await connect();const out=[];let from=0;const page=750;
+  while(true){
+    const {data,error}=await c.from(spec.table)
+      .select(`${spec.id},payload,revision,deleted,updated_at`)
+      .order(spec.id,{ascending:true}).range(from,from+page-1);
+    if(error)throw error;
+    const rows=data||[];out.push(...rows);
+    if(rows.length<page)break;
+    from+=page;
+    if(from>50000)throw new Error('YARDIVO normalized dataset safety limit exceeded');
+  }
+  return out;
+}
+async function fetchNormalizedKey(key){
+  const rows=await normalizedRows(key);let max=0,updatedAt='';const live=[];
+  const kind=normalizedKind(key),spec=normalizedSpec(key);
+  for(const r of rows){
+    const rr=Number(r.revision)||0,id=String(r?.[spec.id]||'');
+    max=Math.max(max,rr);
+    if(id)normalizedRowRevisions.set(kind+':'+id,rr);
+    if(String(r.updated_at||'')>updatedAt)updatedAt=String(r.updated_at||'');
+    if(!r.deleted&&r.payload&&typeof r.payload==='object')live.push(r.payload);
+  }
+  const value=JSON.stringify(live),canonical=normalizedCanonical(key);
+  for(const alias of normalizedAliases(key)){revisions.set(alias,max);lastValues.set(alias,value)}
+  return{key:canonical,value_json:value,revision:max,updated_at:updatedAt,updated_by:'normalized-row-api',deleted:false};
+}
+async function normalizedLatestRevision(key){
+  const spec=normalizedSpec(key);if(!spec)return 0;
+  const c=await connect();
+  const {data,error}=await c.from(spec.table).select('revision').order('revision',{ascending:false}).limit(1);
+  if(error)throw error;
+  return Number(data?.[0]?.revision)||0;
+}
+async function syncNormalizedSet(key,value){
+  const spec=normalizedSpec(key);if(!spec)throw new Error('Unknown normalized dataset');
+  const canonical=normalizedCanonical(key);
+  let next;try{next=JSON.parse(String(value||'[]'))}catch(_){throw new Error('Neispravan JSON za '+canonical)}
+  if(!Array.isArray(next))throw new Error('Normalized dataset mora biti array: '+canonical);
+
+  let oldRaw=lastValues.get(canonical);
+  if(oldRaw==null){const remote=await fetchNormalizedKey(canonical);oldRaw=String(remote.value_json||'[]')}
+  let prev=[];try{prev=JSON.parse(oldRaw||'[]')}catch(_){prev=[]}
+  if(!Array.isArray(prev))prev=[];
+
+  const oldMap=new Map(prev.map(x=>[normalizedItemId(x),x]).filter(([id])=>id));
+  const newMap=new Map(next.map(x=>[normalizedItemId(x),x]).filter(([id])=>id));
+  if(newMap.size!==next.length)throw new Error('Svaka stavka mora imati jedinstveni id.');
+
+  const changed=[];
+  for(const [id,item] of newMap){
+    const before=oldMap.get(id);
+    if(!before||jsonStable(before)!==jsonStable(item))changed.push(item);
+  }
+  const removed=[...oldMap.keys()].filter(id=>!newMap.has(id));
+  if(!changed.length&&!removed.length){
+    const rev=revisions.get(canonical)||0;
+    for(const alias of normalizedAliases(canonical)){lastValues.set(alias,String(value));revisions.set(alias,rev)}
+    return{ok:true,revision:rev,deduped:true,normalized:true,rows:0};
+  }
+
+  const c=await connect();let max=revisions.get(canonical)||0,kind=normalizedKind(canonical);
+  for(const item of changed){
+    const id=normalizedItemId(item),expected=Number(normalizedRowRevisions.get(kind+':'+id)||0);
+    const {data,error}=await c.rpc(spec.upsert,{p_payload:item,p_expected_revision:expected});
+    if(error)throw error;
+    const r=data||{};
+    if(r.conflict){
+      const remote=await fetchNormalizedKey(canonical);
+      const state={};for(const alias of normalizedAliases(canonical))state[alias]={value:remote.value_json,revision:remote.revision,updatedAt:remote.updated_at||'',updatedBy:'normalized-row-api',deleted:false};
+      await applySnapshot(state);conflictNotice(canonical);
+      return{ok:false,conflict:true,revision:Number(r.current_revision)||remote.revision,normalized:true};
+    }
+    const nr=Number(r.new_revision)||0;normalizedRowRevisions.set(kind+':'+id,nr);max=Math.max(max,nr);
+  }
+  for(const id of removed){
+    const expected=Number(normalizedRowRevisions.get(kind+':'+id)||0);
+    const {data,error}=await c.rpc(spec.del,{p_id:id,p_expected_revision:expected});
+    if(error)throw error;
+    const r=data||{};
+    if(r.conflict){
+      const remote=await fetchNormalizedKey(canonical);
+      const state={};for(const alias of normalizedAliases(canonical))state[alias]={value:remote.value_json,revision:remote.revision,updatedAt:remote.updated_at||'',updatedBy:'normalized-row-api',deleted:false};
+      await applySnapshot(state);conflictNotice(canonical);
+      return{ok:false,conflict:true,revision:Number(r.current_revision)||remote.revision,normalized:true};
+    }
+    const nr=Number(r.new_revision)||0;normalizedRowRevisions.set(kind+':'+id,nr);max=Math.max(max,nr);
+  }
+
+  const finalValue=JSON.stringify(next);
+  for(const alias of normalizedAliases(canonical)){revisions.set(alias,max);lastValues.set(alias,finalValue)}
+  lastRevision=Math.max(lastRevision,max);
+  return{ok:true,revision:max,normalized:true,rows:changed.length+removed.length,upserts:changed.length,deletes:removed.length};
+}
+
 async function fetchKey(key){
+  if(normalizedKind(key))return await fetchNormalizedKey(key);
   const c=await connect();
   const {data,error}=await c.from('yardivo_app_state')
     .select('key,value_json,revision,updated_at,updated_by,deleted')
@@ -14876,6 +15005,9 @@ async function atomicSet(key,value,expectedRevision){
 }
 /* Existing delete RPC is retained; deletes are rare and still refresh revision afterwards. */
 async function sendDelete(key){
+  if(normalizedKind(key)){
+    return {ok:true,revision:revisions.get(normalizedCanonical(key))||0,normalized:true,protected:true};
+  }
   const c=await connect();
   const {data,error}=await c.rpc('yardivo_delete_state',{
     p_key:key,p_client_id:clientId,p_user:currentUser()
@@ -14891,28 +15023,33 @@ async function bootstrapRemote(){
   if(error)throw error;
   const state={};let max=0;
   (data||[]).forEach(r=>{
+    if(normalizedKind(r.key))return;
     const rev=Number(r.revision)||0;
     max=Math.max(max,rev);revisions.set(r.key,rev);
     if(!r.deleted)lastValues.set(r.key,String(r.value_json??''));
     state[r.key]={value:r.deleted?null:r.value_json,revision:rev,updatedAt:r.updated_at||'',updatedBy:r.updated_by||'',deleted:!!r.deleted};
   });
+  for(const key of ['yardivo_yms_announcements_v1','studenac_yms_incidents']){
+    const r=await fetchNormalizedKey(key);
+    max=Math.max(max,Number(r.revision)||0);
+    for(const alias of normalizedAliases(key)){
+      state[alias]={value:r.value_json,revision:r.revision,updatedAt:r.updated_at||'',updatedBy:'normalized-row-api',deleted:false};
+    }
+  }
   return {state,revision:max};
 }
 async function getChanges(since){
   const c=await connect();
-  /* Metadata-first fallback poll: do not download every large JSON value every minute. */
   const {data,error}=await c.from('yardivo_app_state')
     .select('key,revision,updated_at,updated_by,deleted')
     .order('revision',{ascending:true});
   if(error)throw error;
 
-  const changed=(data||[]).filter(r=>shouldSync(r.key) && (Number(r.revision)||0)>Number(revisions.get(r.key)||0));
+  const changed=(data||[]).filter(r=>!normalizedKind(r.key)&&shouldSync(r.key)&&(Number(r.revision)||0)>Number(revisions.get(r.key)||0));
   let max=Number(since)||0;
-  (data||[]).forEach(r=>{max=Math.max(max,Number(r.revision)||0)});
-  if(!changed.length)return {state:{},revision:max};
+  (data||[]).forEach(r=>{if(!normalizedKind(r.key))max=Math.max(max,Number(r.revision)||0)});
 
-  const rows=await Promise.all(changed.map(r=>fetchKey(r.key)));
-  const state={};
+  const rows=await Promise.all(changed.map(r=>fetchKey(r.key))),state={};
   rows.forEach(r=>{
     if(!r||!shouldSync(r.key))return;
     const rev=Number(r.revision)||0;
@@ -14920,6 +15057,17 @@ async function getChanges(since){
     if(!r.deleted)lastValues.set(r.key,String(r.value_json??'')); else lastValues.delete(r.key);
     state[r.key]={value:r.deleted?null:r.value_json,revision:rev,updatedAt:r.updated_at||'',updatedBy:r.updated_by||'',deleted:!!r.deleted};
   });
+
+  for(const key of ['yardivo_yms_announcements_v1','studenac_yms_incidents']){
+    const latest=await normalizedLatestRevision(key),canonical=normalizedCanonical(key);
+    max=Math.max(max,latest);
+    if(latest>Number(revisions.get(canonical)||0)){
+      const r=await fetchNormalizedKey(canonical);
+      for(const alias of normalizedAliases(canonical)){
+        state[alias]={value:r.value_json,revision:r.revision,updatedAt:r.updated_at||'',updatedBy:'normalized-row-api',deleted:false};
+      }
+    }
+  }
   return {state,revision:max};
 }
 function refreshViews(){
@@ -14963,6 +15111,15 @@ async function resolveConflict(key){
 async function sendSet(key,value){
   if(!shouldSync(key)||applyingRemote)return {ok:true,revision:revisions.get(key)||0};
   value=String(value);
+  if(normalizedKind(key)){
+    const canonical=normalizedCanonical(key);
+    if(lastValues.get(canonical)===value)return {ok:true,revision:revisions.get(canonical)||0,deduped:true,normalized:true};
+    const prior=inFlight.get(canonical)||Promise.resolve();
+    const task=prior.catch(()=>{}).then(()=>syncNormalizedSet(canonical,value))
+      .finally(()=>{if(inFlight.get(canonical)===task)inFlight.delete(canonical)});
+    inFlight.set(canonical,task);
+    return task;
+  }
   /* Major write-amplification fix: identical state never reaches Supabase. */
   if(lastValues.get(key)===value)return {ok:true,revision:revisions.get(key)||0,deduped:true};
 
@@ -19759,29 +19916,31 @@ function ensure(){
  apply();
 }
 function stateOf(a,selected){
- const s=String(a.status||'').toLowerCase();
- const today=isoToday();
- if(selected>today && a.date===selected)return'incoming';
- if(s.includes('odbij'))return'rejected';
- if(s.includes('zaprim')||s.includes('završ')||s.includes('izašao'))return'done';
- if(s.includes('rampi'))return'dock';
- if(s.includes('dvori')||s.includes('ček'))return'yard';
+ const s=String(a.status||'').toLowerCase(),today=isoToday();
+ if(selected!==today)return'incoming';
+ if(a.rejectedAt||s.includes('odbij'))return'rejected';
+ if(a.gateOutAt||a.completedAt||a.receivedAt||s.includes('zaprim')||s.includes('završ')||s.includes('izašao'))return'done';
+ if(a.dockArrivalAt||s.includes('rampi'))return'dock';
+ if(a.yardArrivalAt||s.includes('dvori')||s.includes('ček'))return'yard';
+ if(a.gateCheckedAt||a.actualDate||a.actualTime||s.includes('porta')||s.includes('gate')||s.includes('ulaz'))return'gate';
  return'incoming'
 }
 function pos(a,i,n,q){
  const dock=Math.max(1,Math.min(n,Number(a.dock)||1));
- if(q==='dock')return{x:250+(dock-1)*Math.min(96,620/Math.max(1,n-1)),y:310,r:90};
- if(q==='yard')return{x:285+(i%5)*145,y:535+(i%2)*52,r:0};
- if(q==='rejected')return{x:25,y:590+(i%2)*42,r:180};
- if(q==='done')return{x:-145,y:420,r:180};
- return{x:35+(i%5)*155,y:395+(i%2)*58,r:0}
+ const step=Math.min(96,620/Math.max(1,n-1));
+ if(q==='dock')return{x:250+(dock-1)*step,y:318,r:90};
+ if(q==='yard')return{x:320+(i%4)*150,y:500+Math.floor((i%8)/4)*72,r:(i%2?5:-5)};
+ if(q==='gate')return{x:95+(i%2)*82,y:505+(i%2)*48,r:0};
+ if(q==='rejected')return{x:-85,y:555+(i%2)*48,r:180};
+ if(q==='done')return{x:-175,y:485+(i%2)*45,r:180};
+ return{x:-175-(i%4)*145,y:335+(i%4)*55,r:0}
 }
 function truck(a,i,n,selected){
  const q=stateOf(a,selected),p=pos(a,i,n,q);
  const pallets=Math.max(0,Number(a.pallets||a.palettes||a.palette||0)||0);
  const sizeClass=pallets<15?'small':'long';
  const supplier=esc(a.supplier||'DOBAVLJAČ');
- return `<div class="myy-truck ${q} ${sizeClass}" data-id="${esc(a.id)}" title="Klikni za detalje najave" style="left:${p.x}px;top:${p.y}px;--tr:${p.r}deg;transform:translateZ(28px) rotate(${p.r}deg)">
+ return `<div class="myy-truck ${q} ${sizeClass}" data-id="${esc(a.id)}" title="Klikni za detalje najave" style="left:${p.x}px;top:${p.y}px;--tr:${p.r}deg;--from-r:${q==='dock'?'0':p.r}deg;transform:translateZ(28px) rotate(${p.r}deg)">
  <div class="myy-label">${esc(a.time||'--:--')} · ${supplier} · ${esc(a.plannedPlate||a.arrivalPlate||'')}</div>
  <div class="myy-trailer"><span class="myy-supplier-side">${supplier}</span></div><div class="myy-cab"></div><i class="myy-wheel myy-w1"></i><i class="myy-wheel myy-w2"></i><i class="myy-wheel myy-w3"></i></div>`
 }
@@ -22074,6 +22233,703 @@ new MutationObserver(()=>{
    setTimeout(ensureSettings,25);
  }
 }).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+
+<style id="yardivo-green-white-polish-20260831">
+/* GREEN / WHITE LIGHT — polished clean logistics look:
+   white workspace + green structure + soft status chips; no dark navy/brown pills. */
+body.light-mode.yardivo-light-green{
+  background:#f3f8f4!important;
+}
+
+/* Top-level balance: white dominant, green used as navigational/interactive accent. */
+body.light-mode.yardivo-light-green .topbar,
+body.light-mode.yardivo-light-green .sidebar,
+body.light-mode.yardivo-light-green .panel,
+body.light-mode.yardivo-light-green .card,
+body.light-mode.yardivo-light-green .stat,
+body.light-mode.yardivo-light-green .report-stat,
+body.light-mode.yardivo-light-green .ops-kpi{
+  background:#fff!important;
+}
+body.light-mode.yardivo-light-green .view,
+body.light-mode.yardivo-light-green .main,
+body.light-mode.yardivo-light-green .app-shell{
+  background:#f3f8f4!important;
+}
+
+/* Stronger but still clean green navigation. */
+body.light-mode.yardivo-light-green .nav-btn.active{
+  background:#e2f3e7!important;
+  color:#145b31!important;
+  border-color:#a7d4b3!important;
+  box-shadow:inset 3px 0 0 #2f9d58!important;
+}
+body.light-mode.yardivo-light-green .nav-btn:hover{
+  background:#edf8f0!important;
+  border-color:#cbe3d1!important;
+}
+
+/* Warehouse / user / notification controls — remove navy chips from screenshot. */
+body.light-mode.yardivo-light-green .location-badge,
+body.light-mode.yardivo-light-green #globalWarehouseInfo{
+  background:#e8f5ec!important;
+  color:#21643a!important;
+  border-color:#acd5b7!important;
+  box-shadow:none!important;
+}
+body.light-mode.yardivo-light-green .notif-bell{
+  background:#fff!important;
+  color:#237244!important;
+  border-color:#b7d9c0!important;
+  box-shadow:none!important;
+}
+body.light-mode.yardivo-light-green .notif-bell:hover{
+  background:#eef8f1!important;
+  border-color:#85c598!important;
+}
+body.light-mode.yardivo-light-green .user-chip,
+body.light-mode.yardivo-light-green #currentUserChip{
+  background:#fff!important;
+  color:#24442f!important;
+  border-color:#c5ddcb!important;
+  box-shadow:none!important;
+}
+body.light-mode.yardivo-light-green #currentUserLabel{color:#24442f!important}
+body.light-mode.yardivo-light-green #logoutBtn,
+body.light-mode.yardivo-light-green #homeLogoutBtn{
+  background:#fff!important;
+  color:#a63b43!important;
+  border-color:#e1a6aa!important;
+}
+
+/* Screenshot: complete driver data badge must be soft green, never dark. */
+body.light-mode.yardivo-light-green .driver-data-ok,
+body.light-mode.yardivo-light-green .identity-chip{
+  background:#e7f6eb!important;
+  color:#176b38!important;
+  border-color:#8fcea2!important;
+  box-shadow:none!important;
+}
+body.light-mode.yardivo-light-green .missing-driver-data,
+body.light-mode.yardivo-light-green .identity-missing{
+  background:#fff5e8!important;
+  color:#9a5d12!important;
+  border-color:#e4bc7d!important;
+}
+
+/* Status pills: pastel/light, readable, no dark brown/navy fills. */
+body.light-mode.yardivo-light-green .notice-pill{
+  box-shadow:none!important;
+  font-weight:900!important;
+}
+body.light-mode.yardivo-light-green .notice-pill.ok{
+  background:#e5f5ea!important;
+  color:#176b38!important;
+  border-color:#91cda2!important;
+}
+body.light-mode.yardivo-light-green .notice-pill.warn{
+  background:#fff4df!important;
+  color:#8a5a10!important;
+  border-color:#e7c27f!important;
+}
+body.light-mode.yardivo-light-green .delay-chip.good{
+  background:#e6f6eb!important;
+  color:#176b38!important;
+  border-color:#96cca4!important;
+}
+body.light-mode.yardivo-light-green .delay-chip.late{
+  background:#fdecee!important;
+  color:#9a2e38!important;
+  border-color:#e8aab0!important;
+}
+body.light-mode.yardivo-light-green .delay-chip.early{
+  background:#eef5f1!important;
+  color:#37614a!important;
+  border-color:#bdd5c4!important;
+}
+body.light-mode.yardivo-light-green .incident-chip{
+  background:#fff3e2!important;
+  color:#945c13!important;
+  border-color:#e3b873!important;
+}
+
+/* Override inline dark status styles generated by older renderers. */
+body.light-mode.yardivo-light-green .notice-pill[style*="background:#6f42c1"],
+body.light-mode.yardivo-light-green .notice-pill[style*="background: #6f42c1"]{
+  background:#f1eafa!important;color:#664299!important;border-color:#c7b3e7!important;
+}
+body.light-mode.yardivo-light-green .notice-pill[style*="background:#6b2a2f"],
+body.light-mode.yardivo-light-green .notice-pill[style*="background: #6b2a2f"]{
+  background:#fdecee!important;color:#982f39!important;border-color:#e4a4aa!important;
+}
+body.light-mode.yardivo-light-green .notice-pill[style*="background:#b96f00"],
+body.light-mode.yardivo-light-green .notice-pill[style*="background: #b96f00"],
+body.light-mode.yardivo-light-green .notice-pill[style*="background:#d18a09"],
+body.light-mode.yardivo-light-green .notice-pill[style*="background: #d18a09"]{
+  background:#fff4df!important;color:#88570f!important;border-color:#e6bf78!important;
+}
+
+/* All standard table action buttons use clean white/green hierarchy. */
+body.light-mode.yardivo-light-green td .action:not(.danger),
+body.light-mode.yardivo-light-green td button:not(.danger),
+body.light-mode.yardivo-light-green .table-wrap button:not(.danger),
+body.light-mode.yardivo-light-green .data-wrap button:not(.danger){
+  background:#fff!important;
+  color:#23653b!important;
+  border-color:#abd3b5!important;
+  box-shadow:none!important;
+}
+body.light-mode.yardivo-light-green td .action:not(.danger):hover,
+body.light-mode.yardivo-light-green td button:not(.danger):hover,
+body.light-mode.yardivo-light-green .table-wrap button:not(.danger):hover,
+body.light-mode.yardivo-light-green .data-wrap button:not(.danger):hover{
+  background:#edf8f0!important;
+  color:#14562e!important;
+  border-color:#79bd8e!important;
+}
+
+/* Primary actions: green, not blue. */
+body.light-mode.yardivo-light-green .primary,
+body.light-mode.yardivo-light-green .recommend-btn{
+  background:#2b9855!important;
+  color:#fff!important;
+  border-color:#25864b!important;
+}
+body.light-mode.yardivo-light-green .primary:hover,
+body.light-mode.yardivo-light-green .recommend-btn:hover{
+  background:#247e48!important;
+}
+
+/* Report / KPI cards — explicitly ensure no dark remnant can reappear. */
+body.light-mode.yardivo-light-green #dailyReport .report-stat,
+body.light-mode.yardivo-light-green .report-grid .report-stat,
+body.light-mode.yardivo-light-green .ops-kpi,
+body.light-mode.yardivo-light-green .performance-kpi,
+body.light-mode.yardivo-light-green .control-tower-kpi{
+  background:#fff!important;
+  color:#1d3827!important;
+  border-color:#cfe1d3!important;
+}
+body.light-mode.yardivo-light-green .report-stat small,
+body.light-mode.yardivo-light-green .ops-kpi small{
+  color:#62806a!important;
+}
+body.light-mode.yardivo-light-green .report-stat strong,
+body.light-mode.yardivo-light-green .ops-kpi strong{
+  color:#173a24!important;
+}
+
+/* Full screen / Supabase status badges follow the same visual language. */
+body.light-mode.yardivo-light-green #yardivoFullscreenBtn{
+  background:#fff!important;
+  color:#2a6840!important;
+  border-color:#b9d8c1!important;
+  box-shadow:0 5px 15px rgba(31,77,47,.08)!important;
+}
+body.light-mode.yardivo-light-green #yardivoFullscreenBtn:hover{
+  background:#eef8f1!important;
+  border-color:#84c497!important;
+}
+body.light-mode.yardivo-light-green [id*="supabase"][class*="badge"],
+body.light-mode.yardivo-light-green [class*="supabase"][class*="badge"],
+body.light-mode.yardivo-light-green .supabase-status,
+body.light-mode.yardivo-light-green #supabaseStatus,
+body.light-mode.yardivo-light-green #supabaseSyncStatus{
+  background:#e7f6eb!important;
+  color:#176b38!important;
+  border-color:#8dcca0!important;
+  box-shadow:none!important;
+}
+
+/* Green-white cards: soft green headers, not green everywhere. */
+body.light-mode.yardivo-light-green .panel-head{
+  background:#f7fbf8!important;
+  border-color:#d7e6da!important;
+}
+body.light-mode.yardivo-light-green .section-title{
+  color:#173a24!important;
+}
+body.light-mode.yardivo-light-green .section-title h1,
+body.light-mode.yardivo-light-green .panel-head h2{
+  color:#173a24!important;
+}
+
+/* Notifications / empty states */
+body.light-mode.yardivo-light-green .notice-result.good{
+  background:#edf8f0!important;
+  color:#265d38!important;
+  border-color:#a9d3b4!important;
+}
+body.light-mode.yardivo-light-green .notice-result.good h3{color:#1c6a39!important}
+
+/* Keep semantic danger/warning notification count obvious without dark surfaces. */
+body.light-mode.yardivo-light-green #notifCount,
+body.light-mode.yardivo-light-green .nav-badge{
+  background:#e5535b!important;
+  color:#fff!important;
+  border:none!important;
+}
+</style>
+
+
+<style id="yardivo-overview-3d-carousel-style-20260831">
+/* ===== OVERVIEW 3D SUPPLIER BAR CAROUSEL ===== */
+#overviewSupplier3D{
+  margin:14px 0 18px;
+  padding:14px;
+  border:1px solid var(--theme-border,#29485e);
+  border-radius:12px;
+  background:linear-gradient(180deg,var(--theme-panel,#071722),var(--theme-panel-2,#0a1a26));
+  overflow:hidden;
+}
+#overviewSupplier3D .ov3d-head{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  margin-bottom:12px;
+}
+#overviewSupplier3D .ov3d-head h2{margin:0;font-size:14px}
+#overviewSupplier3D .ov3d-head small{display:block;margin-top:4px}
+#overviewSupplier3D .ov3d-controls{display:flex;gap:7px;align-items:center}
+#overviewSupplier3D .ov3d-controls button{
+  min-width:42px;height:36px;border-radius:8px;border:1px solid var(--theme-border,#29485e);
+  background:var(--theme-panel-2,#0a1a26);color:var(--theme-text,#e9f1f5);
+  cursor:pointer;font-weight:1000;
+}
+#overviewSupplier3D .ov3d-stage{
+  position:relative;
+  min-height:360px;
+  perspective:1100px;
+  perspective-origin:50% 44%;
+  overflow:hidden;
+  border:1px solid var(--theme-border-soft,#1d3749);
+  border-radius:12px;
+  background:
+    radial-gradient(circle at 50% 30%,rgba(255,255,255,.045),transparent 38%),
+    linear-gradient(180deg,rgba(255,255,255,.018),transparent 70%);
+  touch-action:pan-y;
+}
+#overviewSupplier3D .ov3d-world{
+  position:absolute;left:50%;top:52%;
+  width:860px;height:280px;
+  transform-style:preserve-3d;
+  transform:translate(-50%,-50%) rotateX(62deg) rotateZ(var(--ov3d-rz,-11deg));
+  transition:transform .28s ease;
+}
+#overviewSupplier3D .ov3d-floor{
+  position:absolute;inset:18px 40px 14px;
+  transform:translateZ(-10px);
+  border:1px solid var(--theme-border,#29485e);
+  border-radius:14px;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 84px,rgba(255,255,255,.035) 85px 86px),
+    repeating-linear-gradient(0deg,transparent 0 54px,rgba(255,255,255,.03) 55px 56px),
+    rgba(0,0,0,.10);
+}
+#overviewSupplier3D .ov3d-bars{
+  position:absolute;inset:0 50px 8px;
+  display:flex;align-items:flex-end;justify-content:center;gap:22px;
+  transform-style:preserve-3d;
+}
+#overviewSupplier3D .ov3d-item{
+  width:76px;height:236px;position:relative;transform-style:preserve-3d;cursor:pointer;
+}
+#overviewSupplier3D .ov3d-bar3{
+  position:absolute;left:18px;bottom:38px;width:40px;
+  height:var(--h,60px);
+  transform-style:preserve-3d;
+  transition:height .35s ease,filter .2s ease,transform .2s ease;
+}
+#overviewSupplier3D .ov3d-item:hover .ov3d-bar3,
+#overviewSupplier3D .ov3d-item.selected .ov3d-bar3{
+  transform:translateZ(8px);
+  filter:brightness(1.08);
+}
+#overviewSupplier3D .ov3d-face{
+  position:absolute;box-sizing:border-box;border:1px solid rgba(255,255,255,.12);
+}
+#overviewSupplier3D .ov3d-front{
+  inset:0;
+  background:var(--bar,#2fb96b);
+  transform:translateZ(11px);
+}
+#overviewSupplier3D .ov3d-side{
+  top:0;right:-22px;width:22px;height:100%;
+  background:color-mix(in srgb,var(--bar,#2fb96b) 72%,#000);
+  transform-origin:left center;transform:rotateY(90deg);
+}
+#overviewSupplier3D .ov3d-top{
+  left:0;top:-22px;width:40px;height:22px;
+  background:color-mix(in srgb,var(--bar,#2fb96b) 88%,#fff);
+  transform-origin:left bottom;transform:rotateX(90deg);
+}
+#overviewSupplier3D .ov3d-score{
+  position:absolute;left:50%;bottom:4px;transform:translateX(-50%);
+  min-width:58px;padding:5px 6px;border-radius:999px;
+  border:1px solid var(--theme-border,#29485e);
+  background:var(--theme-panel,#071722);color:var(--theme-text,#e9f1f5);
+  text-align:center;font-size:9px;font-weight:1000;
+}
+#overviewSupplier3D .ov3d-name{
+  position:absolute;left:50%;bottom:-23px;transform:translateX(-50%) rotateZ(11deg);
+  width:105px;text-align:center;font-size:7px;line-height:1.2;
+  color:var(--theme-muted,#7f9bad);font-weight:900;
+}
+#overviewSupplier3D .ov3d-detail{
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;
+  margin-top:12px;
+}
+#overviewSupplier3D .ov3d-kpi{
+  padding:9px 10px;border:1px solid var(--theme-border-soft,#1d3749);
+  border-radius:8px;background:var(--theme-card,#091a27);
+}
+#overviewSupplier3D .ov3d-kpi small{display:block;font-size:7px;color:var(--theme-muted,#7f9bad)}
+#overviewSupplier3D .ov3d-kpi strong{display:block;margin-top:3px;font-size:13px}
+#overviewSupplier3D .ov3d-hint{
+  margin-top:9px;font-size:7px;color:var(--theme-muted,#7f9bad);text-align:center;
+}
+body.light-mode #overviewSupplier3D{
+  background:#fff!important;border-color:#d5dce1!important;
+}
+body.light-mode #overviewSupplier3D .ov3d-stage{
+  background:linear-gradient(180deg,#f8faf9,#eef3ef)!important;
+  border-color:#d6ded9!important;
+}
+body.light-mode #overviewSupplier3D .ov3d-floor{
+  background:
+    repeating-linear-gradient(90deg,transparent 0 84px,rgba(25,70,40,.04) 85px 86px),
+    repeating-linear-gradient(0deg,transparent 0 54px,rgba(25,70,40,.035) 55px 56px),
+    #eef4ef!important;
+  border-color:#d3ded6!important;
+}
+body.light-mode #overviewSupplier3D .ov3d-score,
+body.light-mode #overviewSupplier3D .ov3d-kpi{
+  background:#fff!important;color:#183324!important;border-color:#d3ded6!important;
+}
+body.light-mode.yardivo-light-green #overviewSupplier3D{
+  border-color:#cfe1d3!important;
+}
+body.light-mode.yardivo-light-green #overviewSupplier3D .ov3d-stage{
+  background:linear-gradient(180deg,#fbfefc,#edf7ef)!important;
+  border-color:#cfe1d3!important;
+}
+body.light-mode.yardivo-light-green #overviewSupplier3D .ov3d-score{
+  border-color:#abd3b5!important;color:#1e6339!important;
+}
+@media(max-width:850px){
+  #overviewSupplier3D .ov3d-world{width:720px;transform:translate(-50%,-50%) rotateX(62deg) rotateZ(var(--ov3d-rz,-8deg)) scale(.84)}
+  #overviewSupplier3D .ov3d-detail{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){
+  #overviewSupplier3D .ov3d-stage{min-height:320px}
+  #overviewSupplier3D .ov3d-world{width:620px;scale:.73}
+  #overviewSupplier3D .ov3d-detail{grid-template-columns:1fr 1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  #overviewSupplier3D .ov3d-world,#overviewSupplier3D .ov3d-bar3{transition:none!important}
+}
+</style>
+
+<script id="yardivo-overview-3d-carousel-20260831">
+(function(){
+'use strict';
+let angle=-11, selected='', drag=null;
+
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function stats(){
+ try{
+   if(window.YardivoOverviewReliability?.supplierStats)return window.YardivoOverviewReliability.supplierStats();
+ }catch(_){}
+ try{
+   const sel=document.getElementById('overviewSupplierSelect');
+   const names=[...sel.options].map(o=>o.value).filter(Boolean);
+   const a=Array.isArray(window.announcements)?window.announcements:(typeof announcements!=='undefined'?announcements:[]);
+   const inc=Array.isArray(window.incidents)?window.incidents:(typeof incidents!=='undefined'?incidents:[]);
+   if(typeof supplierStat==='function')return names.map(n=>supplierStat(n,a,inc));
+ }catch(_){}
+ return [];
+}
+function color(p){
+ p=Number(p)||0;
+ return p>=80?'#2fa45d':p>=55?'#d59a2d':'#cf5058';
+}
+function ensure(){
+ const view=document.getElementById('overview');if(!view)return null;
+ let root=document.getElementById('overviewSupplier3D');
+ if(root)return root;
+ root=document.createElement('section');
+ root.id='overviewSupplier3D';
+ root.innerHTML=`
+  <div class="ov3d-head">
+    <div><h2>3D POUZDANOST DOBAVLJAČA</h2><small>Stupčasti pregled ocjene dobavljača · povuci lijevo/desno za rotaciju</small></div>
+    <div class="ov3d-controls">
+      <button type="button" data-ov3d-left aria-label="Rotiraj lijevo">←</button>
+      <button type="button" data-ov3d-reset aria-label="Vrati prikaz">↺</button>
+      <button type="button" data-ov3d-right aria-label="Rotiraj desno">→</button>
+    </div>
+  </div>
+  <div class="ov3d-stage" tabindex="0" aria-label="3D graf pouzdanosti dobavljača">
+    <div class="ov3d-world">
+      <div class="ov3d-floor"></div>
+      <div class="ov3d-bars"></div>
+    </div>
+  </div>
+  <div class="ov3d-detail"></div>
+  <div class="ov3d-hint">Klikni stupac za detalje dobavljača · ← / → ili povlačenje = rotacija</div>`;
+ const firstPanel=view.querySelector('.panel');
+ if(firstPanel)firstPanel.insertAdjacentElement('afterend',root);else view.prepend(root);
+
+ const stage=root.querySelector('.ov3d-stage');
+ stage.addEventListener('pointerdown',e=>{
+   if(e.button!==0)return;drag={x:e.clientX,a:angle};stage.setPointerCapture?.(e.pointerId);
+ });
+ stage.addEventListener('pointermove',e=>{
+   if(!drag)return;angle=Math.max(-32,Math.min(32,drag.a+(e.clientX-drag.x)*.08));applyAngle(root);
+ });
+ stage.addEventListener('pointerup',()=>drag=null);
+ stage.addEventListener('pointercancel',()=>drag=null);
+ stage.addEventListener('keydown',e=>{
+   if(e.key==='ArrowLeft'){angle=Math.max(-32,angle-4);applyAngle(root)}
+   if(e.key==='ArrowRight'){angle=Math.min(32,angle+4);applyAngle(root)}
+ });
+ root.querySelector('[data-ov3d-left]').onclick=()=>{angle=Math.max(-32,angle-5);applyAngle(root)};
+ root.querySelector('[data-ov3d-right]').onclick=()=>{angle=Math.min(32,angle+5);applyAngle(root)};
+ root.querySelector('[data-ov3d-reset]').onclick=()=>{angle=-11;applyAngle(root)};
+ return root;
+}
+function applyAngle(root){
+ root?.querySelector('.ov3d-world')?.style.setProperty('--ov3d-rz',angle+'deg');
+}
+function render(){
+ const root=ensure();if(!root)return;
+ let data=stats().filter(x=>x&&x.reliability!=null);
+ if(!data.length){
+   root.querySelector('.ov3d-bars').innerHTML='<div style="padding:40px;color:var(--theme-muted)">Nema dovoljno podataka za 3D graf.</div>';
+   root.querySelector('.ov3d-detail').innerHTML='';
+   return;
+ }
+ data=data.sort((a,b)=>(b.reliability||0)-(a.reliability||0)).slice(0,10);
+ if(!selected||!data.some(x=>x.name===selected))selected=data[0].name;
+
+ const bars=root.querySelector('.ov3d-bars');
+ bars.innerHTML=data.map(x=>{
+   const h=Math.max(12,Math.round((Number(x.reliability)||0)*1.55));
+   return `<div class="ov3d-item ${x.name===selected?'selected':''}" data-supplier="${esc(x.name)}">
+     <div class="ov3d-bar3" style="--h:${h}px;--bar:${color(x.reliability)}">
+       <div class="ov3d-face ov3d-front"></div>
+       <div class="ov3d-face ov3d-side"></div>
+       <div class="ov3d-face ov3d-top"></div>
+     </div>
+     <div class="ov3d-score">${x.reliability}% · ${x.score10??Math.round(x.reliability/10)}/10</div>
+     <div class="ov3d-name">${esc(x.name)}</div>
+   </div>`;
+ }).join('');
+ bars.querySelectorAll('.ov3d-item').forEach(el=>el.onclick=()=>{selected=el.dataset.supplier;render()});
+
+ const x=data.find(d=>d.name===selected)||data[0];
+ root.querySelector('.ov3d-detail').innerHTML=`
+   <div class="ov3d-kpi"><small>DOBAVLJAČ</small><strong>${esc(x.name)}</strong></div>
+   <div class="ov3d-kpi"><small>POUZDANOST</small><strong>${x.reliability}%</strong></div>
+   <div class="ov3d-kpi"><small>OCJENA</small><strong>${x.score10??Math.round(x.reliability/10)}/10</strong></div>
+   <div class="ov3d-kpi"><small>NA VRIJEME</small><strong>${x.punctuality==null?'—':x.punctuality+'%'}</strong></div>
+   <div class="ov3d-kpi"><small>INCIDENTI</small><strong>${x.incidents??0}</strong></div>`;
+ applyAngle(root);
+}
+window.YardivoOverview3D={render};
+window.addEventListener('load',()=>setTimeout(render,500));
+window.addEventListener('yardivo:login',()=>setTimeout(render,250));
+document.addEventListener('click',e=>{
+ if(e.target?.closest?.('[data-view="overview"],[data-home-target="overview"]'))setTimeout(render,80);
+});
+setInterval(()=>{
+ const v=document.getElementById('overview');
+ if(v?.classList.contains('active'))render();
+},5000);
+})();
+</script>
+
+
+<style id="yardivo-myyard-digital-twin-v2-20260831">
+/* MY YARD · operational 3D digital twin */
+#myYard .myy-shell{
+  background:
+    radial-gradient(circle at 52% 13%,rgba(110,160,135,.20),transparent 24%),
+    linear-gradient(180deg,#17221d 0,#101713 60%,#0a100d 100%)!important;
+}
+#myYard .myy-stage{perspective:1650px!important;perspective-origin:50% 27%!important}
+#myYard .myy-floor{
+  background:
+    linear-gradient(90deg,transparent 49.7%,rgba(255,255,255,.055) 50%,transparent 50.3%),
+    linear-gradient(0deg,transparent 49.7%,rgba(255,255,255,.035) 50%,transparent 50.3%),
+    linear-gradient(135deg,#36413b,#202a25)!important;
+  border:2px solid #526158!important;
+  box-shadow:0 45px 90px #000b,inset 0 0 90px #0005!important;
+}
+#myYard .myy-floor:after{
+  content:"";position:absolute;inset:14px;border:2px solid #87938c33;border-radius:12px;pointer-events:none
+}
+#myYard .myy-building{
+  filter:drop-shadow(24px 34px 22px #0009);
+}
+#myYard .myy-front{
+  background:
+    repeating-linear-gradient(90deg,#d9dedb 0 82px,#c7ceca 83px 86px),
+    linear-gradient(#e7ebe9,#b7c0bb)!important;
+}
+#myYard .myy-roof{
+  background:
+    repeating-linear-gradient(90deg,#eef1ef 0 76px,#cbd2ce 77px 80px),
+    linear-gradient(135deg,#f5f6f5,#c4cbc7)!important;
+  box-shadow:inset 0 0 35px #83908766!important;
+}
+#myYard .myy-side{background:linear-gradient(90deg,#bcc5c0,#89958e)!important}
+#myYard .myy-dock{
+  border-radius:2px!important;
+  background:linear-gradient(90deg,#111614 0 68%,#232b27 68% 76%,#d02c32 76%)!important;
+}
+#myYard .myy-dock:before{
+  content:"";position:absolute;left:7px;right:18px;bottom:-18px;height:15px;
+  background:repeating-linear-gradient(90deg,#e5e8e6 0 7px,#4d5651 7px 14px);
+  border:1px solid #151a17;transform:translateZ(-2px)
+}
+#myYard .myy-gate{box-shadow:14px 20px 24px #0008!important}
+#myYard .myy-sign{box-shadow:0 8px 20px #0008!important}
+#myYard .myy-trucks{transform-style:preserve-3d}
+#myYard .myy-truck{
+  width:132px!important;height:42px!important;
+  transform-style:preserve-3d!important;
+  transition:left 1.55s cubic-bezier(.22,.75,.22,1),top 1.55s cubic-bezier(.22,.75,.22,1),
+    transform 1.55s cubic-bezier(.22,.75,.22,1),opacity .85s ease,filter .45s ease!important;
+  will-change:left,top,transform,opacity;
+}
+#myYard .myy-trailer{
+  height:38px!important;border-radius:2px!important;
+  background:linear-gradient(180deg,#f9fbfa,#cbd3cf)!important;
+  border:2px solid #707c75!important;
+  box-shadow:0 7px 0 #8f9993,7px 13px 15px #0009!important;
+}
+#myYard .myy-trailer:before{
+  content:"";position:absolute;left:3px;right:3px;top:-7px;height:7px;
+  background:linear-gradient(90deg,#e8ecea,#b6c0ba);
+  border:1px solid #7d8982;transform:skewX(-28deg);transform-origin:bottom
+}
+#myYard .myy-cab{
+  height:35px!important;border-radius:3px 8px 3px 3px!important;
+  background:linear-gradient(135deg,#f9fbfa 0 48%,#aab6b0 49% 100%)!important;
+  border:2px solid #69756e!important;box-shadow:5px 8px 10px #0007!important
+}
+#myYard .myy-cab:before{
+  content:"";position:absolute;right:3px;top:4px;width:15px;height:10px;border-radius:2px;
+  background:linear-gradient(135deg,#567282,#172a34);border:1px solid #4c5a55
+}
+#myYard .myy-wheel{
+  width:11px!important;height:11px!important;background:#0b0d0c!important;
+  border:2px solid #58615c!important;box-shadow:0 1px 2px #000!important
+}
+#myYard .myy-truck.gate{filter:drop-shadow(0 0 10px #e3b54a66)}
+#myYard .myy-truck.yard{filter:drop-shadow(0 0 10px #51ca8266)}
+#myYard .myy-truck.dock{filter:drop-shadow(0 0 12px #e4494e88)!important}
+#myYard .myy-truck.done,#myYard .myy-truck.rejected{pointer-events:none}
+#myYard .myy-truck.myy-enter-yard{animation:myyEnterYard 1.7s cubic-bezier(.18,.72,.2,1) both}
+#myYard .myy-truck.myy-enter-dock{animation:myyReverseDock 1.8s cubic-bezier(.18,.72,.2,1) both}
+#myYard .myy-truck.myy-exit{animation:myyExitFade 2.2s cubic-bezier(.3,.7,.2,1) both}
+@keyframes myyEnterYard{
+  0%{opacity:.2;filter:blur(2px);transform:translateZ(28px) rotate(var(--from-r,0deg)) translateX(-115px)}
+  45%{opacity:1;filter:none}
+  100%{opacity:1;transform:translateZ(28px) rotate(var(--tr,0deg))}
+}
+@keyframes myyReverseDock{
+  0%{opacity:.55;transform:translateZ(28px) rotate(0deg) translateX(100px)}
+  55%{opacity:1;transform:translateZ(28px) rotate(55deg) translateX(30px)}
+  100%{opacity:1;transform:translateZ(28px) rotate(90deg)}
+}
+@keyframes myyExitFade{
+  0%{opacity:1}
+  58%{opacity:.92;filter:none}
+  100%{opacity:0;filter:blur(3px);transform:translateZ(28px) rotate(180deg) translateX(150px)}
+}
+#myYard .myy-zone{
+  position:absolute;z-index:5;padding:5px 8px;border-radius:5px;
+  border:1px solid #75867c66;background:#111a16d9;color:#c9d5ce;
+  font:1000 7px Arial;letter-spacing:.7px;transform:translateZ(5px);pointer-events:none
+}
+#myYard .myy-zone-incoming{left:-52px;top:332px;color:#e5c970}
+#myYard .myy-zone-gate{left:72px;top:450px;color:#f0c95e}
+#myYard .myy-zone-yard{left:390px;top:478px;color:#79d99d}
+#myYard .myy-zone-exit{left:-32px;top:515px;color:#eaa4a8}
+#myYard .myy-legend{
+  position:absolute;left:18px;bottom:18px;z-index:70;display:flex;gap:7px;flex-wrap:wrap;
+  padding:7px 9px;border:1px solid #40564a;border-radius:8px;background:#0b1410e8;
+  backdrop-filter:blur(8px);font:900 7px Arial;color:#aab9b0
+}
+#myYard .myy-legend i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}
+#myYard .myy-legend .inc i{background:#d4ad4c}.myy-legend .gate i{background:#f1ca5f}
+#myYard .myy-legend .yard i{background:#54ca82}.myy-legend .dock i{background:#e54c52}
+body.light-mode #myYard .myy-shell{background:linear-gradient(180deg,#e8efeb,#d6e0da)!important}
+body.light-mode #myYard .myy-legend{background:#fffffff2!important;color:#44544b!important;border-color:#bdcbc2!important}
+</style>
+<script id="yardivo-myyard-digital-twin-v2-20260831">
+(function(){
+'use strict';
+const prev=new Map(),timers=new Map();
+function today(){const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
+function rows(){try{return Array.isArray(announcements)?announcements:[]}catch(_){return[]}}
+function phase(a,selected){
+ const s=String(a?.status||'').toLowerCase();
+ const live=selected===today();
+ if(!live)return 'incoming';
+ if(a?.rejectedAt||s.includes('odbij'))return'rejected';
+ if(a?.gateOutAt||a?.completedAt||a?.receivedAt||s.includes('zaprim')||s.includes('završ')||s.includes('izašao'))return'done';
+ if(a?.dockArrivalAt||s.includes('rampi'))return'dock';
+ if(a?.yardArrivalAt||s.includes('dvori')||s.includes('ček'))return'yard';
+ if(a?.gateCheckedAt||a?.actualDate||a?.actualTime||s.includes('porta')||s.includes('gate')||s.includes('ulaz'))return'gate';
+ return'incoming';
+}
+function decorate(){
+ const root=document.getElementById('myYard');if(!root)return;
+ const d=root.querySelector('.myy-date')?.value||today(),isToday=d===today();
+ const floor=root.querySelector('.myy-floor');
+ if(floor&&!floor.querySelector('.myy-zone')){
+   floor.insertAdjacentHTML('beforeend',
+    '<div class="myy-zone myy-zone-incoming">DOLASCI · IZVAN TERENA</div>'+
+    '<div class="myy-zone myy-zone-gate">PORTA</div>'+
+    '<div class="myy-zone myy-zone-yard">DVORIŠTE</div>'+
+    '<div class="myy-zone myy-zone-exit">IZLAZ</div>');
+ }
+ const shell=root.querySelector('.myy-shell');
+ if(shell&&!shell.querySelector('.myy-legend')){
+   shell.insertAdjacentHTML('beforeend','<div class="myy-legend"><span class="inc"><i></i>U DOLASKU</span><span class="gate"><i></i>PORTA</span><span class="yard"><i></i>DVORIŠTE</span><span class="dock"><i></i>RAMPA</span></div>');
+ }
+ const data=rows().filter(a=>(a.warehouse||'W101')===(typeof activeWarehouse!=='undefined'&&activeWarehouse&&activeWarehouse!=='ALL'?activeWarehouse:(window.currentSession?.location==='DU'?'W201':'W101'))&&a.date===d);
+ const byId=new Map(data.map(a=>[String(a.id),a]));
+ root.querySelectorAll('.myy-truck').forEach((el,i)=>{
+   const a=byId.get(String(el.dataset.id));if(!a)return;
+   const q=phase(a,d),id=String(a.id),old=prev.get(id);
+   el.classList.remove('incoming','gate','yard','dock','done','rejected');
+   el.classList.add(q);
+   if(isToday){
+     if(old&&old!==q){
+       el.classList.remove('myy-enter-yard','myy-enter-dock','myy-exit');
+       if(q==='yard')el.classList.add('myy-enter-yard');
+       else if(q==='dock')el.classList.add('myy-enter-dock');
+       else if(q==='done'||q==='rejected')el.classList.add('myy-exit');
+     }
+   }
+   prev.set(id,q);
+ });
+}
+function patchLegacy(){
+ if(window.YardivoMyYard?.__digitalTwinV2)return;
+ const api=window.YardivoMyYard;if(!api)return;
+ const oldRender=api.render;
+ api.render=function(){const r=oldRender.apply(this,arguments);requestAnimationFrame(()=>requestAnimationFrame(decorate));return r};
+ api.__digitalTwinV2=true;
+}
+function boot(){patchLegacy();decorate()}
+document.addEventListener('click',e=>{if(e.target.closest('[data-view="myYard"],[data-home-target="myYard"]'))setTimeout(boot,70)},true);
+window.addEventListener('load',()=>setTimeout(boot,900));
+setInterval(()=>{if(document.getElementById('myYard')?.classList.contains('active'))boot()},1000);
 })();
 </script>
 
