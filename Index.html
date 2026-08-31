@@ -22084,7 +22084,7 @@ function patch(){
  setTimeout(apply,100);
 }
 window.addEventListener('load',()=>setTimeout(patch,1200));
-/* disabled by yardivo-myyard-flicker-fix-v1: competing periodic lighting writer */
+setInterval(()=>{patch();if(document.getElementById('myYard')?.classList.contains('active'))apply()},1500);
 })();
 </script>
 
@@ -22588,7 +22588,7 @@ html:not([data-yardivo-ux="original"]) #yardivoWarRoomMyYardMirror .wrmirror-bad
    }catch(_){}
  }
  window.addEventListener('load',()=>setTimeout(applyGraphiteMapScene,1500));
- /* disabled by yardivo-myyard-flicker-fix-v1: competing periodic lighting writer */
+ setInterval(()=>{if(document.documentElement.dataset.yardivoUx!=='original')applyGraphiteMapScene()},1800);
 })();
 </script>
 
@@ -22824,38 +22824,6 @@ window.YardivoDarkLook={apply,get};
  }
  window.addEventListener('load',()=>setTimeout(clean,400));
  new MutationObserver(clean).observe(document.documentElement,{childList:true,subtree:true});
-})();
-</script>
-
-
-<style id="yardivo-myyard-flicker-fix-v1-20260831">
-/* One stable visual owner for My Yard. JS no longer alternates scene brightness. */
-#myYard .myy-stage,#yardivoMyYardWebGL{background:#263c31!important}
-html[data-yardivo-ux="original"] #myYard .myy-stage,
-html[data-yardivo-ux="original"] #yardivoMyYardWebGL{background:#cfdad3!important}
-</style>
-<script id="yardivo-myyard-flicker-fix-v1-20260831-js">
-(function(){
-'use strict';
-let last='';
-function desired(){
- return document.documentElement.dataset.yardivoUx==='original' ? 'original' : 'professional';
-}
-function apply(force){
- const m=desired();if(!force&&m===last)return;
- const e=window.__YARDIVO_MYYARD_ENGINE__,T=window.__YARDIVO_THREE_MODULE__;if(!e||!T)return;
- last=m;
- const col=m==='original'?0xcfdad3:0x263c31;
- e.scene.background=new T.Color(col);
- e.scene.fog=new T.FogExp2(col,.0065);
- e.renderer.toneMappingExposure=m==='original'?1.22:1.18;
-}
-window.YardivoMyYardStableLighting={apply};
-window.addEventListener('load',()=>setTimeout(()=>apply(true),1600));
-document.addEventListener('click',e=>{
- if(e.target.closest('[data-view="myYard"],[data-home-target="myYard"],#yardivoUxStyleSetting'))setTimeout(()=>apply(true),180);
-},true);
-new MutationObserver(()=>apply(false)).observe(document.documentElement,{attributes:true,attributeFilter:['data-yardivo-ux']});
 })();
 </script>
 
