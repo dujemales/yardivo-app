@@ -7,7 +7,7 @@ Designed & Developed by Duje Maleš
 
 <html lang="hr">
 <head>
-<meta name="yardivo-build" content="PROD-QA-LOGIN-SCROLL-SUPABASE-FIX-2026-08-31">
+<meta name="yardivo-build" content="PROD-QA-LOGIN-STABILITY-FINAL-2026-08-31">
 <script id="yardivo-rbac-session-migration">
 (function(){
   try{
@@ -6315,7 +6315,7 @@ function start(){
   ];
 
   let value=0,stage=0;
-  const WELCOME_MS=5200;
+  const WELCOME_MS=220;
   const startedAt=performance.now();
   const timer=setInterval(()=>{
     const elapsed=performance.now()-startedAt;
@@ -6330,7 +6330,7 @@ function start(){
 
     if(value>=100){
       clearInterval(timer);
-      setTimeout(showLogin,220);
+      setTimeout(showLogin,30);
     }
   },50);
 }
@@ -20507,18 +20507,58 @@ document.addEventListener('wheel',e=>{
  }
 },{capture:true,passive:true});
 
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
-window.addEventListener('load',apply);
-const obs=new MutationObserver(m=>{
- for(const x of m){
-   const t=x.target;
-   if(t?.id==='loginRole'||t?.contains?.(document.getElementById('loginRole'))){queueMicrotask(fixRole);break}
- }
-});
-setTimeout(()=>{
+function stableApply(){
+  apply();
+  setTimeout(apply,40);
+  setTimeout(apply,180);
+  setTimeout(apply,700);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',stableApply,{once:true});else stableApply();
+window.addEventListener('load',stableApply);
+})();
+</script>
+
+
+<script id="yardivo-final-login-stability-20260831">
+(function(){
+'use strict';
+function loginVisible(){
  const o=document.getElementById('loginOverlay');
- if(o)obs.observe(o,{subtree:true,attributes:true,attributeFilter:['class','style','disabled','hidden','aria-hidden']})
-},0);
+ return !!o && getComputedStyle(o).display!=='none';
+}
+function sessionActive(){
+ try{return !!window.currentSession?.role}catch(_){return false}
+}
+function stabilize(){
+ const splash=document.getElementById('yardivoWelcomeSplash');
+ if(splash){
+   splash.classList.add('hide');
+   splash.style.display='none';
+ }
+ const overlay=document.getElementById('loginOverlay');
+ if(!overlay)return;
+ if(sessionActive()){
+   overlay.style.display='none';
+   overlay.setAttribute('aria-hidden','true');
+ }else{
+   overlay.style.display='flex';
+   overlay.setAttribute('aria-hidden','false');
+ }
+ const u=document.getElementById('loginUser');
+ const pw=document.getElementById('loginPass');
+ const role=document.getElementById('loginRole');
+ [u,pw,role].forEach(el=>{
+   if(!el)return;
+   el.disabled=false;
+   el.removeAttribute('disabled');
+   el.style.pointerEvents='auto';
+   el.style.userSelect='auto';
+ });
+}
+window.YardivoLoginStability={stabilize};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',stabilize,{once:true});else stabilize();
+window.addEventListener('load',()=>setTimeout(stabilize,50));
+window.addEventListener('yardivo:login',()=>setTimeout(stabilize,0));
 })();
 </script>
 
