@@ -7,7 +7,7 @@ Designed & Developed by Duje Maleš
 
 <html lang="hr">
 <head>
-<meta name="yardivo-build" content="PROD-QA-DEEP-TESTED-MYYARD-2026-08-31">
+<meta name="yardivo-build" content="PROD-QA-LOGIN-SCROLL-SUPABASE-FIX-2026-08-31">
 <script id="yardivo-rbac-session-migration">
 (function(){
   try{
@@ -14858,7 +14858,7 @@ const META_KEY='yardivo_supabase_sync_meta_v2';
 const POLL_MS=60000;
 const DEBOUNCE_MS=220;
 
-let applyingRemote=false,flushing=false,bootstrapped=false,lastRevision=0,sb=null;
+let applyingRemote=false,flushing=false,bootstrapped=false,lastRevision=0,sb=null,authReady=false;
 const revisions=new Map();
 const lastValues=new Map();
 const timers=new Map();
@@ -14956,14 +14956,30 @@ function conflictNotice(key){
   try{showYmsToast?.('warning','PROMJENA DRUGOG KORISNIKA',`"${key}" je u međuvremenu promijenjen. Učitana je novija verzija; ponovi svoju radnju ako je još potrebna.`)}catch(e){}
 }
 async function connect(){
-  if(sb)return sb;
   if(!configured())throw new Error('Supabase nije konfiguriran.');
   if(!window.supabase?.createClient)throw new Error('Supabase JS biblioteka nije učitana.');
-  sb=window.supabase.createClient(YARDIVO_SUPABASE_CONFIG.url,YARDIVO_SUPABASE_CONFIG.publishableKey,{
-    auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}
-  });
+  if(!sb){
+    sb=window.supabase.createClient(YARDIVO_SUPABASE_CONFIG.url,YARDIVO_SUPABASE_CONFIG.publishableKey,{
+      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}
+    });
+    try{
+      sb.auth.onAuthStateChange((event,session)=>{
+        authReady=!!session && session.user?.is_anonymous!==true;
+        if(!authReady){bootstrapped=false}
+      });
+    }catch(_){}
+  }
   const {data}=await sb.auth.getSession();
-  if(!data?.session)throw new Error('YARDIVO_AUTH_REQUIRED');
+  if(!data?.session){
+    authReady=false;
+    throw new Error('YARDIVO_AUTH_REQUIRED');
+  }
+  if(data.session.user?.is_anonymous===true){
+    authReady=false;
+    try{await sb.auth.signOut({scope:'local'})}catch(_){}
+    throw new Error('YARDIVO_AUTH_REQUIRED');
+  }
+  authReady=true;
   return sb;
 }
 function readQueue(){try{const q=JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY)||'[]');return Array.isArray(q)?q:[]}catch(e){return[]}}
@@ -15145,7 +15161,7 @@ async function flushQueue(){
   }finally{flushing=false}
 }
 function scheduleSet(key,value){
-  if(!shouldSync(key)||applyingRemote)return;
+  if(!shouldSync(key)||applyingRemote||!authReady)return;
   value=String(value);
   if(lastValues.get(key)===value)return;
   clearTimeout(timers.get(key));
@@ -15161,7 +15177,7 @@ function scheduleSet(key,value){
   },DEBOUNCE_MS));
 }
 async function deleteKey(key){
-  if(!shouldSync(key)||applyingRemote)return;
+  if(!shouldSync(key)||applyingRemote||!authReady)return;
   try{
     const r=await sendDelete(key);
     lastRevision=Math.max(lastRevision,Number(r?.revision)||0);
@@ -15213,6 +15229,11 @@ async function initialSync(){
     status(readQueue().length?`● SUPABASE · ${readQueue().length} ČEKA`:'● SUPABASE · ONLINE',readQueue().length?'warn':'ok');
     refreshViews();
   }catch(e){
+    if(String(e?.message||e)==='YARDIVO_AUTH_REQUIRED'){
+      authReady=false;bootstrapped=false;
+      status('● SUPABASE · ČEKA PRIJAVU','');
+      return;
+    }
     bootstrapped=true;
     status(readQueue().length?`● SUPABASE OFFLINE · ${readQueue().length} ČEKA`:'● SUPABASE OFFLINE · lokalna kopija aktivna','warn');
     showSyncError('INITIAL SYNC',e);
@@ -15227,6 +15248,9 @@ async function poll(){
     if(r.state&&Object.keys(r.state).length)await applySnapshot(r.state);
     status('● SUPABASE · ONLINE','ok');
   }catch(e){
+    if(String(e?.message||e)==='YARDIVO_AUTH_REQUIRED'){
+      authReady=false;bootstrapped=false;status('● SUPABASE · ČEKA PRIJAVU','');return;
+    }
     status(readQueue().length?`● SUPABASE OFFLINE · ${readQueue().length} ČEKA`:'● SUPABASE OFFLINE','warn',errText(e));
     showSyncError('POLL',e);
   }
@@ -19349,7 +19373,7 @@ function late(a){try{return Number(delayMinutes?.(a)||a.lateMinutes||0)>15}catch
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function pos(a,i,n){const p=phase(a),d=Math.max(1,Math.min(n,Number(a.dock||1)));if(p==='dock')return[248+(d-1)*(520/Math.max(1,n-1)),244,0];if(p==='yard')return[295+(i%5)*118,365+Math.floor(i/5)*64,180];if(p==='gate')return[128+(i%3)*108,455+(i%2)*48,0];if(p==='done')return[5,520-(i%4)*45,180];return[-138-(i%4)*118,320+(i%5)*55,0]}
 function infrastructure(){return `<div class="yf-floor"><div class="yf-road"></div><div class="yf-gate"></div><div class="yf-sign yf-in">ULAZ →</div><div class="yf-sign yf-out">← IZLAZ</div><div class="yf-wait">NAJAVLJENI / ČEKANJE</div><div class="yf-building"><div class="front"></div><div class="roof"></div><div class="side"></div></div><div class="yf-dynamic"></div></div>`}
-function makeHost(parent,id,key,war=false){let host=document.getElementById(id);if(host)return host;host=document.createElement('div');host.id=id;host.innerHTML=`<div class="yf-stage"><div class="yf-toolbar"><i class="dot"></i><b>${war?'WAR ROOM · LIVE YARD':'LIVE YARD'}</b><button data-yf-mode="2d">2D</button><button data-yf-mode="3d" class="active">3D</button><span class="yf-meta"></span></div>${war?'<div class="yf-war-title">POVEĆANI OPERATIVNI DIGITAL TWIN</div>':''}<div class="yf-world mode3d">${infrastructure()}</div><div class="yf-help">POVUCI MIŠ = ROTACIJA 360° · KOTAČIĆ = ZOOM</div></div>`;parent.appendChild(host);const st=state[key],world=host.querySelector('.yf-world');function apply(){world.className='yf-world '+(st.mode==='3d'?'mode3d':'mode2d');world.style.setProperty('--yf-rz',st.rz+'deg');world.style.setProperty('--yf-scale',st.scale);host.querySelectorAll('[data-yf-mode]').forEach(b=>b.classList.toggle('active',b.dataset.yfMode===st.mode));host.querySelector('.yf-help').style.display=st.mode==='3d'?'block':'none'}host.querySelectorAll('[data-yf-mode]').forEach(b=>b.onclick=e=>{e.stopPropagation();st.mode=b.dataset.yfMode;apply()});host.addEventListener('pointerdown',e=>{if(st.mode!=='3d'||e.button!==0||e.target.closest('button,.yf-truck'))return;st.drag=true;st.px=e.clientX});host.addEventListener('pointermove',e=>{if(!st.drag)return;st.rz+=(e.clientX-st.px)*.18;st.px=e.clientX;apply()});window.addEventListener('pointerup',()=>st.drag=false);host.addEventListener('wheel',e=>{if(st.mode!=='3d')return;e.preventDefault();st.scale=Math.max(.52,Math.min(1.2,st.scale-e.deltaY*.0007));apply()},{passive:false});apply();return host}
+function makeHost(parent,id,key,war=false){let host=document.getElementById(id);if(host)return host;host=document.createElement('div');host.id=id;host.innerHTML=`<div class="yf-stage"><div class="yf-toolbar"><i class="dot"></i><b>${war?'WAR ROOM · LIVE YARD':'LIVE YARD'}</b><button data-yf-mode="2d">2D</button><button data-yf-mode="3d" class="active">3D</button><span class="yf-meta"></span></div>${war?'<div class="yf-war-title">POVEĆANI OPERATIVNI DIGITAL TWIN</div>':''}<div class="yf-world mode3d">${infrastructure()}</div><div class="yf-help">POVUCI MIŠ = ROTACIJA 360° · CTRL + CTRL + KOTAČIĆ = ZOOM</div></div>`;parent.appendChild(host);const st=state[key],world=host.querySelector('.yf-world');function apply(){world.className='yf-world '+(st.mode==='3d'?'mode3d':'mode2d');world.style.setProperty('--yf-rz',st.rz+'deg');world.style.setProperty('--yf-scale',st.scale);host.querySelectorAll('[data-yf-mode]').forEach(b=>b.classList.toggle('active',b.dataset.yfMode===st.mode));host.querySelector('.yf-help').style.display=st.mode==='3d'?'block':'none'}host.querySelectorAll('[data-yf-mode]').forEach(b=>b.onclick=e=>{e.stopPropagation();st.mode=b.dataset.yfMode;apply()});host.addEventListener('pointerdown',e=>{if(st.mode!=='3d'||e.button!==0||e.target.closest('button,.yf-truck'))return;st.drag=true;st.px=e.clientX});host.addEventListener('pointermove',e=>{if(!st.drag)return;st.rz+=(e.clientX-st.px)*.18;st.px=e.clientX;apply()});window.addEventListener('pointerup',()=>st.drag=false);host.addEventListener('wheel',e=>{if(st.mode!=='3d')return;e.preventDefault();st.scale=Math.max(.52,Math.min(1.2,st.scale-e.deltaY*.0007));apply()},{passive:false});apply();return host}
 function hideLegacyLive(){['lyCanvas','yardivoReal3DHost','yardivoNative3D','yardivoV25Live','yardivoV26'].forEach(id=>{const x=document.getElementById(id);if(x)x.style.setProperty('display','none','important')});const stage=document.getElementById('liveYardStage');if(stage){Array.from(stage.children).forEach(x=>{if(x.id!=='yardivoFinalLiveYard'&&!x.classList.contains('ly-stage-head'))x.style?.setProperty('display','none','important')})}}
 function hideLegacyWar(){['yardivoWar3DHost','yardivoNativeWar3D','yardivoV25War'].forEach(id=>{const x=document.getElementById(id);if(x)x.style.setProperty('display','none','important')})}
 function truckHtml(a){return `<span class="yf-label">${esc(a.supplier||'DOBAVLJAČ')}</span><div class="yf-trailer"></div><div class="yf-cab"></div><i class="yf-wheel w1"></i><i class="yf-wheel w2"></i><i class="yf-wheel w3"></i>`}
@@ -19786,7 +19810,7 @@ function ensure(){
  <div class="myy-building"><div class="myy-front">WAREHOUSE</div><div class="myy-roof"></div><div class="myy-side"></div></div>
  <div class="myy-gate"></div><div class="myy-bar"></div><div class="myy-sign">ULAZ → &nbsp;&nbsp; ← IZLAZ</div>
  <div class="myy-docks"></div><div class="myy-trucks"></div></div></div>
- <div class="myy-help">3D: POVUCI MIŠ = ROTACIJA · KOTAČIĆ = ZOOM</div></div></div>`;
+ <div class="myy-help">3D: POVUCI MIŠ = ROTACIJA · CTRL + KOTAČIĆ = ZOOM</div></div></div>`;
  main.appendChild(s);
  const nav=document.querySelector('.nav');
  if(nav&&!nav.querySelector('[data-view="myYard"]')){
@@ -20419,6 +20443,82 @@ function bind(){
 }
 document.addEventListener('click',e=>{if(e.target.closest('[data-view="myYard"],[data-home-target="myYard"]'))setTimeout(bind,0)},true);
 window.addEventListener('load',()=>setTimeout(bind,300));
+})();
+</script>
+
+
+<style id="yardivo-final-login-interaction-fix-20260831">
+html,body{overscroll-behavior:auto!important}
+#loginOverlay{
+  overflow-y:auto!important;overflow-x:hidden!important;
+  overscroll-behavior-y:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+#loginOverlay .login-card{margin:auto!important;flex:0 0 auto!important}
+#loginOverlay label:has(#loginRole){
+  display:grid!important;visibility:visible!important;opacity:1!important;
+  height:auto!important;max-height:none!important;overflow:visible!important
+}
+#loginRole{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  pointer-events:auto!important;cursor:pointer!important;position:relative!important;z-index:2!important
+}
+@media(max-height:720px){
+ #loginOverlay{align-items:flex-start!important;padding-top:20px!important;padding-bottom:28px!important}
+ #loginOverlay .login-card{margin:0 auto!important}
+}
+</style>
+<script id="yardivo-final-login-interaction-fix-js-20260831">
+(function(){
+'use strict';
+function fixRole(){
+ const s=document.getElementById('loginRole');if(!s)return;
+ const label=s.closest('label');
+ label?.classList.remove('login-role-hidden','role-hidden');
+ if(label){label.style.removeProperty('display');label.hidden=false}
+ s.disabled=false;s.removeAttribute('disabled');s.removeAttribute('aria-hidden');
+ s.style.pointerEvents='auto';
+ const wanted=[['admin','Admin'],['inventory','Upravljanje zalihama'],['reception','Prijam'],['gate','Porta']];
+ const vals=[...s.options].map(o=>o.value).join('|');
+ if(vals!==wanted.map(x=>x[0]).join('|')){
+   const cur=s.value;
+   s.innerHTML=wanted.map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+   if(wanted.some(x=>x[0]===cur))s.value=cur;
+ }
+}
+function fixLoginScroll(){
+ const o=document.getElementById('loginOverlay');if(!o)return;
+ o.style.overflowY='auto';
+ o.style.touchAction='pan-y';
+}
+function apply(){fixRole();fixLoginScroll()}
+
+/* Preserve normal mouse-wheel page scrolling.
+   My Yard zoom is intentionally Ctrl+wheel so the 3D stage cannot trap ordinary scrolling. */
+document.addEventListener('wheel',e=>{
+ const overlay=document.getElementById('loginOverlay');
+ const loginVisible=overlay && getComputedStyle(overlay).display!=='none';
+ if(loginVisible){
+   e.stopImmediatePropagation();
+   return;
+ }
+ if(e.target?.closest?.('#myYard') && !e.ctrlKey){
+   e.stopImmediatePropagation();
+ }
+},{capture:true,passive:true});
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
+window.addEventListener('load',apply);
+const obs=new MutationObserver(m=>{
+ for(const x of m){
+   const t=x.target;
+   if(t?.id==='loginRole'||t?.contains?.(document.getElementById('loginRole'))){queueMicrotask(fixRole);break}
+ }
+});
+setTimeout(()=>{
+ const o=document.getElementById('loginOverlay');
+ if(o)obs.observe(o,{subtree:true,attributes:true,attributeFilter:['class','style','disabled','hidden','aria-hidden']})
+},0);
 })();
 </script>
 
