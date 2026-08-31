@@ -7,6 +7,29 @@ Designed & Developed by Duje Maleš
 
 <html lang="hr">
 <head>
+<script id="yardivo-first-paint-bootstrap-v1">
+(function(){
+ try{
+   var main=localStorage.getItem('yardivo_main_theme_v2')||'dark';
+   var dark=localStorage.getItem('yardivo_dark_look_v2')||'original';
+   if(main!=='light'&&main!=='dark')main='dark';
+   if(['graphite','blue','original'].indexOf(dark)<0)dark='original';
+   document.documentElement.classList.add('yardivo-booting');
+   document.documentElement.setAttribute('data-yardivo-main-theme',main);
+   document.documentElement.setAttribute('data-yardivo-dark-look',dark);
+ }catch(e){
+   document.documentElement.classList.add('yardivo-booting');
+   document.documentElement.setAttribute('data-yardivo-main-theme','dark');
+   document.documentElement.setAttribute('data-yardivo-dark-look','original');
+ }
+})();
+</script>
+<style id="yardivo-first-paint-bootstrap-style-v1">
+html.yardivo-booting #loginOverlay,
+html.yardivo-booting #loginScreen,
+html.yardivo-booting .login-screen,
+html.yardivo-booting .login-overlay{visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+</style>
 <meta name="yardivo-build" content="PROD-PROFESSIONAL-UX-V2-2026-08-31">
 <script id="yardivo-rbac-session-migration">
 (function(){
@@ -6116,6 +6139,8 @@ html[data-theme="light"] .yardivo-welcome-copy{color:#7a909f}
 let started=false;
 
 function showLogin(){
+  document.documentElement.classList.remove('yardivo-booting');
+  document.documentElement.classList.add('yardivo-welcome-complete');
   document.body.classList.remove('yardivo-welcome-active');
   document.body.classList.add('yardivo-prelogin');
   const splash=document.getElementById('yardivoWelcomeSplash');
@@ -21553,7 +21578,7 @@ function getChoice(){
  }catch(_){return 'blue'}
 }
 function saveChoice(v){
- v=v==='graphite'?'graphite':'blue';
+ v=['blue','graphite','original'].includes(v)?v:'original';
  try{localStorage.setItem(key(),v)}catch(_){}
  apply(v);
 }
@@ -21605,6 +21630,11 @@ function ensureSettings(){
          <input type="radio" name="yardivoDarkStyle" value="graphite">
          <strong>CRNO-SIVI DARK</strong>
          <small>Crna i grafitno-siva tema bez plavih površina.</small>
+       </label>
+       <label class="yardivo-dark-style-option original" data-dark-style="original">
+         <input type="radio" name="yardivoDarkStyle" value="original">
+         <strong>YARDIVO ORIGINAL THEME</strong>
+         <small>Prvotni YARDIVO izgled: duboki tamno-plavi tonovi i originalni plavi naglasci.</small>
        </label>
      </div>
      <div class="yardivo-dark-style-note">Postavka se pamti posebno za prijavljenog korisnika na ovom uređaju.</div>
@@ -24111,7 +24141,7 @@ function settings(){
  const cards=[...s.querySelectorAll('.settings-card,.card,.panel')];
  const parent=cards.find(x=>/izgled|appearance|tema|dark|light/i.test(x.textContent||''))||cards[0]||s;
  const box=document.createElement('div');box.id='yardivoThemeSettingsV2';
- box.innerHTML='<div class="yt-title">DARK MODE THEME</div><div class="yt-row"><button type="button" data-dark-look="graphite">CRNO-SIVI</button><button type="button" data-dark-look="blue">PLAVI</button><button type="button" data-dark-look="original">ORIGINAL THEME</button></div><div class="yt-note">ORIGINAL THEME vraća prvotni tamno-plavi YARDIVO izgled. Opcije vrijede samo u Dark Modeu.</div>';
+ box.innerHTML='<div class="yt-title">DARK MODE THEME</div><div class="yt-row"><button type="button" data-dark-look="graphite">CRNO-SIVI</button><button type="button" data-dark-look="blue">PLAVI</button><button type="button" data-dark-look="original">YARDIVO ORIGINAL THEME</button></div><div class="yt-note">ORIGINAL THEME vraća prvotni tamno-plavi YARDIVO izgled. Opcije vrijede samo u Dark Modeu.</div>';
  parent.appendChild(box);box.onclick=e=>{const b=e.target.closest('[data-dark-look]');if(b)setDark(b.dataset.darkLook)};sync()
 }
 function hook(){
@@ -24126,6 +24156,141 @@ window.addEventListener('load',()=>setTimeout(()=>{hook();settings();scene()},50
 document.addEventListener('click',e=>{if(e.target.closest('[data-view="settings"],[data-home-target="settings"]'))setTimeout(settings,120)},true);
 new MutationObserver(()=>{hook();settings()}).observe(document.documentElement,{childList:true,subtree:true});
 window.YardivoThemeV2={setMain,setDark,main,dark,scene};
+})();
+</script>
+
+
+<style id="yardivo-login-theme-sync-v1-20260831">
+/* Login follows the currently selected application theme. */
+html[data-yardivo-main-theme="light"] #loginOverlay{
+ background:linear-gradient(135deg,#edf2ef 0%,#ffffff 58%,#f3f6f4 100%)!important
+}
+html[data-yardivo-main-theme="light"] #loginOverlay .login-card{
+ background:#fff!important;color:#18211c!important;border-color:#d8e1dc!important;
+ box-shadow:0 24px 70px rgba(26,42,33,.13)!important
+}
+html[data-yardivo-main-theme="light"] #loginOverlay input,
+html[data-yardivo-main-theme="light"] #loginOverlay select{
+ background:#fff!important;color:#18211c!important;border-color:#cbd7d0!important
+}
+
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] #loginOverlay{
+ background:radial-gradient(circle at 70% 12%,#222a25 0%,#111412 45%,#090b0a 100%)!important
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] #loginOverlay .login-card{
+ background:#191d1a!important;color:#f0f3f1!important;border-color:#303733!important
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] #loginOverlay input,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] #loginOverlay select{
+ background:#202522!important;color:#f0f3f1!important;border-color:#363e39!important
+}
+
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="blue"] #loginOverlay{
+ background:radial-gradient(circle at 72% 10%,#17324a 0%,#0b1824 44%,#060e15 100%)!important
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="blue"] #loginOverlay .login-card{
+ background:#102233!important;color:#eef6fc!important;border-color:#284961!important
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="blue"] #loginOverlay input,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="blue"] #loginOverlay select{
+ background:#162b3d!important;color:#eef6fc!important;border-color:#31556e!important
+}
+
+/* Original first YARDIVO blue login */
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] #loginOverlay{
+ background:
+   radial-gradient(circle at 72% 12%,rgba(35,107,157,.28),transparent 32%),
+   linear-gradient(135deg,#04101b 0%,#07131f 52%,#0a2133 100%)!important
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] #loginOverlay .login-card{
+ background:linear-gradient(180deg,#0f2639,#0b1d2d)!important;
+ color:#edf6ff!important;border-color:#234965!important;
+ box-shadow:0 28px 80px rgba(0,0,0,.45),0 0 0 1px rgba(62,143,200,.08) inset!important
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] #loginOverlay input,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] #loginOverlay select{
+ background:#122b40!important;color:#edf6ff!important;border-color:#2c506d!important
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] #loginOverlay button{
+ border-color:#2d668c!important
+}
+
+/* Welcome follows selected theme too, but remains the ONLY visible startup screen. */
+html[data-yardivo-main-theme="light"] #yardivoWelcomeSplash{
+ background:linear-gradient(135deg,#edf2ef,#fff)!important;color:#18211c!important
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] #yardivoWelcomeSplash{
+ background:linear-gradient(135deg,#0a0d0b,#171c18)!important
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="blue"] #yardivoWelcomeSplash{
+ background:linear-gradient(135deg,#06101a,#10283b)!important
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] #yardivoWelcomeSplash{
+ background:linear-gradient(135deg,#04101b,#0d2940)!important
+}
+
+/* Ensure the visible legacy settings card displays all 3 options cleanly. */
+#yardivoDarkStyleSettings .yardivo-dark-style-options{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important
+}
+#yardivoDarkStyleSettings .yardivo-dark-style-option.original{
+ border-color:#2d5878!important;
+ background:linear-gradient(145deg,rgba(14,42,64,.9),rgba(8,27,43,.9))!important
+}
+body.light-mode #yardivoDarkStyleSettings .yardivo-dark-style-option.original{
+ background:#f1f7fb!important;color:#183044!important;border-color:#b7ccda!important
+}
+@media(max-width:900px){
+ #yardivoDarkStyleSettings .yardivo-dark-style-options{grid-template-columns:1fr!important}
+}
+</style>
+<script id="yardivo-theme-canonical-bridge-v1-20260831-js">
+(function(){
+'use strict';
+const MAIN='yardivo_main_theme_v2', DARK='yardivo_dark_look_v2';
+function currentMain(){const v=localStorage.getItem(MAIN);return v==='light'||v==='dark'?v:(document.body.classList.contains('light-mode')?'light':'dark')}
+function currentDark(){
+ let v=localStorage.getItem(DARK);
+ if(!['blue','graphite','original'].includes(v)){
+   try{v=localStorage.getItem('yardivo_dark_style')}catch(_){}
+ }
+ return ['blue','graphite','original'].includes(v)?v:'original';
+}
+function apply(){
+ const m=currentMain(),d=currentDark();
+ localStorage.setItem(MAIN,m);localStorage.setItem(DARK,d);
+ document.documentElement.dataset.yardivoMainTheme=m;
+ document.documentElement.dataset.yardivoDarkLook=d;
+ document.body.classList.toggle('light-mode',m==='light');
+ document.body.classList.toggle('dark-mode',m==='dark');
+ // Keep legacy controller synchronized, otherwise it can overwrite the new option.
+ try{localStorage.setItem('yardivo_dark_style',d)}catch(_){}
+ document.querySelectorAll('input[name="yardivoDarkStyle"]').forEach(x=>x.checked=x.value===d);
+ document.querySelectorAll('.yardivo-dark-style-option').forEach(x=>x.classList.toggle('active',x.dataset.darkStyle===d));
+ document.querySelectorAll('#yardivoThemeSettingsV2 [data-dark-look]').forEach(x=>x.classList.toggle('active',x.dataset.darkLook===d));
+}
+document.addEventListener('change',e=>{
+ const x=e.target.closest('input[name="yardivoDarkStyle"]');
+ if(!x)return;
+ const v=['blue','graphite','original'].includes(x.value)?x.value:'original';
+ localStorage.setItem(DARK,v);localStorage.setItem('yardivo_dark_style',v);
+ apply();
+ try{window.YardivoThemeV2?.setDark?.(v)}catch(_){}
+},true);
+document.addEventListener('click',e=>{
+ const x=e.target.closest('.yardivo-dark-style-option[data-dark-style]');
+ if(!x)return;
+ const v=x.dataset.darkStyle;
+ if(['blue','graphite','original'].includes(v)){
+   localStorage.setItem(DARK,v);localStorage.setItem('yardivo_dark_style',v);apply();
+   try{window.YardivoThemeV2?.setDark?.(v)}catch(_){}
+ }
+},true);
+window.addEventListener('load',()=>setTimeout(apply,250));
+window.addEventListener('yardivo:login',()=>setTimeout(apply,50));
+new MutationObserver(apply).observe(document.documentElement,{attributes:true,attributeFilter:['data-yardivo-main-theme','data-yardivo-dark-look']});
+window.YardivoCanonicalTheme={apply,currentMain,currentDark};
+apply();
 })();
 </script>
 
