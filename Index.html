@@ -7,7 +7,7 @@ Designed & Developed by Duje Maleš
 
 <html lang="hr">
 <head>
-<meta name="yardivo-build" content="PROD-QA-CHANGE-PASSWORD-AUTH-SCOPE-FIX-2026-08-31">
+<meta name="yardivo-build" content="PROD-QA-DARK-GRAPHITE-CHOICE-2026-08-31">
 <script id="yardivo-rbac-session-migration">
 (function(){
   try{
@@ -20854,6 +20854,661 @@ document.addEventListener('click',e=>{
  if(e.target.closest('#ycpSave')){e.preventDefault();save()}
 });
 $('yardivoChangePasswordDialog')?.addEventListener('cancel',e=>{e.preventDefault();close()});
+})();
+</script>
+
+
+<style id="yardivo-full-light-mode-20260831">
+/* ===== YARDIVO FULL LIGHT MODE — FINAL OVERRIDE =====
+   No dark/blue application surfaces may bleed through in light mode.
+   Semantic state colours (success/warning/danger) remain only as text/badges. */
+body.light-mode{
+  --bg:#f6f7f8!important;
+  --bg2:#ffffff!important;
+  --panel:#ffffff!important;
+  --panel2:#f8f9fa!important;
+  --line:#d8dde2!important;
+  --line2:#cbd2d8!important;
+  --text:#182027!important;
+  --muted:#65717b!important;
+  --blue:#4d5963!important;
+  --blue2:#38434c!important;
+  --theme-bg:#f6f7f8!important;
+  --theme-bg-2:#ffffff!important;
+  --theme-panel:#ffffff!important;
+  --theme-panel-2:#f7f8f9!important;
+  --theme-card:#ffffff!important;
+  --theme-border:#d2d8dd!important;
+  --theme-border-soft:#e1e5e8!important;
+  --theme-text:#182027!important;
+  --theme-muted:#697680!important;
+  --theme-input:#ffffff!important;
+  --theme-hover:#f0f2f4!important;
+  --theme-shadow:rgba(31,42,50,.10)!important;
+  background:#f6f7f8!important;
+  color:#182027!important;
+}
+
+/* Main application chrome */
+body.light-mode .app-shell,
+body.light-mode .main,
+body.light-mode main,
+body.light-mode .content,
+body.light-mode .view,
+body.light-mode .view.active,
+body.light-mode .page,
+body.light-mode .page-content,
+body.light-mode .content-wrap{
+  background:#f6f7f8!important;
+  color:#182027!important;
+}
+
+body.light-mode .sidebar,
+body.light-mode aside.sidebar{
+  background:#ffffff!important;
+  border-color:#d7dde2!important;
+  box-shadow:8px 0 24px rgba(31,42,50,.06)!important;
+  color:#182027!important;
+}
+body.light-mode .sidebar-footer{
+  border-color:#e0e4e7!important;
+  color:#6e7a83!important;
+}
+body.light-mode .topbar{
+  background:rgba(255,255,255,.97)!important;
+  border-color:#dce1e5!important;
+  box-shadow:0 2px 12px rgba(31,42,50,.06)!important;
+  color:#182027!important;
+  backdrop-filter:blur(14px)!important;
+}
+
+/* Navigation — neutral in light mode, no blue blocks */
+body.light-mode .nav-btn,
+body.light-mode [data-view].nav-btn{
+  background:transparent!important;
+  color:#39444c!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+body.light-mode .nav-btn span{color:#59656e!important}
+body.light-mode .nav-btn:hover{
+  background:#f0f2f4!important;
+  color:#182027!important;
+  border-color:#d9dee2!important;
+}
+body.light-mode .nav-btn.active{
+  background:#e7eaed!important;
+  color:#11171c!important;
+  border-color:#cbd2d8!important;
+  box-shadow:none!important;
+}
+body.light-mode .nav-btn.active span{color:#11171c!important}
+
+/* Panels, cards, tiles and widgets */
+body.light-mode .panel,
+body.light-mode .panel-head,
+body.light-mode .panel-body,
+body.light-mode .card,
+body.light-mode .slot,
+body.light-mode .stat,
+body.light-mode .dock-card,
+body.light-mode .recommend-card,
+body.light-mode .home-menu-card,
+body.light-mode .home-card,
+body.light-mode .settings-card,
+body.light-mode .setting-card,
+body.light-mode .widget,
+body.light-mode .tile,
+body.light-mode .kpi-card,
+body.light-mode [class*="panel"],
+body.light-mode [class*="card"]:not(.badge):not(.status-card){
+  background:#ffffff!important;
+  border-color:#d8dde2!important;
+  color:#182027!important;
+  box-shadow:0 4px 16px rgba(31,42,50,.06)!important;
+}
+
+/* Important app-specific surfaces */
+body.light-mode #dashboard,
+body.light-mode #weeklyMap,
+body.light-mode #dailyMap,
+body.light-mode #myYard,
+body.light-mode #announcements,
+body.light-mode #yardivoMyAnnouncements,
+body.light-mode #overview,
+body.light-mode #suppliers,
+body.light-mode #calendar,
+body.light-mode #heatmap,
+body.light-mode #controltower,
+body.light-mode #controlTower,
+body.light-mode #incidents,
+body.light-mode #incidentArchive,
+body.light-mode #reports,
+body.light-mode #settings,
+body.light-mode #receiving,
+body.light-mode #checkin,
+body.light-mode #docks,
+body.light-mode #operations,
+body.light-mode #unannounced,
+body.light-mode #epal,
+body.light-mode #orderSearch,
+body.light-mode #liveYard{
+  background:#f6f7f8!important;
+  color:#182027!important;
+}
+
+/* Tables */
+body.light-mode .table-wrap,
+body.light-mode .data-wrap,
+body.light-mode table,
+body.light-mode tbody,
+body.light-mode tr{
+  background:#ffffff!important;
+  color:#202a31!important;
+}
+body.light-mode thead,
+body.light-mode thead tr,
+body.light-mode th{
+  background:#f0f2f4!important;
+  color:#3d4952!important;
+  border-color:#d8dde2!important;
+}
+body.light-mode td{
+  background:#ffffff!important;
+  color:#202a31!important;
+  border-color:#e0e4e7!important;
+}
+body.light-mode tbody tr:hover td{background:#f6f7f8!important}
+
+/* Inputs, selects, textareas and dialogs */
+body.light-mode input,
+body.light-mode select,
+body.light-mode textarea{
+  background:#ffffff!important;
+  color:#182027!important;
+  border-color:#cbd3d9!important;
+  box-shadow:none!important;
+}
+body.light-mode input::placeholder,
+body.light-mode textarea::placeholder{color:#8a949c!important}
+body.light-mode dialog,
+body.light-mode .modal,
+body.light-mode .dialog,
+body.light-mode .modal-content,
+body.light-mode .login-card{
+  background:#ffffff!important;
+  color:#182027!important;
+  border-color:#cfd6dc!important;
+  box-shadow:0 24px 70px rgba(31,42,50,.18)!important;
+}
+body.light-mode dialog::backdrop{background:rgba(70,80,88,.22)!important}
+
+/* Buttons — neutral light treatment instead of blue */
+body.light-mode .primary,
+body.light-mode button.primary,
+body.light-mode .recommend-btn,
+body.light-mode .action,
+body.light-mode button:not(.nav-btn):not(.theme-slider):not(.badge){
+  background:#eef1f3!important;
+  color:#1d272e!important;
+  border-color:#cbd2d8!important;
+  box-shadow:none!important;
+}
+body.light-mode .primary:hover,
+body.light-mode button.primary:hover,
+body.light-mode button:not(.nav-btn):hover{
+  background:#e2e6e9!important;
+  color:#11171c!important;
+  border-color:#b9c2c9!important;
+}
+body.light-mode .secondary,
+body.light-mode .icon-btn{
+  background:#ffffff!important;
+  color:#303b43!important;
+  border-color:#cbd3d9!important;
+}
+
+/* Text that was hardcoded for dark surfaces */
+body.light-mode h1,
+body.light-mode h2,
+body.light-mode h3,
+body.light-mode h4,
+body.light-mode strong,
+body.light-mode label,
+body.light-mode .label,
+body.light-mode .slot-title,
+body.light-mode .panel-head h2{
+  color:#182027!important;
+}
+body.light-mode .subtitle,
+body.light-mode small,
+body.light-mode .meta,
+body.light-mode .note,
+body.light-mode .slot-truck,
+body.light-mode .legend,
+body.light-mode .info-row span{
+  color:#6c7881!important;
+}
+
+/* Dashboard / planner / maps: remove dark navy backplates */
+body.light-mode .planner,
+body.light-mode .planner-grid,
+body.light-mode .planner-grid>div,
+body.light-mode .planner-grid .time,
+body.light-mode .planner-grid .dock-label,
+body.light-mode .dash-clean-grid,
+body.light-mode .dash-chart-panel,
+body.light-mode .dash-bottom-grid,
+body.light-mode .dash-donut-wrap,
+body.light-mode .yard-grid,
+body.light-mode .dock-grid,
+body.light-mode .cards{
+  background:#ffffff!important;
+  color:#263139!important;
+  border-color:#d9dee2!important;
+}
+
+/* My Yard: light scene frame; 3D objects can retain their own semantic colours */
+body.light-mode #myYard [class*="stage"],
+body.light-mode #myYard [class*="scene"],
+body.light-mode #myYard [class*="floor"],
+body.light-mode #myYard .yard-3d-stage{
+  background:#eef1f3!important;
+  border-color:#d2d8dd!important;
+  box-shadow:none!important;
+}
+
+/* Light switch itself */
+body.light-mode .theme-switch-wrap{
+  background:#ffffff!important;
+  border-color:#d2d8dd!important;
+}
+body.light-mode .theme-switch input:checked + .theme-slider{
+  background:#e1e5e8!important;
+  border-color:#bbc4cb!important;
+}
+
+/* Status indicators keep meaning, but not dark theme backplates */
+body.light-mode .live{
+  background:#eef8f1!important;
+  color:#237544!important;
+  border-color:#a9d9b9!important;
+}
+body.light-mode .badge,
+body.light-mode .priority,
+body.light-mode .op,
+body.light-mode [class*="status-badge"],
+body.light-mode [class*="status-pill"]{
+  box-shadow:none!important;
+}
+
+/* Welcome and login are intentionally separate from app theme.
+   Once inside the app, every normal application surface is light. */
+</style>
+<script id="yardivo-full-light-mode-sync-20260831">
+(function(){
+'use strict';
+function sync(){
+ const light=document.body.classList.contains('light-mode');
+ document.documentElement.classList.toggle('yardivo-full-light',light);
+ document.documentElement.dataset.yardivoTheme=light?'light':'dark';
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',sync,{once:true});else sync();
+window.addEventListener('load',sync);
+document.addEventListener('change',e=>{
+ if(e.target?.id==='yardivoThemeSwitch'||e.target?.closest?.('#yardivoThemeSwitch'))setTimeout(sync,0);
+});
+new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:['class']});
+})();
+</script>
+
+
+<style id="yardivo-dark-accent-choice-style-20260831">
+/* Dark appearance selector in Settings: Admin / Inventory / Reception only. */
+#yardivoDarkStyleSettings{
+  display:none;
+  margin-bottom:12px;
+}
+body[data-yardivo-role="admin"] #yardivoDarkStyleSettings,
+body[data-yardivo-role="inventory"] #yardivoDarkStyleSettings,
+body[data-yardivo-role="reception"] #yardivoDarkStyleSettings{
+  display:block!important;
+}
+body[data-yardivo-role="gate"] #yardivoDarkStyleSettings{display:none!important}
+
+.yardivo-dark-style-options{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(180px,260px));
+  gap:10px;
+  margin-top:10px;
+}
+.yardivo-dark-style-option{
+  position:relative;
+  min-height:88px;
+  padding:13px 14px;
+  border:1px solid #2b4355;
+  border-radius:9px;
+  cursor:pointer;
+  transition:.16s ease;
+  user-select:none;
+}
+.yardivo-dark-style-option input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.yardivo-dark-style-option strong{display:block;font-size:12px;margin-bottom:5px}
+.yardivo-dark-style-option small{display:block;line-height:1.45}
+.yardivo-dark-style-option.blue{
+  background:linear-gradient(145deg,#081724,#0c263a);
+}
+.yardivo-dark-style-option.graphite{
+  background:linear-gradient(145deg,#111315,#23272b);
+  border-color:#41474d;
+}
+.yardivo-dark-style-option.selected{
+  outline:2px solid rgba(222,230,235,.88);
+  outline-offset:1px;
+}
+.yardivo-dark-style-note{margin-top:9px;color:#8296a5;font-size:9px}
+body.light-mode #yardivoDarkStyleSettings{
+  background:#fff!important;border-color:#d8dde2!important;color:#182027!important;
+}
+body.light-mode .yardivo-dark-style-option{
+  color:#fff!important;
+}
+@media(max-width:650px){
+  .yardivo-dark-style-options{grid-template-columns:1fr}
+}
+
+/* ===== GRAPHITE / BLACK-GREY DARK MODE ===== */
+body:not(.light-mode).yardivo-dark-graphite{
+  --bg:#0d0f10!important;
+  --bg2:#121416!important;
+  --panel:#151719!important;
+  --panel2:#1a1d20!important;
+  --line:#303438!important;
+  --line2:#3a3f44!important;
+  --text:#f2f3f4!important;
+  --muted:#9ca3a9!important;
+  --blue:#8d959c!important;
+  --blue2:#697178!important;
+  --theme-bg:#0d0f10!important;
+  --theme-bg-2:#111315!important;
+  --theme-panel:#16181a!important;
+  --theme-panel-2:#1b1e21!important;
+  --theme-card:#181a1d!important;
+  --theme-border:#373c41!important;
+  --theme-border-soft:#292d31!important;
+  --theme-text:#f1f3f4!important;
+  --theme-muted:#969da3!important;
+  --theme-input:#101214!important;
+  --theme-hover:#24282b!important;
+  --theme-shadow:rgba(0,0,0,.45)!important;
+  background:radial-gradient(circle at 65% 0%,#202326 0,#111315 34%,#090a0b 100%)!important;
+  color:#f1f3f4!important;
+}
+
+/* App shell and chrome */
+body:not(.light-mode).yardivo-dark-graphite .app-shell,
+body:not(.light-mode).yardivo-dark-graphite .main,
+body:not(.light-mode).yardivo-dark-graphite main,
+body:not(.light-mode).yardivo-dark-graphite .view,
+body:not(.light-mode).yardivo-dark-graphite .content{
+  background:#101214!important;
+  color:#f1f3f4!important;
+}
+body:not(.light-mode).yardivo-dark-graphite .sidebar{
+  background:linear-gradient(180deg,#111315,#0c0e0f)!important;
+  border-color:#292d31!important;
+  box-shadow:12px 0 38px rgba(0,0,0,.25)!important;
+}
+body:not(.light-mode).yardivo-dark-graphite .topbar{
+  background:rgba(16,18,20,.94)!important;
+  border-color:#2e3236!important;
+}
+
+/* Navigation: graphite active state, no blue */
+body:not(.light-mode).yardivo-dark-graphite .nav-btn{
+  color:#d8dcdf!important;
+}
+body:not(.light-mode).yardivo-dark-graphite .nav-btn span{color:#b5bcc1!important}
+body:not(.light-mode).yardivo-dark-graphite .nav-btn:hover{
+  background:#24272a!important;
+  border-color:#393e42!important;
+}
+body:not(.light-mode).yardivo-dark-graphite .nav-btn.active{
+  background:linear-gradient(90deg,#373b3f,#26292c)!important;
+  border-color:#4c5257!important;
+  color:#fff!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.24)!important;
+}
+
+/* Core surfaces */
+body:not(.light-mode).yardivo-dark-graphite .panel,
+body:not(.light-mode).yardivo-dark-graphite .panel-head,
+body:not(.light-mode).yardivo-dark-graphite .panel-body,
+body:not(.light-mode).yardivo-dark-graphite .stat,
+body:not(.light-mode).yardivo-dark-graphite .card,
+body:not(.light-mode).yardivo-dark-graphite .slot,
+body:not(.light-mode).yardivo-dark-graphite .dock-card,
+body:not(.light-mode).yardivo-dark-graphite .home-menu-card,
+body:not(.light-mode).yardivo-dark-graphite .settings-card,
+body:not(.light-mode).yardivo-dark-graphite [class*="panel"],
+body:not(.light-mode).yardivo-dark-graphite [class*="card"]:not(.badge):not(.status-card){
+  background:linear-gradient(180deg,#191b1e,#141618)!important;
+  border-color:#34393d!important;
+  color:#eef0f1!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.20)!important;
+}
+
+/* Tables / planner */
+body:not(.light-mode).yardivo-dark-graphite table,
+body:not(.light-mode).yardivo-dark-graphite tbody,
+body:not(.light-mode).yardivo-dark-graphite td{
+  background:#151719!important;
+  color:#e7eaec!important;
+  border-color:#303438!important;
+}
+body:not(.light-mode).yardivo-dark-graphite thead,
+body:not(.light-mode).yardivo-dark-graphite th{
+  background:#202326!important;
+  color:#cfd4d7!important;
+  border-color:#373c40!important;
+}
+body:not(.light-mode).yardivo-dark-graphite tbody tr:hover td{background:#222528!important}
+body:not(.light-mode).yardivo-dark-graphite .planner-grid,
+body:not(.light-mode).yardivo-dark-graphite .planner-grid>div,
+body:not(.light-mode).yardivo-dark-graphite .planner-grid .time,
+body:not(.light-mode).yardivo-dark-graphite .planner-grid .dock-label{
+  background:#191b1e!important;
+  border-color:#32363a!important;
+  color:#dce0e3!important;
+}
+
+/* Inputs and dialogs */
+body:not(.light-mode).yardivo-dark-graphite input,
+body:not(.light-mode).yardivo-dark-graphite select,
+body:not(.light-mode).yardivo-dark-graphite textarea{
+  background:#101214!important;
+  color:#f0f2f3!important;
+  border-color:#3b4044!important;
+}
+body:not(.light-mode).yardivo-dark-graphite dialog,
+body:not(.light-mode).yardivo-dark-graphite .modal,
+body:not(.light-mode).yardivo-dark-graphite .modal-content{
+  background:#17191b!important;
+  color:#f1f3f4!important;
+  border-color:#3b4044!important;
+}
+
+/* Buttons: graphite instead of blue. Semantic status colours remain untouched. */
+body:not(.light-mode).yardivo-dark-graphite .primary,
+body:not(.light-mode).yardivo-dark-graphite .recommend-btn,
+body:not(.light-mode).yardivo-dark-graphite .action:not(.danger){
+  background:linear-gradient(180deg,#4a4f54,#303438)!important;
+  border-color:#5c6267!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+body:not(.light-mode).yardivo-dark-graphite .primary:hover,
+body:not(.light-mode).yardivo-dark-graphite .recommend-btn:hover,
+body:not(.light-mode).yardivo-dark-graphite .action:not(.danger):hover{
+  background:linear-gradient(180deg,#5a6065,#3a3f43)!important;
+  border-color:#6a7177!important;
+}
+body:not(.light-mode).yardivo-dark-graphite .secondary,
+body:not(.light-mode).yardivo-dark-graphite .icon-btn{
+  background:#1d2022!important;
+  border-color:#44494e!important;
+  color:#e5e8ea!important;
+}
+
+/* Replace decorative blue accents with neutral graphite where they are theme chrome. */
+body:not(.light-mode).yardivo-dark-graphite .brand-slash,
+body:not(.light-mode).yardivo-dark-graphite .panel-head a,
+body:not(.light-mode).yardivo-dark-graphite .stat-icon.blue{
+  color:#a7adb2!important;
+}
+body:not(.light-mode).yardivo-dark-graphite .control-tower-kpi{
+  border-color:#383d41!important;
+  border-top-color:#777e84!important;
+}
+body:not(.light-mode).yardivo-dark-graphite .theme-switch-wrap{
+  background:#191b1d!important;
+  border-color:#41464a!important;
+}
+body:not(.light-mode).yardivo-dark-graphite .theme-slider{
+  background:#34383c!important;
+  border-color:#555b60!important;
+}
+
+/* Home / dashboard wrappers */
+body:not(.light-mode).yardivo-dark-graphite.home-menu-mode,
+body:not(.light-mode).yardivo-dark-graphite .home-menu-mode,
+body:not(.light-mode).yardivo-dark-graphite #homeMenu,
+body:not(.light-mode).yardivo-dark-graphite #dashboard,
+body:not(.light-mode).yardivo-dark-graphite #settings{
+  background:#101214!important;
+}
+</style>
+
+<script id="yardivo-dark-accent-choice-20260831">
+(function(){
+'use strict';
+const BASE_KEY='yardivo_dark_style_v1';
+
+function role(){
+ let r=String(window.currentSession?.role||window.currentSession?.app_role||'').trim().toLowerCase();
+ if(r==='zalihe'||r==='upravljanje zalihama')r='inventory';
+ if(r==='prijam')r='reception';
+ if(r==='porta'||r==='portir')r='gate';
+ return r;
+}
+function user(){
+ return String(window.currentSession?.username||window.currentSession?.user||'guest').trim().toLowerCase()||'guest';
+}
+function key(){return BASE_KEY+'_'+user()}
+function getChoice(){
+ try{
+   const v=localStorage.getItem(key())||localStorage.getItem(BASE_KEY)||'blue';
+   return v==='graphite'?'graphite':'blue';
+ }catch(_){return 'blue'}
+}
+function saveChoice(v){
+ v=v==='graphite'?'graphite':'blue';
+ try{localStorage.setItem(key(),v)}catch(_){}
+ apply(v);
+}
+function apply(v=getChoice()){
+ const graphite=v==='graphite';
+ document.body.classList.toggle('yardivo-dark-graphite',graphite);
+ document.body.dataset.yardivoDarkStyle=graphite?'graphite':'blue';
+ const box=document.getElementById('yardivoDarkStyleSettings');
+ if(box){
+   box.querySelectorAll('.yardivo-dark-style-option').forEach(el=>{
+     const yes=el.dataset.darkStyle===v;
+     el.classList.toggle('selected',yes);
+     const input=el.querySelector('input');
+     if(input)input.checked=yes;
+   });
+   const state=box.querySelector('#yardivoDarkStyleState');
+   if(state)state.textContent=v==='graphite'?'CRNO-SIVI':'PLAVI';
+ }
+}
+function ensureSettings(){
+ const r=role();
+ if(!['admin','inventory','reception'].includes(r)){
+   document.getElementById('yardivoDarkStyleSettings')?.remove();
+   return;
+ }
+ if(document.getElementById('yardivoDarkStyleSettings')){apply();return}
+ const settings=document.getElementById('settings');
+ if(!settings)return;
+
+ const panel=document.createElement('section');
+ panel.id='yardivoDarkStyleSettings';
+ panel.className='panel';
+ panel.innerHTML=`
+   <div class="panel-head">
+     <div>
+       <h2>IZGLED DARK MODEA</h2>
+       <small>Odaberi stil tamne teme. Light mode ostaje potpuno svijetli.</small>
+     </div>
+     <span class="master-sync-state ok" id="yardivoDarkStyleState"></span>
+   </div>
+   <div class="master-settings-body">
+     <div class="yardivo-dark-style-options">
+       <label class="yardivo-dark-style-option blue" data-dark-style="blue">
+         <input type="radio" name="yardivoDarkStyle" value="blue">
+         <strong>PLAVI DARK</strong>
+         <small>Originalni YARDIVO tamnoplavi izgled.</small>
+       </label>
+       <label class="yardivo-dark-style-option graphite" data-dark-style="graphite">
+         <input type="radio" name="yardivoDarkStyle" value="graphite">
+         <strong>CRNO-SIVI DARK</strong>
+         <small>Crna i grafitno-siva tema bez plavih površina.</small>
+       </label>
+     </div>
+     <div class="yardivo-dark-style-note">Postavka se pamti posebno za prijavljenog korisnika na ovom uređaju.</div>
+   </div>`;
+
+ /* Place it near the top of Settings, after the font section when possible. */
+ const fontRange=document.getElementById('fontRange');
+ const fontPanel=fontRange?.closest('section.panel');
+ if(fontPanel?.parentNode)fontPanel.insertAdjacentElement('afterend',panel);
+ else settings.prepend(panel);
+
+ panel.addEventListener('change',e=>{
+   const input=e.target.closest('input[name="yardivoDarkStyle"]');
+   if(input)saveChoice(input.value);
+ });
+ panel.querySelectorAll('.yardivo-dark-style-option').forEach(el=>{
+   el.addEventListener('click',()=>saveChoice(el.dataset.darkStyle));
+ });
+ apply();
+}
+function refresh(){
+ apply();
+ ensureSettings();
+}
+window.YardivoDarkStyle={apply,refresh,getChoice,set:saveChoice};
+
+if(document.readyState==='loading'){
+ document.addEventListener('DOMContentLoaded',()=>setTimeout(refresh,120),{once:true});
+}else setTimeout(refresh,120);
+window.addEventListener('load',()=>setTimeout(refresh,200));
+window.addEventListener('yardivo:login',()=>setTimeout(refresh,50));
+document.addEventListener('click',e=>{
+ if(e.target?.closest?.('[data-view="settings"],[data-home-target="settings"]'))setTimeout(refresh,60);
+});
+/* Settings is dynamically rebuilt by older modules, so recreate only when needed. */
+new MutationObserver(()=>{
+ if(document.getElementById('settings') && ['admin','inventory','reception'].includes(role()) &&
+    !document.getElementById('yardivoDarkStyleSettings')){
+   setTimeout(ensureSettings,20);
+ }
+}).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
 
