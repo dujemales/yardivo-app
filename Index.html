@@ -7,7 +7,7 @@ Designed & Developed by Duje Maleš
 
 <html lang="hr">
 <head>
-<meta name="yardivo-build" content="PROD-PROFESSIONAL-UX-V1-2026-08-31">
+<meta name="yardivo-build" content="PROD-PROFESSIONAL-UX-V2-2026-08-31">
 <script id="yardivo-rbac-session-migration">
 (function(){
   try{
@@ -23339,6 +23339,529 @@ tbody tr:hover td{background:color-mix(in srgb,var(--yv-brand) 4%,var(--yv-surfa
    document.querySelectorAll('button').forEach(b=>{if(!b.title&&b.textContent.trim().length<3)b.setAttribute('aria-label',b.textContent.trim()||'Akcija')});
  }
  window.addEventListener('load',polish);
+})();
+</script>
+
+
+<style id="yardivo-professional-redesign-v2-20260831">
+/* YARDIVO Professional UX v2 — premium logistics control-system refinement */
+:root{
+ --yv2-green:#147a49;--yv2-green2:#0c5b35;--yv2-mint:#eef8f2;--yv2-ink:#14231b;
+ --yv2-sub:#718077;--yv2-border:#dbe5df;--yv2-canvas:#f2f6f3;
+ --yv2-blue:#2777d8;--yv2-amber:#c78b25;--yv2-red:#d34b54;
+}
+body.light-mode{background:linear-gradient(180deg,#f8faf9 0,#f2f6f3 240px)!important}
+body.light-mode .main,body.light-mode .main-content,body.light-mode #mainContent{background:transparent!important}
+
+/* Top chrome: quieter, more expensive-looking */
+.topbar,.top-bar,#topbar{
+ min-height:64px!important;padding-left:22px!important;padding-right:22px!important;
+ box-shadow:0 1px 0 rgba(20,60,38,.04),0 10px 30px rgba(24,50,36,.025)!important
+}
+.topbar:after,.top-bar:after,#topbar:after{
+ content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
+ background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--yv-brand) 28%,transparent),transparent);pointer-events:none
+}
+
+/* Sidebar: stronger information architecture */
+.sidebar,#sidebar{padding-top:10px!important}
+.sidebar .logo,.sidebar .brand,.sidebar-brand{
+ padding:12px 16px 18px!important;font-size:20px!important;color:var(--yv-text)!important
+}
+.sidebar .logo:after,.sidebar .brand:after,.sidebar-brand:after{
+ content:"YARD MANAGEMENT SYSTEM";display:block;margin-top:4px;font-size:7px;letter-spacing:.16em;font-weight:850;color:var(--yv-muted)
+}
+.sidebar .nav-section-title,.sidebar .nav-label,.sidebar small{
+ font-size:8px!important;letter-spacing:.13em!important;text-transform:uppercase!important;color:var(--yv-muted)!important;font-weight:900!important
+}
+.sidebar .nav-item,.sidebar [data-view],.sidebar [data-home-target]{
+ position:relative!important;font-size:12px!important
+}
+.sidebar .active:before,.sidebar [data-view].active:before,.sidebar [data-home-target].active:before{
+ content:"";position:absolute;left:-8px;top:8px;bottom:8px;width:3px;border-radius:0 4px 4px 0;background:var(--yv-brand)
+}
+
+/* Content widths & vertical rhythm */
+.view,.app-view,.page-section{padding-top:22px!important}
+.view>h1,.app-view>h1,.page-section>h1,.page-title{margin-bottom:5px!important}
+.page-title{font-size:25px!important;line-height:1.08!important}
+.page-subtitle,.subtitle{font-size:11px!important}
+
+/* Cards: flatter by default, elevation on interaction */
+.card,.panel,.section-card,.settings-card,.kpi-card,.metric-card,.summary-card,.overview-card{
+ transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease!important
+}
+.card:hover,.kpi-card:hover,.metric-card:hover,.summary-card:hover{
+ border-color:color-mix(in srgb,var(--yv-brand) 24%,var(--yv-line))!important;
+ box-shadow:0 13px 32px rgba(18,49,32,.09)!important
+}
+body:not(.light-mode) .card:hover,body:not(.light-mode) .kpi-card:hover{box-shadow:0 13px 32px rgba(0,0,0,.26)!important}
+
+/* KPI visual hierarchy */
+.kpi-card,.metric-card,.summary-card{position:relative!important;overflow:hidden!important;padding:16px!important}
+.kpi-card:after,.metric-card:after,.summary-card:after{
+ content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:color-mix(in srgb,var(--yv-brand) 70%,transparent);opacity:.65
+}
+.kpi-value,.metric-value,.stat-value{font-size:clamp(22px,2vw,31px)!important;line-height:1!important}
+.kpi-label,.metric-label,.stat-label{font-size:8px!important;letter-spacing:.075em!important;text-transform:uppercase!important;color:var(--yv-muted)!important;font-weight:900!important}
+
+/* Buttons: compact enterprise controls */
+.btn,button:not(.nav-item):not(.icon-btn){min-height:36px!important;padding:8px 13px!important}
+.btn-primary,.primary,.btn-save,[class*="btn-primary"]{
+ background:linear-gradient(180deg,color-mix(in srgb,var(--yv-brand) 94%,white),var(--yv-brand2))!important;
+ box-shadow:0 7px 16px color-mix(in srgb,var(--yv-brand) 18%,transparent)!important
+}
+.btn-primary:active,.primary:active{transform:translateY(0)!important;box-shadow:none!important}
+
+/* Forms: more refined */
+input,select,textarea{font-size:12px!important}
+input::placeholder,textarea::placeholder{color:color-mix(in srgb,var(--yv-muted) 72%,transparent)!important}
+select{cursor:pointer}
+
+/* Tables: sticky, clean operations console */
+.table-wrap,.table-container{border-radius:11px!important}
+thead th{position:sticky;top:0;z-index:2;padding-top:11px!important;padding-bottom:11px!important}
+tbody td{padding-top:10px!important;padding-bottom:10px!important;font-size:11px!important}
+tbody tr:last-child td{border-bottom:0!important}
+
+/* Status semantics across the app */
+[class*="status"][class*="green"],.status-ok,.status-done,.status-received{background:#e8f6ee!important;color:#147347!important;border-color:#bfe3cf!important}
+[class*="status"][class*="red"],.status-late,.status-error{background:#fbecee!important;color:#b83842!important;border-color:#efc4c8!important}
+[class*="status"][class*="amber"],.status-waiting,.status-warning{background:#fff5e4!important;color:#99630c!important;border-color:#efd7a8!important}
+
+/* Home menu tiles */
+#homeMenu .card,#homeMenu .menu-card,#homeMenu [data-home-target]{
+ position:relative!important;overflow:hidden!important;min-height:112px!important;
+ background:linear-gradient(145deg,var(--yv-surface),color-mix(in srgb,var(--yv-brand) 3%,var(--yv-surface)))!important
+}
+#homeMenu .card:after,#homeMenu .menu-card:after,#homeMenu [data-home-target]:after{
+ content:"";position:absolute;width:74px;height:74px;right:-28px;bottom:-30px;border-radius:50%;
+ background:color-mix(in srgb,var(--yv-brand) 6%,transparent);pointer-events:none
+}
+
+/* Digital Twin framing */
+#myYard .myy-stage,#yardivoWarRoom #wrYardCanvas{
+ border:1px solid color-mix(in srgb,var(--yv-brand) 20%,var(--yv-line))!important;
+ box-shadow:inset 0 0 0 1px rgba(255,255,255,.04),0 18px 42px rgba(20,52,34,.10)!important
+}
+#yardivoMyYardWebGL .my3-hud,#yardivoWarRoomWebGL .wr3-hud{
+ text-transform:uppercase!important;letter-spacing:.06em!important
+}
+
+/* Settings become a proper admin console */
+#settings .settings-card,#settings .card{
+ box-shadow:none!important;border-color:var(--yv-line)!important
+}
+#settings .settings-card:hover,#settings .card:hover{border-color:color-mix(in srgb,var(--yv-brand) 28%,var(--yv-line))!important}
+
+/* Modal hierarchy */
+.modal-content,.dialog,.drawer,.side-panel{
+ overflow:hidden!important
+}
+.modal-content h2,.modal-content h3,.dialog h2,.dialog h3{font-weight:900!important;letter-spacing:-.025em!important}
+
+/* Better focus accessibility */
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible{
+ outline:2px solid var(--yv-brand)!important;outline-offset:2px!important
+}
+
+/* Subtle operational live indicator */
+#myYard .my3-hud i,#yardivoWarRoom .wr3-hud i{
+ animation:yvLivePulse 2.2s ease-in-out infinite
+}
+@keyframes yvLivePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.72)}}
+
+/* Login premium polish */
+#loginOverlay .login-card,#loginOverlay>div>div{
+ background:color-mix(in srgb,var(--yv-surface) 96%,transparent)!important;
+ backdrop-filter:blur(24px)!important
+}
+#loginOverlay input,#loginOverlay select{min-height:44px!important}
+#loginOverlay button{min-height:42px!important}
+
+/* Responsive density */
+@media(max-width:1100px){
+ .page-title{font-size:22px!important}
+ .kpi-card,.metric-card,.summary-card{padding:13px!important}
+}
+@media(max-width:700px){
+ .view,.app-view,.page-section{padding:14px!important}
+ .topbar,.top-bar,#topbar{padding-left:12px!important;padding-right:12px!important}
+ .card,.panel,.section-card{box-shadow:none!important}
+}
+</style>
+<script id="yardivo-professional-redesign-v2-js">
+(function(){
+ document.documentElement.dataset.yardivoDesign='professional-v2';
+ function enhance(){
+   document.querySelectorAll('table').forEach(t=>t.setAttribute('data-yv-ui','operations-table'));
+   document.querySelectorAll('.kpi-card,.metric-card,.summary-card').forEach(x=>x.setAttribute('data-yv-ui','metric'));
+ }
+ window.addEventListener('load',enhance);
+ new MutationObserver(enhance).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
+
+
+<style id="yardivo-warroom-exact-myyard-mirror-v1-20260831">
+/* WAR ROOM = exact visual mirror of MY YARD */
+#yardivoWarRoom #wrYardCanvas{position:relative!important;overflow:hidden!important;min-height:560px}
+#yardivoWarRoomWebGL{display:none!important}
+#yardivoWarRoomMyYardMirror{position:absolute;inset:0;z-index:30;background:#cfdad3;overflow:hidden}
+#yardivoWarRoomMyYardMirror canvas{display:block;width:100%!important;height:100%!important;cursor:grab;touch-action:none}
+#yardivoWarRoomMyYardMirror .wrmirror-badge{
+ position:absolute;left:16px;top:16px;z-index:5;padding:7px 11px;border:1px solid #9bb2a5;border-radius:999px;
+ background:#f8fbf9e8;color:#2d3b34;font:900 8px Arial;letter-spacing:.05em;pointer-events:none
+}
+</style>
+<script id="yardivo-warroom-exact-myyard-mirror-v1-20260831-js">
+(function(){
+'use strict';
+let mirrorRenderer=null,mirrorScene=null,mirrorCamera=null,ro=null,raf=0;
+
+async function boot(){
+ const stage=document.querySelector('#yardivoWarRoom #wrYardCanvas');
+ if(!stage)return;
+ let host=document.getElementById('yardivoWarRoomMyYardMirror');
+ if(!host){
+   host=document.createElement('div');host.id='yardivoWarRoomMyYardMirror';
+   host.innerHTML='<div class="wrmirror-badge">WAR ROOM · MY YARD DIGITAL TWIN</div>';
+   stage.prepend(host);
+ }
+ try{
+   // Ensure the canonical My Yard engine exists. War Room renders the SAME scene and camera.
+   if(window.YardivoMyYardWebGL?.boot) await window.YardivoMyYardWebGL.boot();
+   const e=window.__YARDIVO_MYYARD_ENGINE__;
+   const T=window.__YARDIVO_THREE_MODULE__;
+   if(!e||!T)return;
+
+   mirrorScene=e.scene; mirrorCamera=e.camera;
+   if(!mirrorRenderer){
+     mirrorRenderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+     mirrorRenderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));
+     mirrorRenderer.shadowMap.enabled=true;mirrorRenderer.shadowMap.type=T.PCFSoftShadowMap;
+     mirrorRenderer.outputColorSpace=T.SRGBColorSpace;
+     mirrorRenderer.toneMapping=T.ACESFilmicToneMapping;
+     mirrorRenderer.toneMappingExposure=e.renderer?.toneMappingExposure||1.22;
+     host.appendChild(mirrorRenderer.domElement);
+
+     let drag=false,moved=false,px=0,py=0;
+     const c=mirrorRenderer.domElement;
+     c.addEventListener('pointerdown',ev=>{if(ev.button!==0)return;drag=true;moved=false;px=ev.clientX;py=ev.clientY;c.setPointerCapture?.(ev.pointerId)});
+     c.addEventListener('pointermove',ev=>{
+       if(!drag)return;const dx=ev.clientX-px,dy=ev.clientY-py;if(Math.abs(dx)+Math.abs(dy)>3)moved=true;
+       // manipulate the canonical My Yard camera, so both views remain literally identical
+       const cam=mirrorCamera, target=new T.Vector3(0,0,-2),off=cam.position.clone().sub(target);
+       let sph=new T.Spherical().setFromVector3(off);sph.theta-=dx*.0075;sph.phi=Math.max(.30,Math.min(1.28,sph.phi+dy*.005));
+       cam.position.copy(new T.Vector3().setFromSpherical(sph).add(target));cam.lookAt(target);px=ev.clientX;py=ev.clientY;
+     });
+     const stop=ev=>{drag=false;try{c.releasePointerCapture?.(ev.pointerId)}catch(_){}};
+     c.addEventListener('pointerup',stop);c.addEventListener('pointercancel',stop);
+     c.addEventListener('wheel',ev=>{
+       if(!ev.ctrlKey)return;ev.preventDefault();const target=new T.Vector3(0,0,-2),off=mirrorCamera.position.clone().sub(target);
+       const factor=ev.deltaY>0?1.06:.94;const len=Math.max(35,Math.min(125,off.length()*factor));
+       mirrorCamera.position.copy(off.normalize().multiplyScalar(len).add(target));mirrorCamera.lookAt(target);
+     },{passive:false});
+
+     ro=new ResizeObserver(()=>{
+       const w=Math.max(10,host.clientWidth),hh=Math.max(10,host.clientHeight);
+       mirrorRenderer.setSize(w,hh,false);mirrorCamera.aspect=w/hh;mirrorCamera.updateProjectionMatrix();
+     });ro.observe(host);
+   }
+   window.YardivoMyYardWebGL?.refresh?.();
+   if(!raf){
+     const draw=()=>{raf=requestAnimationFrame(draw);if(mirrorRenderer&&mirrorScene&&mirrorCamera)mirrorRenderer.render(mirrorScene,mirrorCamera)};
+     draw();
+   }
+ }catch(err){console.error('YARDIVO exact War Room mirror',err)}
+}
+document.addEventListener('click',e=>{
+ if(e.target.closest('[data-view="yardivoWarRoom"],[data-home-target="yardivoWarRoom"],[data-view="controltower"],[data-view="controlTower"]'))setTimeout(boot,120)
+},true);
+window.addEventListener('load',()=>setTimeout(boot,1400));
+setInterval(()=>{const r=document.getElementById('yardivoWarRoom');if(r?.classList.contains('active')||r?.offsetParent)boot()},1600);
+window.YardivoWarRoomExactMirror={boot};
+})();
+</script>
+
+
+<style id="yardivo-ux-original-option-v1-20260831">
+/* UX appearance selector */
+#yardivoUxStyleSetting{margin-top:14px;padding-top:14px;border-top:1px solid var(--yv-line,#dce5df)}
+#yardivoUxStyleSetting .yv-ux-title{font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+#yardivoUxStyleSetting .yv-ux-options{display:flex;gap:8px;flex-wrap:wrap}
+#yardivoUxStyleSetting button{min-height:36px;padding:8px 12px;border-radius:8px;border:1px solid var(--yv-line,#dce5df);background:var(--yv-surface,#fff);color:var(--yv-text,#17231d);font-weight:850}
+#yardivoUxStyleSetting button.active{border-color:#167a4a!important;box-shadow:0 0 0 2px rgba(22,122,74,.12)!important;color:#167a4a!important}
+
+/* ORIGINAL YARDIVO means: neutralize only the two professional UX override sheets.
+   Original app CSS, original dark mode, WebGL and all functionality remain active. */
+html[data-yardivo-ux="original"] #yardivo-professional-redesign-v1-20260831,
+html[data-yardivo-ux="original"] #yardivo-professional-redesign-v2-20260831{display:none!important}
+</style>
+<script id="yardivo-ux-original-option-v1-20260831-js">
+(function(){
+'use strict';
+const KEY='yardivo_ux_style_v1';
+function mode(){return localStorage.getItem(KEY)||'professional'}
+function apply(v){
+ v=(v==='original')?'original':'professional';
+ localStorage.setItem(KEY,v);
+ document.documentElement.dataset.yardivoUx=v;
+ // Disable/enable the actual style sheets so original CSS is truly restored.
+ ['yardivo-professional-redesign-v1-20260831','yardivo-professional-redesign-v2-20260831'].forEach(id=>{
+   const s=document.getElementById(id);if(s)s.disabled=(v==='original');
+ });
+ document.querySelectorAll('#yardivoUxStyleSetting button[data-ux]').forEach(b=>b.classList.toggle('active',b.dataset.ux===v));
+}
+function inject(){
+ const settings=document.getElementById('settings');if(!settings||document.getElementById('yardivoUxStyleSetting'))return;
+ // Place in appearance/theme area when available; otherwise inside Settings.
+ const anchors=[...settings.querySelectorAll('h2,h3,h4,label,div')];
+ let target=anchors.find(x=>/izgled|appearance|tema|dark|svijetl/i.test((x.textContent||'').trim()) && x.children.length<12);
+ let parent=target?.closest('.settings-card,.card,.panel')||settings.querySelector('.settings-card,.card,.panel')||settings;
+ const box=document.createElement('div');box.id='yardivoUxStyleSetting';
+ box.innerHTML='<div class="yv-ux-title">UX IZGLED</div><div class="yv-ux-options"><button type="button" data-ux="professional">PROFESSIONAL UX</button><button type="button" data-ux="original">ORIGINAL YARDIVO</button></div><div style="margin-top:7px;font-size:9px;opacity:.68">Original YARDIVO vraća originalne boje i izgled, uključujući originalni Dark Mode.</div>';
+ parent.appendChild(box);
+ box.addEventListener('click',e=>{const b=e.target.closest('button[data-ux]');if(b)apply(b.dataset.ux)});
+ apply(mode());
+}
+apply(mode());
+window.addEventListener('load',()=>setTimeout(inject,350));
+document.addEventListener('click',e=>{if(e.target.closest('[data-view="settings"],[data-home-target="settings"]'))setTimeout(inject,100)},true);
+new MutationObserver(()=>{if(document.getElementById('settings'))inject()}).observe(document.documentElement,{childList:true,subtree:true});
+window.YardivoUxStyle={apply,mode};
+})();
+</script>
+
+
+<style id="yardivo-professional-graphite-green-maps-v1-20260831">
+/* Professional UX = graphite/black-grey chrome + green operational maps.
+   Original YARDIVO mode is unaffected because these rules are scoped to professional UX. */
+html:not([data-yardivo-ux="original"]) body{
+ --yv-bg:#111412!important;
+ --yv-surface:#191d1a!important;
+ --yv-surface2:#202522!important;
+ --yv-line:#303733!important;
+ --yv-text:#f0f3f1!important;
+ --yv-muted:#9aa49e!important;
+ --yv-brand:#5baf7d!important;
+ --yv-brand2:#397d58!important;
+ --yv-soft:#222d27!important;
+ --yv-shadow:0 12px 34px rgba(0,0,0,.25)!important;
+ --yv-shadow-lg:0 24px 60px rgba(0,0,0,.36)!important;
+ background:#111412!important;color:#f0f3f1!important
+}
+html:not([data-yardivo-ux="original"]) body.light-mode{
+ --yv-bg:#111412!important;--yv-surface:#191d1a!important;--yv-surface2:#202522!important;
+ --yv-line:#303733!important;--yv-text:#f0f3f1!important;--yv-muted:#9aa49e!important;
+ background:#111412!important;color:#f0f3f1!important
+}
+html:not([data-yardivo-ux="original"]) body .sidebar,
+html:not([data-yardivo-ux="original"]) body #sidebar,
+html:not([data-yardivo-ux="original"]) body .topbar,
+html:not([data-yardivo-ux="original"]) body .top-bar,
+html:not([data-yardivo-ux="original"]) body #topbar,
+html:not([data-yardivo-ux="original"]) body .card,
+html:not([data-yardivo-ux="original"]) body .panel,
+html:not([data-yardivo-ux="original"]) body .section-card,
+html:not([data-yardivo-ux="original"]) body .settings-card,
+html:not([data-yardivo-ux="original"]) body .modal-content{
+ background:#191d1a!important;color:#f0f3f1!important;border-color:#303733!important
+}
+html:not([data-yardivo-ux="original"]) body .main,
+html:not([data-yardivo-ux="original"]) body .main-content,
+html:not([data-yardivo-ux="original"]) body #mainContent,
+html:not([data-yardivo-ux="original"]) body .view,
+html:not([data-yardivo-ux="original"]) body .app-view{background:#111412!important}
+html:not([data-yardivo-ux="original"]) body table{background:#191d1a!important;border-color:#303733!important}
+html:not([data-yardivo-ux="original"]) body thead th{background:#202522!important;color:#aab3ae!important;border-color:#303733!important}
+html:not([data-yardivo-ux="original"]) body tbody td{background:#191d1a!important;color:#e7ebe8!important;border-color:#303733!important}
+html:not([data-yardivo-ux="original"]) body input,
+html:not([data-yardivo-ux="original"]) body select,
+html:not([data-yardivo-ux="original"]) body textarea{background:#202522!important;color:#eef2ef!important;border-color:#363e39!important}
+
+/* Green maps / spatial operational surfaces */
+html:not([data-yardivo-ux="original"]) #myYard .myy-stage,
+html:not([data-yardivo-ux="original"]) #yardivoMyYardWebGL,
+html:not([data-yardivo-ux="original"]) #yardivoWarRoom #wrYardCanvas,
+html:not([data-yardivo-ux="original"]) #yardivoWarRoomMyYardMirror,
+html:not([data-yardivo-ux="original"]) #weeklyMap,
+html:not([data-yardivo-ux="original"]) #dailyMap,
+html:not([data-yardivo-ux="original"]) #heatmap,
+html:not([data-yardivo-ux="original"]) [id*="Map"] .map,
+html:not([data-yardivo-ux="original"]) [class*="yard-map"],
+html:not([data-yardivo-ux="original"]) [class*="warehouse-map"]{
+ background:#263c31!important;
+ border-color:#466a56!important
+}
+/* Keep green visual language around map controls/cards without making the whole app green. */
+html:not([data-yardivo-ux="original"]) #weeklyMap .card,
+html:not([data-yardivo-ux="original"]) #dailyMap .card,
+html:not([data-yardivo-ux="original"]) #heatmap .card,
+html:not([data-yardivo-ux="original"]) #myYard .myy-shell,
+html:not([data-yardivo-ux="original"]) #yardivoWarRoom{
+ border-color:#3c5d4a!important
+}
+html:not([data-yardivo-ux="original"]) #yardivoMyYardWebGL .my3-hud,
+html:not([data-yardivo-ux="original"]) #yardivoMyYardWebGL .my3-legend,
+html:not([data-yardivo-ux="original"]) #yardivoWarRoomMyYardMirror .wrmirror-badge{
+ background:rgba(19,31,24,.91)!important;color:#e3eee7!important;border-color:#4d765d!important
+}
+</style>
+<script id="yardivo-professional-graphite-green-maps-v1-20260831-js">
+(function(){
+ function applyGraphiteMapScene(){
+   if(document.documentElement.dataset.yardivoUx==='original')return;
+   try{
+     const e=window.__YARDIVO_MYYARD_ENGINE__,T=window.__YARDIVO_THREE_MODULE__;
+     if(!e||!T)return;
+     e.scene.background=new T.Color(0x263c31);
+     e.scene.fog=new T.FogExp2(0x263c31,.0065);
+     e.renderer.toneMappingExposure=1.18;
+   }catch(_){}
+ }
+ window.addEventListener('load',()=>setTimeout(applyGraphiteMapScene,1500));
+ setInterval(()=>{if(document.documentElement.dataset.yardivoUx!=='original')applyGraphiteMapScene()},1800);
+})();
+</script>
+
+
+<style id="yardivo-overview-2d3d-fix-v1-20260831">
+#overviewSupplier3D .ov3d-mode{display:inline-flex;gap:3px;padding:3px;border:1px solid var(--yv-line,#34463c);border-radius:8px;background:rgba(0,0,0,.12)}
+#overviewSupplier3D .ov3d-mode button{min-width:42px!important}
+#overviewSupplier3D .ov3d-mode button.active{background:var(--yv-brand,#4aae73)!important;color:#fff!important;border-color:var(--yv-brand,#4aae73)!important}
+#overviewSupplier3D[data-mode="2d"] .ov3d-world{transform:translate(-50%,-50%)!important;perspective:none!important}
+#overviewSupplier3D[data-mode="2d"] .ov3d-floor{display:none!important}
+#overviewSupplier3D[data-mode="2d"] .ov3d-bars{transform:none!important}
+#overviewSupplier3D[data-mode="2d"] .ov3d-bar3{transform:none!important;box-shadow:none!important}
+#overviewSupplier3D[data-mode="2d"] .ov3d-side,#overviewSupplier3D[data-mode="2d"] .ov3d-top{display:none!important}
+#overviewSupplier3D[data-mode="2d"] .ov3d-front{transform:none!important;inset:0!important;width:100%!important;height:100%!important}
+</style>
+<script id="yardivo-overview-2d3d-fix-v1-20260831-js">
+(function(){
+'use strict';
+const KEY='yardivo_overview_chart_mode_v1';
+function arr(){try{return Array.isArray(announcements)?announcements:[]}catch(_){return[]}}
+function inc(){try{return Array.isArray(incidents)?incidents:[]}catch(_){return[]}}
+function names(){
+ try{return window.YardivoOverviewMaster?.allSupplierNames?.()||[]}catch(_){}
+ return [...new Set([...arr().map(a=>a.supplier),...inc().map(i=>i.supplier)].filter(Boolean))];
+}
+function stats(){
+ const A=arr(),I=inc();
+ try{
+  if(window.YardivoOverviewMaster?.supplierStat)return names().map(n=>window.YardivoOverviewMaster.supplierStat(n,A,I));
+ }catch(_){}
+ return [];
+}
+function mode(v){
+ const root=document.getElementById('overviewSupplier3D');if(!root)return;
+ v=v==='2d'?'2d':'3d';root.dataset.mode=v;localStorage.setItem(KEY,v);
+ root.querySelectorAll('[data-ov-mode]').forEach(b=>b.classList.toggle('active',b.dataset.ovMode===v));
+}
+function wire(){
+ const root=document.getElementById('overviewSupplier3D');if(!root)return;
+ const ctr=root.querySelector('.ov3d-controls');if(ctr&&!ctr.querySelector('.ov3d-mode')){
+   const x=document.createElement('span');x.className='ov3d-mode';
+   x.innerHTML='<button type="button" data-ov-mode="2d">2D</button><button type="button" data-ov-mode="3d">3D</button>';
+   ctr.prepend(x);x.onclick=e=>{const b=e.target.closest('[data-ov-mode]');if(b)mode(b.dataset.ovMode)};
+ }
+ mode(localStorage.getItem(KEY)||'3d');
+}
+function render(){
+ const root=document.getElementById('overviewSupplier3D');if(!root)return;
+ wire();
+ let data=stats().filter(Boolean).sort((a,b)=>(b.reliability??-1)-(a.reliability??-1)||b.evaluated-a.evaluated);
+ const bars=root.querySelector('.ov3d-bars'),detail=root.querySelector('.ov3d-detail');if(!bars)return;
+ if(!data.length){bars.innerHTML='<div style="padding:40px;color:var(--theme-muted)">Nema dobavljača u Overview podacima.</div>';if(detail)detail.innerHTML='';return}
+ // Keep suppliers with no evaluated history visible instead of making the graph look broken/empty.
+ data=data.slice(0,20);
+ bars.innerHTML=data.map(x=>{
+   const r=x.reliability==null?0:Number(x.reliability),h=Math.max(8,Math.round(r*1.55));
+   const col=x.reliability==null?'#59655f':(r>=80?'#2fa45d':r>=55?'#d59a2d':'#cf5058');
+   return `<div class="ov3d-item" data-supplier="${String(x.name).replace(/"/g,'&quot;')}">
+    <div class="ov3d-bar3" style="--h:${h}px;--bar:${col}">
+     <div class="ov3d-face ov3d-front"></div><div class="ov3d-face ov3d-side"></div><div class="ov3d-face ov3d-top"></div>
+    </div>
+    <div class="ov3d-score">${x.reliability==null?'—':x.reliability+'% · '+x.score10+'/10'}</div>
+    <div class="ov3d-name">${x.name}</div>
+   </div>`;
+ }).join('');
+ bars.querySelectorAll('[data-supplier]').forEach(el=>el.onclick=()=>{
+   const sel=document.getElementById('overviewSupplierSelect');if(sel){sel.value=el.dataset.supplier;window.YardivoOverviewMaster?.render?.()}
+ });
+ const rated=data.filter(x=>x.reliability!=null),x=rated[0]||data[0];
+ if(detail)detail.innerHTML=`<div class="ov3d-kpi"><small>DOBAVLJAČ</small><strong>${x.name}</strong></div>
+ <div class="ov3d-kpi"><small>POUZDANOST</small><strong>${x.reliability==null?'—':x.reliability+'%'}</strong></div>
+ <div class="ov3d-kpi"><small>OCJENA</small><strong>${x.score10==null?'—':x.score10+'/10'}</strong></div>
+ <div class="ov3d-kpi"><small>NA VRIJEME</small><strong>${x.punctuality==null?'—':x.punctuality+'%'}</strong></div>
+ <div class="ov3d-kpi"><small>INCIDENTI</small><strong>${x.incidents||0}</strong></div>`;
+}
+function refresh(){setTimeout(()=>{wire();render()},80)}
+window.addEventListener('load',()=>setTimeout(refresh,900));
+document.addEventListener('click',e=>{if(e.target.closest('[data-view="overview"],[data-home-target="overview"]'))refresh()},true);
+document.addEventListener('change',e=>{if(e.target.closest('#overviewSupplierSelect'))refresh()},true);
+setInterval(()=>{if(document.getElementById('overview')?.classList.contains('active'))render()},4000);
+window.YardivoOverviewChart23D={render,mode,stats};
+})();
+</script>
+
+<script id="yardivo-xlsx-export-complete-fix-v1-20260831">
+(function(){
+'use strict';
+function fullObjectSheet(name,items){
+ const list=Array.isArray(items)?items:[];
+ const keys=[...new Set(list.flatMap(o=>Object.keys(o||{})))];
+ const rows=list.map(o=>keys.map(k=>{
+   const v=o?.[k];
+   if(v==null)return '';
+   if(typeof v==='object'){try{return JSON.stringify(v)}catch(_){return String(v)}}
+   return v;
+ }));
+ return {name,headers:keys,rows};
+}
+function appendSheet(wb,s){
+ const meta=Array.isArray(s.meta)?s.meta:[];
+ const body=[...meta];
+ if(meta.length)body.push([]);
+ body.push(Array.isArray(s.headers)?s.headers:[]);
+ (s.rows||[]).forEach(r=>body.push(r));
+ const ws=XLSX.utils.aoa_to_sheet(body);
+ // Practical widths so every export opens legibly.
+ const maxCols=Math.max(1,...body.map(r=>r.length));
+ ws['!cols']=Array.from({length:maxCols},(_,c)=>{
+   let n=10;for(let r=0;r<Math.min(body.length,500);r++)n=Math.max(n,String(body[r]?.[c]??'').length);
+   return {wch:Math.min(42,n+2)};
+ });
+ XLSX.utils.book_append_sheet(wb,ws,String(s.name||'YARDIVO').slice(0,31));
+}
+function exportOverview(btn){
+ if(!window.XLSX){alert('XLSX biblioteka nije učitana.');return}
+ try{
+  if(btn){btn.classList.add('yardivo-exporting');btn.textContent='GENERIRAM XLSX...'}
+  const A=(()=>{try{return Array.isArray(announcements)?announcements:[]}catch(_){return[]}})();
+  const I=(()=>{try{return Array.isArray(incidents)?incidents:[]}catch(_){return[]}})();
+  const wb=XLSX.utils.book_new();
+  const names=window.YardivoOverviewMaster?.allSupplierNames?.()||[...new Set([...A.map(a=>a.supplier),...I.map(i=>i.supplier)].filter(Boolean))];
+  const stats=names.map(n=>window.YardivoOverviewMaster?.supplierStat?.(n,A,I)).filter(Boolean);
+  appendSheet(wb,{name:'Overview',headers:['Dobavljač','Score 1-10','Pouzdanost %','Evaluirano','Dolasci','Na vrijeme','Kašnjenja','Avg kašnjenje min','Točnost %','Incidenti','No-show','Odbijeno','Zaprimljeno','Nenajavljeni','Promjene termina','Avg istovar min','Palete'],
+   rows:stats.map(s=>[s.name,s.score10??'',s.reliability??'',s.evaluated??'',s.arrived??'',s.on??'',s.late??'',s.avgLate??'',s.punctuality??'',s.incidents??'',s.noShow??'',s.rejected??'',s.received??'',s.unannounced??'',s.changes??'',s.avgUnload??'',s.pallets??'']),
+   meta:[['YARDIVO','Kompletan Overview export'],['Generirano',new Date().toLocaleString('hr-HR')],['Broj dobavljača',stats.length],['Broj najava',A.length],['Broj incidenata',I.length]]});
+  appendSheet(wb,fullObjectSheet('Sve najave - sva polja',A));
+  appendSheet(wb,fullObjectSheet('Svi incidenti - sva polja',I));
+  const stamp=new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb,`YARDIVO_Overview_SVE_${stamp}.xlsx`);
+ }catch(e){alert('Greška XLSX exporta: '+(e?.message||e))}
+ finally{if(btn){btn.classList.remove('yardivo-exporting');btn.innerHTML='📊 EXPORT XLSX'}}
+}
+function hook(){
+ const b=document.querySelector('#overview [data-xlsx-view="overview"],#overview .yardivo-export-btn');
+ if(b&&!b.dataset.completeOverview){b.dataset.completeOverview='1';b.onclick=()=>exportOverview(b);b.title='Izvezi kompletan Overview, sve najave i sve incidente u Excel'}
+}
+window.addEventListener('load',()=>setTimeout(hook,1000));
+document.addEventListener('click',e=>{if(e.target.closest('[data-view="overview"],[data-home-target="overview"]'))setTimeout(hook,150)},true);
+setInterval(hook,3000);
+window.YardivoOverviewFullXlsx={export:exportOverview};
 })();
 </script>
 
