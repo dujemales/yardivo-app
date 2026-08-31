@@ -7,7 +7,7 @@ Designed & Developed by Duje Maleš
 
 <html lang="hr">
 <head>
-<meta name="yardivo-build" content="PROD-QA-LOGIN-CHANGE-PASSWORD-2026-08-31">
+<meta name="yardivo-build" content="PROD-QA-CHANGE-PASSWORD-AUTH-SCOPE-FIX-2026-08-31">
 <script id="yardivo-rbac-session-migration">
 (function(){
   try{
@@ -6160,7 +6160,7 @@ function start(){
   ];
 
   let value=0,stage=0;
-  const WELCOME_MS=220;
+  const WELCOME_MS=5200;
   const startedAt=performance.now();
   const timer=setInterval(()=>{
     const elapsed=performance.now()-startedAt;
@@ -6175,7 +6175,7 @@ function start(){
 
     if(value>=100){
       clearInterval(timer);
-      setTimeout(showLogin,30);
+      setTimeout(showLogin,220);
     }
   },50);
 }
@@ -20449,32 +20449,15 @@ window.addEventListener('load',stableApply);
 <script id="yardivo-final-login-stability-20260831">
 (function(){
 'use strict';
-function loginVisible(){
- const o=document.getElementById('loginOverlay');
- return !!o && getComputedStyle(o).display!=='none';
-}
 function sessionActive(){
  try{return !!window.currentSession?.role}catch(_){return false}
 }
-function stabilize(){
- const splash=document.getElementById('yardivoWelcomeSplash');
- if(splash){
-   splash.classList.add('hide');
-   splash.style.display='none';
- }
- const overlay=document.getElementById('loginOverlay');
- if(!overlay)return;
- if(sessionActive()){
-   overlay.style.display='none';
-   overlay.setAttribute('aria-hidden','true');
- }else{
-   overlay.style.display='flex';
-   overlay.setAttribute('aria-hidden','false');
- }
+function enableLoginControls(){
  const u=document.getElementById('loginUser');
  const pw=document.getElementById('loginPass');
  const role=document.getElementById('loginRole');
- [u,pw,role].forEach(el=>{
+ const change=document.getElementById('loginChangePasswordBtn');
+ [u,pw,role,change].forEach(el=>{
    if(!el)return;
    el.disabled=false;
    el.removeAttribute('disabled');
@@ -20482,13 +20465,53 @@ function stabilize(){
    el.style.userSelect='auto';
  });
 }
+function stabilize(){
+ const overlay=document.getElementById('loginOverlay');
+ if(!overlay)return;
+ if(sessionActive()){
+   overlay.style.display='none';
+   overlay.setAttribute('aria-hidden','true');
+ }else{
+   /* Welcome controller owns the transition to login.
+      Do not reveal login while the welcome splash is active. */
+   const splash=document.getElementById('yardivoWelcomeSplash');
+   const welcomeActive=document.body.classList.contains('yardivo-welcome-active') &&
+     splash && splash.style.display!=='none' && !splash.classList.contains('hide');
+   if(!welcomeActive){
+     overlay.style.display='flex';
+     overlay.setAttribute('aria-hidden','false');
+   }
+ }
+ enableLoginControls();
+}
 window.YardivoLoginStability={stabilize};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',stabilize,{once:true});else stabilize();
-window.addEventListener('load',()=>setTimeout(stabilize,50));
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(stabilize,40),{once:true});
+else setTimeout(stabilize,40);
+window.addEventListener('load',()=>setTimeout(stabilize,80));
 window.addEventListener('yardivo:login',()=>setTimeout(stabilize,0));
 })();
 </script>
 
+<script id="yardivo-welcome-before-login-lock-20260831">
+(function(){
+'use strict';
+function lock(){
+ const splash=document.getElementById('yardivoWelcomeSplash');
+ const login=document.getElementById('loginOverlay');
+ if(!splash||!login)return;
+ const active=document.body.classList.contains('yardivo-welcome-active') &&
+   splash.style.display!=='none' && !splash.classList.contains('hide');
+ if(active){
+   login.style.display='none';
+   login.setAttribute('aria-hidden','true');
+ }
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock,{once:true});else lock();
+setTimeout(lock,60);
+setTimeout(lock,250);
+setTimeout(lock,1000);
+})();
+</script>
 
 <style id="yardivo-final-theme-logout-layout-20260831">
 /* Only one theme control is allowed: the moon/sun switch. */
@@ -20782,8 +20805,9 @@ async function save(){
 
  btn.disabled=true;msg('Provjera korisnika i promjena lozinke...');
  try{
-   if(typeof authClient!=='function')throw new Error('Supabase Auth nije spreman.');
-   const c=await authClient();
+   const authApi=window.YardivoAuth;
+   if(!authApi || typeof authApi.client!=='function')throw new Error('Supabase Auth nije spreman.');
+   const c=await authApi.client();
 
    // We deliberately re-authenticate with the current password before changing it.
    await c.auth.signOut({scope:'local'}).catch(()=>{});
@@ -20794,8 +20818,8 @@ async function save(){
    if(loginError||!loginData?.session)throw new Error('Trenutna lozinka nije ispravna.');
 
    // Verify the authenticated account maps to the entered YARDIVO username.
-   if(typeof loadServerProfile==='function'){
-     const profile=await loadServerProfile(c);
+   if(typeof authApi.profile==='function'){
+     const profile=await authApi.profile(c);
      if(String(profile?.username||'').trim().toLowerCase()!==username){
        throw new Error('Korisnički račun nije valjan.');
      }
@@ -20814,7 +20838,10 @@ async function save(){
    setTimeout(()=>{close();const le=$('loginError');if(le){le.textContent='Lozinka je promijenjena. Prijavi se novom lozinkom.';} $('loginPass')?.focus();},900);
  }catch(err){
    try{
-     if(typeof authClient==='function'){const c=await authClient();await c.auth.signOut({scope:'local'}).catch(()=>{})}
+     if(window.YardivoAuth && typeof window.YardivoAuth.client==='function'){
+       const c=await window.YardivoAuth.client();
+       await c.auth.signOut({scope:'local'}).catch(()=>{});
+     }
    }catch(_){}
    msg(err?.message||'Promjena lozinke nije uspjela.','error');
  }finally{
