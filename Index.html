@@ -7,7 +7,7 @@ Designed & Developed by Duje Maleš
 
 <html lang="hr">
 <head>
-<meta name="yardivo-build" content="PROD-QA-MY-ANNOUNCEMENTS-OWNER-LOCK-2026-08-31">
+<meta name="yardivo-build" content="PROD-QA-GLOBAL-FONT-SCALE-2026-08-31">
 <script id="yardivo-rbac-session-migration">
 (function(){
   try{
@@ -12269,7 +12269,15 @@ function addSettings(){const grid=document.querySelector('#settings .settings-gr
 <section class="panel"><div class="panel-head"><div><h2>AUTOMATSKI DNEVNI IZVJEŠTAJ</h2><small>Slanje nakon 14:00 preko Google Apps Script integracije</small></div></div><div class="master-settings-body"><div class="form-grid"><label>E-mail primatelja<input id="repEmail" type="email" placeholder="voditelj@tvrtka.hr"></label><label>Vrijeme slanja<input id="repTime" type="time" value="14:05"></label></div><div class="master-perms" id="repItems"></div><div style="display:flex;gap:8px;margin-top:10px"><button class="primary" id="repSave" type="button">SPREMI POSTAVKE</button><button class="secondary" id="repPreview" type="button">PREGLEDAJ IZVJEŠTAJ</button></div><div class="master-note warn" style="margin-top:10px">Za slanje i kada preglednik nije otvoren, vremenski trigger mora biti postavljen u Google Apps Scriptu. HTML sprema konfiguraciju i može je sinkronizirati.</div></div></section>
 <section class="panel"><div class="panel-head"><div><h2>GOOGLE SHEETS · CENTRALNA BAZA</h2><small>Apps Script Web App endpoint</small></div><span id="sheetState" class="master-sync-state warn">NIJE POVEZANO</span></div><div class="master-settings-body"><label>Apps Script Web App URL<input id="sheetUrl" placeholder="https://script.google.com/macros/s/.../exec"></label><div style="display:flex;gap:8px;margin-top:10px"><button class="primary" id="sheetSave" type="button">SPREMI POVEZNICU</button><button class="secondary" id="sheetTest" type="button">TEST VEZE</button><button class="secondary" id="sheetPush" type="button">SINKRONIZIRAJ SADA</button></div><div class="master-note" style="margin-top:10px">Sinkronizacija šalje najave, incidente i korisnike centralnom endpointu. Endpoint mora implementirati spremanje u Google Sheets i autorizaciju.</div></div></section>`);setupSettings();}
 function setupSettings(){const perms=document.getElementById('muPerms');const views=['dashboard','overview','announcements','checkin','yard','docks','incidents','incidentArchive','reports','settings'];perms.innerHTML=views.map(v=>`<label><input type="checkbox" value="${v}">${v}</label>`).join('');const items=['Dnevni sažetak','Broj kamiona','Palete','Kašnjenja','No-show','Stanje rampi','Dobavljači','Incidenti'];document.getElementById('repItems').innerHTML=items.map(x=>`<label><input type="checkbox" value="${x}" checked>${x}</label>`).join('');document.getElementById('muSave').onclick=createUser;renderUsers();let fp=Number(LS.getItem(K.font)||100);applyFont(fp);document.getElementById('fontRange').value=fp;document.getElementById('fontMinus').onclick=()=>applyFont(Math.max(80,Number(LS.getItem(K.font)||100)-5));document.getElementById('fontPlus').onclick=()=>applyFont(Math.min(150,Number(LS.getItem(K.font)||100)+5));document.getElementById('fontReset').onclick=()=>applyFont(100);document.getElementById('fontRange').oninput=e=>applyFont(Number(e.target.value));const r=jget(K.report,{email:'',time:'14:05',items});document.getElementById('repEmail').value=r.email||'';document.getElementById('repTime').value=r.time||'14:05';document.getElementById('repSave').onclick=()=>{jset(K.report,{email:repEmail.value.trim(),time:repTime.value,items:[...document.querySelectorAll('#repItems input:checked')].map(x=>x.value)});toast('success','IZVJEŠTAJ','Postavke dnevnog izvještaja su spremljene.')};document.getElementById('repPreview').onclick=()=>{if(typeof openAppView==='function')openAppView('reports');if(typeof renderDailyReport==='function')renderDailyReport()};const sh=jget(K.sheets,{url:''});document.getElementById('sheetUrl').value=sh.url||'';setSheetState(!!sh.url);document.getElementById('sheetSave').onclick=()=>{jset(K.sheets,{url:sheetUrl.value.trim()});setSheetState(!!sheetUrl.value.trim());toast('success','GOOGLE SHEETS','Poveznica je spremljena.')};document.getElementById('sheetTest').onclick=()=>sheetCall('ping');document.getElementById('sheetPush').onclick=()=>sheetCall('sync');}
-function applyFont(p){LS.setItem(K.font,String(p));document.body.style.setProperty('--yardivo-cell-font',(10*p/100).toFixed(1)+'px');const r=document.getElementById('fontRange'),l=document.getElementById('fontPct');if(r)r.value=p;if(l)l.textContent=p+'%'}
+function applyFont(p){
+ p=Math.max(80,Math.min(150,Number(p)||100));
+ LS.setItem(K.font,String(p));
+ document.documentElement.style.setProperty('--yardivo-ui-scale',String(p/100));
+ document.body.style.setProperty('--yardivo-cell-font',(10*p/100).toFixed(1)+'px');
+ document.documentElement.dataset.yardivoFontScale=String(p);
+ const r=document.getElementById('fontRange'),l=document.getElementById('fontPct');
+ if(r)r.value=p;if(l)l.textContent=p+'%';
+}
 async function createUser(){if(String(currentSession?.role||'').toLowerCase()!=='admin'){toast('error','PRISTUP','Samo Admin može kreirati korisnike.');return}const username=muUser.value.trim().toLowerCase(),pass=muPass.value;if(!username||pass.length<4){toast('error','KORISNIK','Upiši username i lozinku od najmanje 4 znaka.');return}let a=users();if(a.some(x=>x.username===username)){toast('error','KORISNIK','Username već postoji.');return}a.push({id:Date.now(),name:muName.value.trim()||username,username,passwordHash:await sha256(pass),role:muRole.value,location:muLocation.value,status:muStatus.value,permissions:[...document.querySelectorAll('#muPerms input:checked')].map(x=>x.value),createdAt:new Date().toISOString()});saveUsers(a);muName.value=muUser.value=muPass.value='';renderUsers();toast('success','KORISNIK','Novi korisnik je spremljen.')}
 function renderUsers(){const h=document.getElementById('masterUserList');if(!h)return;const a=users();h.innerHTML='<div class="master-user-row"><strong>Korisnik</strong><strong>Rola</strong><strong>Lokacija</strong><strong>Status</strong><strong>Akcije</strong></div>'+a.map(u=>`<div class="master-user-row"><div><strong>${u.name}</strong><br><small>${u.username}</small></div><div>${ROLE_LABEL[u.role]||u.role}</div><div>${u.location}</div><div>${u.status==='active'?'AKTIVAN':'DEAKTIVIRAN'}</div><div><button class="action" data-toggle-user="${u.id}">${u.status==='active'?'DEAKT.':'AKTIV.'}</button> <button class="action danger" data-del-user="${u.id}">OBRIŠI</button></div></div>`).join('');h.querySelectorAll('[data-toggle-user]').forEach(b=>b.onclick=()=>{let a=users(),u=a.find(x=>x.id==b.dataset.toggleUser);if(u){u.status=u.status==='active'?'disabled':'active';saveUsers(a);renderUsers()}});h.querySelectorAll('[data-del-user]').forEach(b=>b.onclick=()=>{if(confirm('Obrisati korisnika?')){saveUsers(users().filter(x=>x.id!=b.dataset.delUser));renderUsers()}})}
 function setSheetState(ok){const e=document.getElementById('sheetState');if(!e)return;e.className='master-sync-state '+(ok?'ok':'warn');e.textContent=ok?'KONFIGURIRANO':'NIJE POVEZANO'}
@@ -20632,6 +20640,60 @@ window.addEventListener('load',()=>setTimeout(lock,100));
 document.addEventListener('click',e=>{
  if(e.target.closest('[data-view="yardivoMyAnnouncements"]'))queueMicrotask(lock);
 },true);
+})();
+</script>
+
+
+<style id="yardivo-global-font-scale-20260831">
+:root{--yardivo-ui-scale:1}
+/* Global accessibility text scaling: applies to the whole application,
+   while icons/3D geometry/layout dimensions remain unchanged. */
+body,
+button,input,select,textarea,
+.nav-btn,.sidebar-footer,
+.topbar,.topbar h1,.subtitle,.clock,.live,
+.view,.panel,.panel-head,.panel-head h2,.panel-head small,
+.stat,.stat strong,.stat small,
+table,thead,tbody,th,td,
+.data-table,.oper-table,.data-wrap,
+label,legend,.master-note,.master-settings-body,.master-perms,
+.primary,.secondary,
+dialog,.modal,.toast,
+.home-menu,.home-card,
+#yardivoMyAnnouncements,
+#receiving,#announcements,#settings,#checkin,#unannounced,
+#overview,#suppliers,#incidents,#incidentArchive,#reports,
+#dailyMap,#weeklyMap,#docks,#operations,#epal,#orderSearch,#liveYard{
+  font-size:calc(1em * var(--yardivo-ui-scale))!important;
+}
+/* Explicit px-sized legacy text must also follow the selected scale. */
+.nav-btn{font-size:calc(14px * var(--yardivo-ui-scale))!important}
+.nav-btn span{font-size:calc(17px * var(--yardivo-ui-scale))!important}
+.sidebar-footer,.sidebar-footer strong{font-size:calc(12px * var(--yardivo-ui-scale))!important}
+.topbar h1{font-size:calc(21px * var(--yardivo-ui-scale))!important}
+.subtitle{font-size:calc(13px * var(--yardivo-ui-scale))!important}
+.clock strong{font-size:calc(14px * var(--yardivo-ui-scale))!important}
+.clock small{font-size:calc(10px * var(--yardivo-ui-scale))!important}
+.live{font-size:calc(11px * var(--yardivo-ui-scale))!important}
+tbody td,.data-table td,.oper-table td,
+input,select,textarea{font-size:calc(10px * var(--yardivo-ui-scale))!important}
+th,.data-table th,.oper-table th{font-size:calc(10px * var(--yardivo-ui-scale))!important}
+button,.primary,.secondary{font-size:calc(11px * var(--yardivo-ui-scale))!important}
+.panel-head h2{font-size:calc(14px * var(--yardivo-ui-scale))!important}
+.panel-head small,.master-note{font-size:calc(10px * var(--yardivo-ui-scale))!important}
+</style>
+<script id="yardivo-global-font-scale-init-20260831">
+(function(){
+'use strict';
+function apply(){
+ let p=100;
+ try{p=Number((window.safeStorage||localStorage).getItem('yardivo_master_font_v1')||100)}catch(e){}
+ p=Math.max(80,Math.min(150,p||100));
+ document.documentElement.style.setProperty('--yardivo-ui-scale',String(p/100));
+ document.documentElement.dataset.yardivoFontScale=String(p);
+}
+apply();
+window.addEventListener('load',apply);
 })();
 </script>
 
