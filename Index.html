@@ -6137,28 +6137,44 @@ html[data-theme="light"] .yardivo-welcome-copy{color:#7a909f}
 'use strict';
 
 let started=false;
+let finished=false;
+let timer=null;
+const WELCOME_MS=5200;
 
-function showLogin(){
-  document.documentElement.classList.remove('yardivo-booting');
-  document.documentElement.classList.add('yardivo-welcome-complete');
-  document.body.classList.remove('yardivo-welcome-active');
-  document.body.classList.add('yardivo-prelogin');
+function revealLogin(){
+  if(finished)return;
+  finished=true;
+  if(timer){clearInterval(timer);timer=null;}
+
+  const bar=document.getElementById('yardivoWelcomeBar');
+  const pct=document.getElementById('yardivoWelcomePercent');
+  const status=document.getElementById('yardivoWelcomeStatus');
+  if(bar)bar.style.width='100%';
+  if(pct)pct.textContent='100%';
+  if(status)status.textContent='Ready';
+
   const splash=document.getElementById('yardivoWelcomeSplash');
   if(splash)splash.classList.add('hide');
 
-  // Restore / reveal login if another startup module hid it.
-  const login=document.getElementById('loginScreen')
-    || document.getElementById('loginOverlay')
-    || document.getElementById('login')
-    || document.querySelector('.login-screen,.login-overlay,[data-login-screen]');
-  if(login){
-    login.classList.remove('hidden');
-    login.style.removeProperty('display');
-    login.setAttribute('aria-hidden','false');
-  }
-
   setTimeout(()=>{
+    document.documentElement.classList.remove('yardivo-booting');
+    document.documentElement.classList.add('yardivo-welcome-complete');
+    document.body.classList.remove('yardivo-welcome-active');
+    document.body.classList.add('yardivo-prelogin');
+
     if(splash)splash.style.display='none';
+
+    const login=document.getElementById('loginScreen')
+      || document.getElementById('loginOverlay')
+      || document.getElementById('login')
+      || document.querySelector('.login-screen,.login-overlay,[data-login-screen]');
+    if(login){
+      login.classList.remove('hidden');
+      login.style.display='flex';
+      login.style.visibility='visible';
+      login.style.opacity='1';
+      login.setAttribute('aria-hidden','false');
+    }
     try{YardivoLoginNotificationFix?.clearLoginOnce?.()}catch(e){}
   },480);
 }
@@ -6166,15 +6182,30 @@ function showLogin(){
 function start(){
   if(started)return;
   started=true;
+
+  document.documentElement.classList.add('yardivo-booting');
   document.body.classList.add('yardivo-welcome-active','yardivo-prelogin');
 
+  const splash=document.getElementById('yardivoWelcomeSplash');
   const login=document.getElementById('loginOverlay');
-  if(login)login.style.display='none';
-
   const bar=document.getElementById('yardivoWelcomeBar');
   const pct=document.getElementById('yardivoWelcomePercent');
   const status=document.getElementById('yardivoWelcomeStatus');
-  if(!bar||!pct){showLogin();return}
+
+  if(splash){
+    splash.style.removeProperty('display');
+    splash.classList.remove('hide');
+  }
+  if(login){
+    login.style.display='none';
+    login.style.visibility='hidden';
+    login.style.opacity='0';
+  }
+  if(!bar||!pct){revealLogin();return;}
+
+  bar.style.width='0%';
+  pct.textContent='0%';
+  if(status)status.textContent='Initializing system';
 
   const stages=[
     [18,'Loading interface'],
@@ -6184,12 +6215,13 @@ function start(){
     [100,'Ready']
   ];
 
-  let value=0,stage=0;
-  const WELCOME_MS=5200;
   const startedAt=performance.now();
-  const timer=setInterval(()=>{
+  let stage=0;
+
+  timer=setInterval(()=>{
+    if(finished)return;
     const elapsed=performance.now()-startedAt;
-    value=Math.min(100,Math.round((elapsed/WELCOME_MS)*100));
+    const value=Math.min(100,Math.round((elapsed/WELCOME_MS)*100));
     bar.style.width=value+'%';
     pct.textContent=value+'%';
 
@@ -6199,8 +6231,8 @@ function start(){
     }
 
     if(value>=100){
-      clearInterval(timer);
-      setTimeout(showLogin,220);
+      clearInterval(timer);timer=null;
+      setTimeout(revealLogin,220);
     }
   },50);
 }
@@ -6211,10 +6243,10 @@ if(document.readyState==='loading'){
   start();
 }
 
-// Fail-safe: user must never get stuck on splash.
-setTimeout(showLogin,5700);
+/* Real fail-safe only. It does not restart or visually alter Welcome. */
+setTimeout(()=>{if(!finished)revealLogin()},6500);
 
-window.YardivoWelcomeSplash={start,hide:showLogin};
+window.YardivoWelcomeSplash={start,hide:revealLogin};
 })();
 </script>
 <script id="yardivo-early-runtime-helpers">
@@ -11534,7 +11566,8 @@ document.getElementById('logoutBtn')?.addEventListener('click',()=>{
 // Ne ulazimo automatski u aplikaciju iz zapamćene sesije.
 currentSession=null;
 try{ safeSessionStorage.removeItem('studenac_demo_session'); }catch(e){}
-showLogin();
+/* Login is revealed exclusively by yardivo-welcome-splash-script after 100%. */
+if(document.documentElement.classList.contains('yardivo-welcome-complete'))showLogin();
 
 
 // ===== KALENDAR NA KLIK U CIJELI OKVIR DATUMA =====
@@ -24215,19 +24248,7 @@ html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] #loginOv
  border-color:#2d668c!important
 }
 
-/* Welcome follows selected theme too, but remains the ONLY visible startup screen. */
-html[data-yardivo-main-theme="light"] #yardivoWelcomeSplash{
- background:linear-gradient(135deg,#edf2ef,#fff)!important;color:#18211c!important
-}
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] #yardivoWelcomeSplash{
- background:linear-gradient(135deg,#0a0d0b,#171c18)!important
-}
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="blue"] #yardivoWelcomeSplash{
- background:linear-gradient(135deg,#06101a,#10283b)!important
-}
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] #yardivoWelcomeSplash{
- background:linear-gradient(135deg,#04101b,#0d2940)!important
-}
+/* Welcome splash intentionally keeps its original fixed YARDIVO appearance. */
 
 /* Ensure the visible legacy settings card displays all 3 options cleanly. */
 #yardivoDarkStyleSettings .yardivo-dark-style-options{
@@ -24259,10 +24280,10 @@ function currentDark(){
 function apply(){
  const m=currentMain(),d=currentDark();
  localStorage.setItem(MAIN,m);localStorage.setItem(DARK,d);
- document.documentElement.dataset.yardivoMainTheme=m;
- document.documentElement.dataset.yardivoDarkLook=d;
- document.body.classList.toggle('light-mode',m==='light');
- document.body.classList.toggle('dark-mode',m==='dark');
+ if(document.documentElement.dataset.yardivoMainTheme!==m)document.documentElement.dataset.yardivoMainTheme=m;
+ if(document.documentElement.dataset.yardivoDarkLook!==d)document.documentElement.dataset.yardivoDarkLook=d;
+ if(document.body.classList.contains('light-mode')!==(m==='light'))document.body.classList.toggle('light-mode',m==='light');
+ if(document.body.classList.contains('dark-mode')!==(m==='dark'))document.body.classList.toggle('dark-mode',m==='dark');
  // Keep legacy controller synchronized, otherwise it can overwrite the new option.
  try{localStorage.setItem('yardivo_dark_style',d)}catch(_){}
  document.querySelectorAll('input[name="yardivoDarkStyle"]').forEach(x=>x.checked=x.value===d);
@@ -24288,7 +24309,17 @@ document.addEventListener('click',e=>{
 },true);
 window.addEventListener('load',()=>setTimeout(apply,250));
 window.addEventListener('yardivo:login',()=>setTimeout(apply,50));
-new MutationObserver(apply).observe(document.documentElement,{attributes:true,attributeFilter:['data-yardivo-main-theme','data-yardivo-dark-look']});
+let __yvThemeObserverBusy=false;
+new MutationObserver(()=>{
+ if(__yvThemeObserverBusy)return;
+ __yvThemeObserverBusy=true;
+ requestAnimationFrame(()=>{
+   __yvThemeObserverBusy=false;
+   const m=currentMain(),d=currentDark();
+   if(document.documentElement.dataset.yardivoMainTheme!==m ||
+      document.documentElement.dataset.yardivoDarkLook!==d) apply();
+ });
+}).observe(document.documentElement,{attributes:true,attributeFilter:['data-yardivo-main-theme','data-yardivo-dark-look']});
 window.YardivoCanonicalTheme={apply,currentMain,currentDark};
 apply();
 })();
