@@ -22084,7 +22084,7 @@ function patch(){
  setTimeout(apply,100);
 }
 window.addEventListener('load',()=>setTimeout(patch,1200));
-setInterval(()=>{patch();if(document.getElementById('myYard')?.classList.contains('active'))apply()},1500);
+/* disabled by yardivo-myyard-flicker-fix-v1: competing periodic lighting writer */
 })();
 </script>
 
@@ -22403,6 +22403,7 @@ async function boot(){
    if(!e||!T)return;
 
    mirrorScene=e.scene; mirrorCamera=e.camera;
+   if(mirrorRenderer && mirrorRenderer.domElement.parentElement!==host) host.appendChild(mirrorRenderer.domElement);
    if(!mirrorRenderer){
      mirrorRenderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
      mirrorRenderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));
@@ -22588,7 +22589,7 @@ html:not([data-yardivo-ux="original"]) #yardivoWarRoomMyYardMirror .wrmirror-bad
    }catch(_){}
  }
  window.addEventListener('load',()=>setTimeout(applyGraphiteMapScene,1500));
- setInterval(()=>{if(document.documentElement.dataset.yardivoUx!=='original')applyGraphiteMapScene()},1800);
+ /* disabled by yardivo-myyard-flicker-fix-v1: competing periodic lighting writer */
 })();
 </script>
 
@@ -22824,6 +22825,201 @@ window.YardivoDarkLook={apply,get};
  }
  window.addEventListener('load',()=>setTimeout(clean,400));
  new MutationObserver(clean).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
+
+
+<style id="yardivo-myyard-flicker-fix-v1-20260831">
+/* One stable visual owner for My Yard. JS no longer alternates scene brightness. */
+#myYard .myy-stage,#yardivoMyYardWebGL{background:#263c31!important}
+html[data-yardivo-ux="original"] #myYard .myy-stage,
+html[data-yardivo-ux="original"] #yardivoMyYardWebGL{background:#cfdad3!important}
+</style>
+<script id="yardivo-myyard-flicker-fix-v1-20260831-js">
+(function(){
+'use strict';
+let last='';
+function desired(){
+ return document.documentElement.dataset.yardivoUx==='original' ? 'original' : 'professional';
+}
+function apply(force){
+ const m=desired();if(!force&&m===last)return;
+ const e=window.__YARDIVO_MYYARD_ENGINE__,T=window.__YARDIVO_THREE_MODULE__;if(!e||!T)return;
+ last=m;
+ const col=m==='original'?0xcfdad3:0x263c31;
+ e.scene.background=new T.Color(col);
+ e.scene.fog=new T.FogExp2(col,.0065);
+ e.renderer.toneMappingExposure=m==='original'?1.22:1.18;
+}
+window.YardivoMyYardStableLighting={apply};
+window.addEventListener('load',()=>setTimeout(()=>apply(true),1600));
+document.addEventListener('click',e=>{
+ if(e.target.closest('[data-view="myYard"],[data-home-target="myYard"],#yardivoUxStyleSetting'))setTimeout(()=>apply(true),180);
+},true);
+new MutationObserver(()=>apply(false)).observe(document.documentElement,{attributes:true,attributeFilter:['data-yardivo-ux']});
+})();
+</script>
+
+
+<style id="yardivo-warroom-blank-fix-v2-20260831">
+/* Older War Room CSS hid every child except the obsolete renderer.
+   Explicitly make the canonical My Yard mirror visible. */
+#yardivoWarRoom #wrYardCanvas>#yardivoWarRoomMyYardMirror{
+ display:block!important;visibility:visible!important;opacity:1!important;
+ position:absolute!important;inset:0!important;z-index:60!important;
+ min-height:560px!important;background:#263c31!important
+}
+#yardivoWarRoom #wrYardCanvas>#yardivoWarRoomMyYardMirror canvas{
+ display:block!important;visibility:visible!important;opacity:1!important
+}
+#yardivoWarRoom #wrYardCanvas>#yardivoWarRoomWebGL,
+#yardivoWarRoom #wrYardCanvas>#yardivoFinalWarYard{display:none!important}
+</style>
+<script id="yardivo-warroom-blank-fix-v2-20260831-js">
+(function(){
+'use strict';
+let obs=null;
+function repair(){
+ const room=document.getElementById('yardivoWarRoom'),stage=document.getElementById('wrYardCanvas');
+ if(!room||!stage)return;
+ let host=document.getElementById('yardivoWarRoomMyYardMirror');
+ if(!host){
+   host=document.createElement('div');host.id='yardivoWarRoomMyYardMirror';
+   host.innerHTML='<div class="wrmirror-badge">WAR ROOM · MY YARD DIGITAL TWIN</div>';
+   stage.appendChild(host);
+ }
+ // The legacy War Room renderer rewrites wrYardCanvas. Re-run canonical mirror boot
+ // after every such rewrite so its canvas is re-mounted instead of staying detached.
+ Promise.resolve(window.YardivoWarRoomExactMirror?.boot?.()).then(()=>{
+   const canvas=[...document.querySelectorAll('canvas')].find(c=>{
+     const e=window.__YARDIVO_MYYARD_ENGINE__;
+     return c!==e?.renderer?.domElement && c.parentElement?.id==='yardivoWarRoomMyYardMirror';
+   });
+   if(canvas&&canvas.parentElement!==host)host.appendChild(canvas);
+ }).catch(()=>{});
+}
+function watch(){
+ const stage=document.getElementById('wrYardCanvas');if(!stage)return;
+ if(obs)obs.disconnect();
+ let busy=false;
+ obs=new MutationObserver(()=>{
+   if(busy)return;busy=true;
+   setTimeout(()=>{repair();busy=false},30);
+ });
+ obs.observe(stage,{childList:true});
+ repair();
+}
+window.addEventListener('load',()=>setTimeout(watch,1500));
+document.addEventListener('click',e=>{
+ if(e.target.closest('#yardivoWarButton,[data-view="yardivoWarRoom"],[data-home-target="yardivoWarRoom"],[data-view="controltower"],[data-view="controlTower"]'))
+   setTimeout(watch,160);
+},true);
+setInterval(()=>{
+ const r=document.getElementById('yardivoWarRoom');
+ if(r?.classList.contains('active'))repair();
+},1200);
+window.YardivoWarRoomBlankRepair={repair,watch};
+})();
+</script>
+
+
+<style id="yardivo-post-login-visibility-fix-v1-20260831">
+/* A fullscreen operational overlay must never survive a new login. */
+body.yardivo-entering-app #yardivoWarRoom{display:none!important}
+body.yardivo-entering-app{overflow:auto!important}
+</style>
+<script id="yardivo-post-login-visibility-fix-v1-20260831-js">
+(function(){
+'use strict';
+
+function clearBlockingOverlays(){
+  const wr=document.getElementById('yardivoWarRoom');
+  if(wr){
+    wr.classList.remove('active');
+    wr.style.removeProperty('display');
+  }
+
+  // Reset fullscreen/scroll state left behind by War Room or other operational screens.
+  document.body.style.removeProperty('overflow');
+  document.documentElement.style.removeProperty('overflow');
+
+  try{
+    if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  }catch(_){}
+
+  // The application shell itself must remain available.
+  ['appShell','app','mainApp'].forEach(id=>{
+    const x=document.getElementById(id);
+    if(x){x.style.removeProperty('display');x.style.removeProperty('visibility');x.style.removeProperty('opacity')}
+  });
+}
+
+function forceHomeAfterLogin(){
+  clearBlockingOverlays();
+
+  document.body.classList.remove(
+    'yardivo-prelogin',
+    'yardivo-welcome-active',
+    'yardivo-role-switching'
+  );
+
+  const overlay=document.getElementById('loginOverlay');
+  if(overlay) overlay.style.display='none';
+
+  // Use the canonical navigator, then defensively ensure exactly one ordinary view is visible.
+  try{ window.openAppView?.('homeMenu'); }catch(_){}
+
+  const home=document.getElementById('homeMenu');
+  if(home){
+    document.querySelectorAll('.view').forEach(v=>{
+      if(v.id!=='homeMenu') v.classList.remove('active');
+    });
+    home.classList.add('active');
+    document.body.classList.add('home-menu-mode');
+    home.style.removeProperty('display');
+    home.style.removeProperty('visibility');
+    home.style.removeProperty('opacity');
+  }
+
+  try{ window.YardivoRoleAccessFinal?.apply?.(); }catch(_){}
+  try{ window.YardivoExactRBAC?.apply?.(); }catch(_){}
+
+  // Home-card stabilizer introduced by the Overview patch.
+  document.documentElement.classList.add('yardivo-home-ready');
+}
+
+const priorEnter=window.enterApp;
+window.enterApp=function(){
+  document.body.classList.add('yardivo-entering-app');
+  clearBlockingOverlays();
+
+  let out;
+  try{
+    if(typeof priorEnter==='function') out=priorEnter.apply(this,arguments);
+  }catch(e){
+    console.error('YARDIVO enterApp recovery:',e);
+  }
+
+  forceHomeAfterLogin();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    forceHomeAfterLogin();
+    document.body.classList.remove('yardivo-entering-app');
+  }));
+  return out;
+};
+
+// Also clean stale War Room/fullscreen state when the login screen becomes visible,
+// so logout -> login cannot leave an invisible fixed layer above the program.
+const mo=new MutationObserver(()=>{
+  const login=document.getElementById('loginOverlay');
+  if(login && getComputedStyle(login).display!=='none') clearBlockingOverlays();
+});
+window.addEventListener('load',()=>{
+  clearBlockingOverlays();
+  try{mo.observe(document.body,{subtree:true,attributes:true,attributeFilter:['class','style']})}catch(_){}
+});
+
+window.YardivoPostLoginVisibilityFix={clearBlockingOverlays,forceHomeAfterLogin};
 })();
 </script>
 
