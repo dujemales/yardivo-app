@@ -13078,19 +13078,7 @@ async function authClient(){
   }
   return window.__yardivoAuthClient;
 }
-async function forcePasswordRotation(c,user){
-  if(user?.user_metadata?.yardivo_password_rotated===true)return;
-  let next='';
-  while(true){
-    next=window.prompt('SIGURNOSNA NADOGRADNJA\nPostavi novu YARDIVO lozinku (najmanje 8 znakova). Privremena/stara lozinka više se neće koristiti.')||'';
-    if(next.length>=8)break;
-    if(!next)throw new Error('Promjena lozinke je obavezna prije ulaska u YARDIVO.');
-    alert('Nova lozinka mora imati najmanje 8 znakova.');
-  }
-  const meta={...(user?.user_metadata||{}),yardivo_password_rotated:true};
-  const {data,error}=await c.auth.updateUser({password:next,data:meta});
-  if(error||!data?.user)throw error||new Error('Promjena lozinke nije uspjela.');
-}
+async function forcePasswordRotation(c,user){return true}
 async function loadServerProfile(c){
   const {data,error}=await c.rpc('yardivo_my_profile');
   if(error)throw error;
@@ -13110,12 +13098,14 @@ async function authoritativeLogin(){
     await c.auth.signOut({scope:'local'}).catch(()=>{});
     const {data,error}=await c.auth.signInWithPassword({email:`${username}@yardivo.local`,password});
     if(error||!data?.session)throw error||new Error('Prijava nije uspjela.');
-    await forcePasswordRotation(c,data.user);
+    /* password change is user-initiated only */
     const p=await loadServerProfile(c);
     if(p.username.toLowerCase()!==username)throw new Error('Identitet korisnika se ne podudara.');
-    const chosenRole=p.role;
-    const roleSelect=document.getElementById('loginRole');
-    if(roleSelect)roleSelect.value=p.role;
+    const chosenRole=normRole(document.getElementById('loginRole')?.value||'');
+    if(chosenRole!==p.role){
+      const labels={admin:'Admin',inventory:'Upravljanje zalihama',reception:'Prijam',gate:'Porta'};
+      throw new Error(`KRIVA ROLA|Dodijeljena rola ovom korisniku je: ${labels[p.role]||p.role}`);
+    }
     const session={user:p.username,username:p.username,role:p.role,location:p.location,authUserId:data.user.id,loginAt:new Date().toISOString(),rememberMe:true,serverAuthorized:true};
     persistAppSession(session);
     try{localStorage.setItem('yardivo_last_location',p.location)}catch(e){}
@@ -13135,7 +13125,16 @@ async function authoritativeLogin(){
   }catch(e){
     try{(await authClient()).auth.signOut({scope:'local'})}catch(_){}
     persistAppSession(null);
-    setLoginError(e?.message==='Invalid login credentials'?'Pogrešno korisničko ime ili lozinka.':(e?.message||'Prijava nije uspjela.'));
+    {
+      const msg=String(e?.message||'');
+      if(msg.startsWith('KRIVA ROLA|')){
+        setLoginError('KRIVA ROLA — '+msg.split('|')[1]);
+      }else if(msg==='Invalid login credentials'||/invalid login credentials/i.test(msg)){
+        setLoginError('POGREŠAN PASSWORD — ili korisničko ime ne postoji.');
+      }else{
+        setLoginError(msg||'Prijava nije uspjela.');
+      }
+    }
     return false;
   }finally{if(btn)btn.disabled=false}
 }
@@ -20387,7 +20386,7 @@ async function create(){
   const password=document.getElementById('muPass')?.value||'';
   const role=document.getElementById('muRole')?.value||'';
   const location=document.getElementById('muLocation')?.value||'VG';
-  if(password.length<8){alert('Lozinka mora imati najmanje 8 znakova.');return}
+  if(password.length<6){alert('Password mora imati najmanje 6 znakova.');return}
   try{
     await invoke('create',{username,password,role,location});
     document.getElementById('muUser').value='';document.getElementById('muPass').value='';
@@ -21081,7 +21080,7 @@ async function save(){
 
  if(!/^[a-z0-9._-]{3,40}$/.test(username)){msg('Upiši valjano korisničko ime.','error');return}
  if(!current){msg('Upiši trenutnu lozinku.','error');return}
- if(next.length<10){msg('Nova lozinka mora imati najmanje 8 znakova.','error');return}
+ if(next.length<10){msg('Novi password mora imati najmanje 6 znakova.','error');return}
  if(next!==confirm){msg('Nova lozinka i potvrda nisu iste.','error');return}
  if(next===current){msg('Nova lozinka mora biti različita od trenutne.','error');return}
 
@@ -24978,27 +24977,14 @@ async function directSupabaseLogin(){
   });
   const auth=await authRes.json().catch(()=>({}));
   if(!authRes.ok||!auth?.access_token){
-    throw new Error(auth?.error_description||auth?.msg||auth?.message||'Pogrešno korisničko ime ili lozinka.');
+    {
+      const raw=String(auth?.error_description||auth?.msg||auth?.message||'');
+      if(/invalid login credentials/i.test(raw)||!raw)throw new Error('POGREŠAN PASSWORD — ili korisničko ime ne postoji.');
+      throw new Error(raw);
+    }
   }
 
   headers.Authorization='Bearer '+auth.access_token;
-
-  /* Keep the established first-login password rotation behavior. */
-  if(auth.user?.user_metadata?.yardivo_password_rotated!==true){
-    let next='';
-    while(true){
-      next=window.prompt('SIGURNOSNA NADOGRADNJA\nPostavi novu YARDIVO lozinku (najmanje 8 znakova).')||'';
-      if(next.length>=8)break;
-      if(!next)throw new Error('Promjena lozinke je obavezna prije ulaska u YARDIVO.');
-      alert('Nova lozinka mora imati najmanje 8 znakova.');
-    }
-    const upd=await fetch(base+'/auth/v1/user',{
-      method:'PUT',
-      headers,
-      body:JSON.stringify({password:next,data:{...(auth.user?.user_metadata||{}),yardivo_password_rotated:true}})
-    });
-    if(!upd.ok)throw new Error('Promjena lozinke nije uspjela.');
-  }
 
   const profRes=await fetch(base+'/rest/v1/rpc/yardivo_my_profile',{
     method:'POST',
@@ -25013,9 +24999,11 @@ async function directSupabaseLogin(){
 
   const aliases={porta:'gate',gate:'gate',inventory:'inventory',reception:'reception',admin:'admin'};
   const role=aliases[String(p.app_role||'').toLowerCase()]||String(p.app_role||'').toLowerCase();
-  const selected=role;
-  const roleSelect=document.getElementById('loginRole');
-  if(roleSelect)roleSelect.value=role;
+  const selected=aliases[String(chosen||'').toLowerCase()]||String(chosen||'').toLowerCase();
+  if(selected!==role){
+    const labels={admin:'Admin',inventory:'Upravljanje zalihama',reception:'Prijam',gate:'Porta'};
+    throw new Error('KRIVA ROLA|Dodijeljena rola ovom korisniku je: '+(labels[role]||role));
+  }
 
   /* Synchronize the official Supabase client too, when the CDN library is available. */
   try{
@@ -30411,7 +30399,7 @@ async function createProfile(){
   const location=document.getElementById('muLocation')?.value||'VG';
 
   if(!/^[a-z0-9._-]{3,40}$/.test(username)){alert('Username mora imati najmanje 3 znaka.');return}
-  if(password.length<8){alert('Lozinka mora imati najmanje 8 znakova.');return}
+  if(password.length<6){alert('Password mora imati najmanje 6 znakova.');return}
   if(!['admin','inventory','reception','gate'].includes(assignedRole)){alert('Odaberi valjanu rolu.');return}
 
   try{
@@ -30682,6 +30670,130 @@ body:not(.home-menu-mode) #homeMenu:not(.active){
   cursor:pointer!important;
 }
 </style>
+
+
+<style id="yardivo-login-feedback-v1-20260901">
+#loginError{
+  min-height:18px;
+  line-height:1.45;
+}
+#loginError.yardivo-login-role-error{
+  color:#ffd36d!important;
+  border-color:#8a6722!important;
+  background:#2a210e!important;
+}
+#loginError.yardivo-login-password-error{
+  color:#ff9b9f!important;
+  border-color:#7b3138!important;
+  background:#2b1115!important;
+}
+#loginError.yardivo-login-ok{
+  color:#7ee6a4!important;
+  border-color:#276b42!important;
+  background:#0d2719!important;
+}
+</style>
+
+<script id="yardivo-login-feedback-password-v1-20260901-js">
+(function(){
+'use strict';
+
+const LABELS={admin:'Admin',inventory:'Upravljanje zalihama',reception:'Prijam',gate:'Porta'};
+
+function box(){
+  return document.getElementById('loginError');
+}
+function feedback(type,text){
+  const e=box();if(!e)return;
+  e.classList.remove('yardivo-login-role-error','yardivo-login-password-error','yardivo-login-ok');
+  if(type==='role')e.classList.add('yardivo-login-role-error');
+  if(type==='password')e.classList.add('yardivo-login-password-error');
+  if(type==='ok')e.classList.add('yardivo-login-ok');
+  e.textContent=text;
+  e.style.display=text?'block':'none';
+}
+
+/* Convert the existing auth messages into clear login feedback. */
+const observer=new MutationObserver(()=>{
+  const e=box();if(!e)return;
+  const t=String(e.textContent||'').trim();
+  if(/^KRIVA ROLA/i.test(t))feedback('role',t);
+  else if(/POGREŠAN PASSWORD|Invalid login credentials|Pogrešno korisničko ime ili lozinka/i.test(t)){
+    feedback('password','POGREŠAN PASSWORD — ili korisničko ime ne postoji.');
+  }
+});
+window.addEventListener('load',()=>{
+  const e=box();if(e)observer.observe(e,{childList:true,subtree:true,characterData:true});
+},{once:true});
+
+async function voluntaryPasswordChange(){
+  const username=(document.getElementById('loginUser')?.value||'').trim().toLowerCase();
+  const current=document.getElementById('loginPass')?.value||'';
+  if(!username||!current){
+    feedback('password','Za promjenu passworda prvo upiši korisničko ime i trenutni password.');
+    return;
+  }
+
+  let next=window.prompt('NOVI PASSWORD\nUpiši novi password (najmanje 6 znakova).');
+  if(next===null)return;
+  if(String(next).length<6){
+    feedback('password','Novi password mora imati najmanje 6 znakova.');
+    return;
+  }
+  const confirmNext=window.prompt('POTVRDI NOVI PASSWORD\nPonovno upiši novi password.');
+  if(confirmNext===null)return;
+  if(next!==confirmNext){
+    feedback('password','Novi passwordi se ne podudaraju.');
+    return;
+  }
+
+  const btn=document.getElementById('loginChangePasswordBtn');
+  if(btn)btn.disabled=true;
+  feedback('ok','Provjera trenutnog passworda…');
+
+  try{
+    const c=await window.YardivoAuth.client();
+    await c.auth.signOut({scope:'local'}).catch(()=>{});
+    const {data,error}=await c.auth.signInWithPassword({email:`${username}@yardivo.local`,password:current});
+    if(error||!data?.session){
+      throw error||new Error('Invalid login credentials');
+    }
+    const {error:updateError}=await c.auth.updateUser({password:next});
+    if(updateError)throw updateError;
+    await c.auth.signOut({scope:'local'}).catch(()=>{});
+    const pass=document.getElementById('loginPass');if(pass)pass.value='';
+    feedback('ok','PASSWORD PROMIJENJEN — prijavi se novim passwordom.');
+  }catch(e){
+    const msg=String(e?.message||'');
+    if(/invalid login credentials/i.test(msg)){
+      feedback('password','TRENUTNI PASSWORD JE POGREŠAN — ili korisničko ime ne postoji.');
+    }else{
+      feedback('password','Promjena passworda nije uspjela: '+msg);
+    }
+  }finally{
+    if(btn)btn.disabled=false;
+  }
+}
+
+/* Existing button becomes optional, never automatic. */
+document.addEventListener('click',e=>{
+  const btn=e.target.closest?.('#loginChangePasswordBtn');
+  if(!btn)return;
+  e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+  voluntaryPasswordChange();
+},true);
+
+/* Role remains user-selected. After valid username/password the server profile
+   verifies it and reports the exact assigned role when selection is wrong. */
+const role=document.getElementById('loginRole');
+if(role){
+  role.disabled=false;
+  role.title='Odaberi svoju rolu. Ako je pogrešna, YARDIVO će prikazati koja ti je rola dodijeljena.';
+}
+
+window.YardivoLoginFeedback={feedback,changePassword:voluntaryPasswordChange,labels:LABELS};
+})();
+</script>
 
 </body>
 </html>
