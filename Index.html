@@ -30500,7 +30500,7 @@ body[data-yardivo-role="reception"] [data-view="liveYard"]{
 }
 </style>
 
-<script id="yardivo-role-stability-final-v4-20260901-js">
+<script id="yardivo-role-stability-final-v5-20260901-js">
 (function(){
 'use strict';
 const MATRIX={
@@ -30518,6 +30518,15 @@ function norm(r){
 }
 function role(){try{return norm(window.currentSession?.role||currentSession?.role)}catch(_){return''}}
 function allowed(v){const r=role();return r==='admin'||!!MATRIX[r]?.has(v)}
+
+function setChromeForView(view){
+ const home=view==='homeMenu';
+ document.body.classList.toggle('home-menu-mode',home);
+ if(!home){
+   document.body.classList.remove('yardivo-home-only');
+ }
+}
+
 function apply(){
  const r=role();if(!r)return;
  document.body.dataset.yardivoRole=r;
@@ -30526,62 +30535,153 @@ function apply(){
  document.querySelectorAll('[data-view]').forEach(el=>{
    const ok=allowed(el.dataset.view);
    el.classList.toggle('role-hidden',!ok);
-   el.style.setProperty('display',ok?'':'none',ok?'':'important');
-   if(ok){el.style.removeProperty('visibility');el.removeAttribute('hidden');el.removeAttribute('aria-disabled')}
+   if(ok){
+     el.style.removeProperty('display');
+     el.style.removeProperty('visibility');
+     el.removeAttribute('hidden');
+     el.removeAttribute('aria-disabled');
+   }else{
+     el.style.setProperty('display','none','important');
+   }
  });
  document.querySelectorAll('[data-home-target]').forEach(el=>{
    const ok=allowed(el.dataset.homeTarget);
    el.classList.toggle('role-hidden',!ok);
-   el.style.setProperty('display',ok?'':'none',ok?'':'important');
-   if(ok){el.style.removeProperty('visibility');el.removeAttribute('hidden');el.removeAttribute('aria-disabled')}
+   if(ok){
+     el.style.removeProperty('display');
+     el.style.removeProperty('visibility');
+     el.removeAttribute('hidden');
+     el.removeAttribute('aria-disabled');
+     el.style.removeProperty('pointer-events');
+   }else{
+     el.style.setProperty('display','none','important');
+   }
  });
 
- /* My Yard is explicitly universal for all four production roles. */
+ /* My Yard is available to every production role. */
  if(['admin','inventory','reception','gate'].includes(r)){
    document.querySelectorAll('[data-view="myYard"],[data-home-target="myYard"]').forEach(el=>{
-     el.classList.remove('role-hidden');el.removeAttribute('hidden');el.removeAttribute('aria-disabled');
-     el.style.removeProperty('display');el.style.removeProperty('visibility');
+     el.classList.remove('role-hidden');
+     el.removeAttribute('hidden');
+     el.removeAttribute('aria-disabled');
+     el.style.removeProperty('display');
+     el.style.removeProperty('visibility');
+     el.style.removeProperty('pointer-events');
    });
  }
 }
-function open(view){
- if(!allowed(view))return false;
- apply();
- const v=document.getElementById(view);
- if(!v)return false;
- document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
- v.classList.add('active');
- document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
- if(view==='myYard')setTimeout(()=>{
-   try{window.YardivoMyYardWebGL?.boot?.()}catch(_){}
-   try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
-   try{window.YardivoMyYardMode?.set?.(window.YardivoMyYardMode.current?.()||'3d')}catch(_){}
- },30);
- if(view==='unannounced')setTimeout(()=>{
+
+function renderView(view){
+ const calls={
+   dashboard:['renderDashboardSimple','renderDashboard'],
+   receiving:['renderReceiving'],
+   dailyMap:['renderDailyMap'],
+   weeklyMap:['renderWeeklyMap'],
+   suppliers:['renderSuppliers'],
+   checkin:['renderCheckinPro','renderCheckin'],
+   docks:['renderDockOverview','renderRampe'],
+   operations:['renderOperations'],
+   incidents:['renderIncidents'],
+   incidentArchive:['renderArchive'],
+   overview:['renderOverview'],
+   unannounced:['renderUnannouncedComplete'],
+   epal:['renderEpal','renderEPAL'],
+   controltower:['renderControlTower'],
+   controlTower:['renderControlTower'],
+   liveYard:['renderLiveYard'],
+   settings:['yardivoEnforceSettingsRBAC']
+ };
+ (calls[view]||[]).forEach(name=>{try{if(typeof window[name]==='function')window[name]()}catch(_){}});
+ if(view==='unannounced'){
    try{window.YardivoUnannouncedGateV2?.populateForm?.()}catch(_){}
    try{window.YardivoUnannouncedSection?.render?.()}catch(_){}
- },20);
+ }
+ if(view==='myYard'){
+   setTimeout(()=>{
+     try{window.YardivoMyYardWebGL?.boot?.()}catch(_){}
+     try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+     try{window.YardivoMyYardMode?.set?.(window.YardivoMyYardMode.current?.()||'3d')}catch(_){}
+     try{window.__YARDIVO_MYYARD_ENGINE__?.resize?.()}catch(_){}
+   },30);
+ }
+}
+
+function activate(view){
+ if(!allowed(view))return false;
+ const target=document.getElementById(view);
+ if(!target)return false;
+
+ setChromeForView(view);
+
+ /* Exactly one application view may be active at any time. */
+ document.querySelectorAll('.view').forEach(v=>{
+   const on=v===target;
+   v.classList.toggle('active',on);
+   if(!on)v.style.removeProperty('display');
+ });
+ document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+
+ if(view==='homeMenu'){
+   target.style.setProperty('display','block','important');
+ }else{
+   target.style.removeProperty('display');
+ }
+
+ apply();
+ renderView(view);
+
+ try{window.dispatchEvent(new CustomEvent('yardivo:view-opened',{detail:{view,role:role()}}))}catch(_){}
  return true;
 }
 
-/* Final click owner for allowed role navigation. Direct activation avoids chains of stale wrappers. */
+/* Capture-phase owner for both sidebar and home cards.
+   It no longer leaves body.home-menu-mode active when opening an app section. */
 document.addEventListener('click',e=>{
  const el=e.target.closest?.('[data-view],[data-home-target]');
  if(!el||!role())return;
  const view=el.dataset.view||el.dataset.homeTarget||'';
  if(!allowed(view))return;
- e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
- open(view);
+ e.preventDefault();
+ e.stopPropagation();
+ e.stopImmediatePropagation();
+ activate(view);
 },true);
 
-window.addEventListener('yardivo:login',()=>setTimeout(apply,30));
+window.addEventListener('yardivo:login',()=>setTimeout(()=>{
+ apply();
+ const active=document.querySelector('.view.active');
+ if(active)setChromeForView(active.id);
+},30));
 window.addEventListener('yardivo:data-synced',apply);
-window.addEventListener('load',()=>setTimeout(apply,900),{once:true});
+window.addEventListener('load',()=>setTimeout(()=>{
+ apply();
+ const active=document.querySelector('.view.active');
+ if(active)setChromeForView(active.id);
+},900),{once:true});
 
-/* No periodic visibility timer here: role UI is event-driven to eliminate blinking. */
-window.YardivoRoleStableFinal={apply,open,allowed,matrix:MATRIX};
+window.YardivoRoleStableFinal={apply,open:activate,allowed,matrix:MATRIX};
 })();
 </script>
+
+
+<style id="yardivo-home-single-view-fix-v1-20260901">
+/* Početni izbornik is a true single-view screen. No operational view may leak below it. */
+body.home-menu-mode .view:not(#homeMenu){
+  display:none!important;
+}
+body.home-menu-mode #homeMenu{
+  display:block!important;
+}
+body:not(.home-menu-mode) #homeMenu:not(.active){
+  display:none!important;
+}
+
+/* Home cards must always be clickable when RBAC says they are allowed. */
+#homeMenu .home-menu-card:not(.role-hidden){
+  pointer-events:auto!important;
+  cursor:pointer!important;
+}
+</style>
 
 </body>
 </html>
