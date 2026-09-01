@@ -21063,7 +21063,7 @@ window.addEventListener('load',apply);
 </div>
 </form>
 </dialog>
-<script id="yardivo-login-change-password-20260831">
+<script id="yardivo-login-change-password-20260831" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
@@ -30728,104 +30728,33 @@ body:not(.home-menu-mode) #homeMenu:not(.active){
 }
 </style>
 
-<script id="yardivo-login-feedback-password-v1-20260901-js">
+<script id="yardivo-login-feedback-password-v2-20260901-js">
 (function(){
 'use strict';
 
-const LABELS={admin:'Admin',inventory:'Upravljanje zalihama',reception:'Prijam',gate:'Porta'};
-
-function box(){
-  return document.getElementById('loginError');
-}
-function feedback(type,text){
-  const e=box();if(!e)return;
-  e.classList.remove('yardivo-login-role-error','yardivo-login-password-error','yardivo-login-ok');
-  if(type==='role')e.classList.add('yardivo-login-role-error');
-  if(type==='password')e.classList.add('yardivo-login-password-error');
-  if(type==='ok')e.classList.add('yardivo-login-ok');
-  e.textContent=text;
-  e.style.display=text?'block':'none';
-}
-
-/* Convert the existing auth messages into clear login feedback. */
-const observer=new MutationObserver(()=>{
+function box(){return document.getElementById('loginError')}
+function styleOnly(){
   const e=box();if(!e)return;
   const t=String(e.textContent||'').trim();
-  if(/^KRIVA ROLA/i.test(t))feedback('role',t);
-  else if(/POGREŠAN PASSWORD|Invalid login credentials|Pogrešno korisničko ime ili lozinka/i.test(t)){
-    feedback('password','POGREŠAN PASSWORD — ili korisničko ime ne postoji.');
-  }
-});
+  e.classList.remove('yardivo-login-role-error','yardivo-login-password-error','yardivo-login-ok');
+  if(/^KRIVA ROLA/i.test(t))e.classList.add('yardivo-login-role-error');
+  else if(/POGREŠAN|PASSWORD|USERNAME|SERVER|PRIJAVA NIJE/i.test(t))e.classList.add('yardivo-login-password-error');
+}
+/* Important: never rewrite textContent from a MutationObserver.
+   Rewriting the same text caused an infinite mutation loop and browser freeze. */
 window.addEventListener('load',()=>{
-  const e=box();if(e)observer.observe(e,{childList:true,subtree:true,characterData:true});
+  const e=box();
+  if(!e)return;
+  let queued=false;
+  new MutationObserver(()=>{
+    if(queued)return;
+    queued=true;
+    queueMicrotask(()=>{queued=false;styleOnly()});
+  }).observe(e,{childList:true,subtree:true,characterData:true});
+  styleOnly();
 },{once:true});
 
-async function voluntaryPasswordChange(){
-  const username=(document.getElementById('loginUser')?.value||'').trim().toLowerCase();
-  const current=document.getElementById('loginPass')?.value||'';
-  if(!username||!current){
-    feedback('password','Za promjenu passworda prvo upiši korisničko ime i trenutni password.');
-    return;
-  }
-
-  let next=window.prompt('NOVI PASSWORD\nUpiši novi password (najmanje 6 znakova).');
-  if(next===null)return;
-  if(String(next).length<6){
-    feedback('password','Novi password mora imati najmanje 6 znakova.');
-    return;
-  }
-  const confirmNext=window.prompt('POTVRDI NOVI PASSWORD\nPonovno upiši novi password.');
-  if(confirmNext===null)return;
-  if(next!==confirmNext){
-    feedback('password','Novi passwordi se ne podudaraju.');
-    return;
-  }
-
-  const btn=document.getElementById('loginChangePasswordBtn');
-  if(btn)btn.disabled=true;
-  feedback('ok','Provjera trenutnog passworda…');
-
-  try{
-    const c=await window.YardivoAuth.client();
-    await c.auth.signOut({scope:'local'}).catch(()=>{});
-    const {data,error}=await c.auth.signInWithPassword({email:`${username}@yardivo.local`,password:current});
-    if(error||!data?.session){
-      throw error||new Error('Invalid login credentials');
-    }
-    const {error:updateError}=await c.auth.updateUser({password:next});
-    if(updateError)throw updateError;
-    await c.auth.signOut({scope:'local'}).catch(()=>{});
-    const pass=document.getElementById('loginPass');if(pass)pass.value='';
-    feedback('ok','PASSWORD PROMIJENJEN — prijavi se novim passwordom.');
-  }catch(e){
-    const msg=String(e?.message||'');
-    if(/invalid login credentials/i.test(msg)){
-      feedback('password','TRENUTNI PASSWORD JE POGREŠAN — ili korisničko ime ne postoji.');
-    }else{
-      feedback('password','Promjena passworda nije uspjela: '+msg);
-    }
-  }finally{
-    if(btn)btn.disabled=false;
-  }
-}
-
-/* Existing button becomes optional, never automatic. */
-document.addEventListener('click',e=>{
-  const btn=e.target.closest?.('#loginChangePasswordBtn');
-  if(!btn)return;
-  e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
-  voluntaryPasswordChange();
-},true);
-
-/* Role remains user-selected. After valid username/password the server profile
-   verifies it and reports the exact assigned role when selection is wrong. */
-const role=document.getElementById('loginRole');
-if(role){
-  role.disabled=false;
-  role.title='Odaberi svoju rolu. Ako je pogrešna, YARDIVO će prikazati koja ti je rola dodijeljena.';
-}
-
-window.YardivoLoginFeedback={feedback,changePassword:voluntaryPasswordChange,labels:LABELS};
+window.YardivoLoginFeedback={style:styleOnly};
 })();
 </script>
 
@@ -31007,5 +30936,74 @@ window.YardivoLoginNoFreeze={fail,unlock};
 }
 </style>
 
+<script id="yardivo-login-change-password-v2-20260901-js">
+(function(){
+'use strict';
+const BASE='https://utkleufcoaxnhrhcmdkb.supabase.co';
+const KEY='sb_publishable_Ix_TndQyIFrGyfIyKEKySg_3GHwAMlL';
+
+function show(text,ok=false){
+ const e=document.getElementById('loginError');if(!e)return;
+ e.textContent=text;
+ e.style.setProperty('display','block','important');
+ e.style.setProperty('visibility','visible','important');
+ e.style.setProperty('opacity','1','important');
+ e.style.setProperty('background',ok?'#0f2419':'#351317','important');
+ e.style.setProperty('border','1px solid '+(ok?'#2f6d48':'#d94a52'),'important');
+ e.style.setProperty('color',ok?'#9ee0b6':'#ffb1b5','important');
+}
+async function fetchJSON(url,options={},ms=6500){
+ const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);
+ try{
+   const r=await fetch(url,{...options,signal:c.signal});
+   const d=await r.json().catch(()=>({}));
+   return {r,d};
+ }finally{clearTimeout(t)}
+}
+async function change(){
+ const username=(document.getElementById('loginUser')?.value||'').trim().toLowerCase();
+ const current=document.getElementById('loginPass')?.value||'';
+ if(!/^[a-z0-9._-]{3,40}$/.test(username)||!current){
+   show('Za promjenu passworda upiši korisničko ime i trenutni password.');
+   return;
+ }
+ const next=window.prompt('NOVI PASSWORD\nUpiši novi password (najmanje 6 znakova).');
+ if(next===null)return;
+ if(String(next).length<6){show('Novi password mora imati najmanje 6 znakova.');return}
+ const again=window.prompt('POTVRDI NOVI PASSWORD\nPonovno upiši novi password.');
+ if(again===null)return;
+ if(next!==again){show('Novi passwordi se ne podudaraju.');return}
+
+ const b=document.getElementById('loginChangePasswordBtn');
+ if(b)b.disabled=true;
+ try{
+   const headers={'apikey':KEY,'Content-Type':'application/json'};
+   const {r:ar,d:auth}=await fetchJSON(BASE+'/auth/v1/token?grant_type=password',{
+     method:'POST',headers,body:JSON.stringify({email:username+'@yardivo.local',password:current})
+   });
+   if(!ar.ok||!auth?.access_token)throw new Error('TRENUTNI USERNAME ILI PASSWORD NIJE ISPRAVAN.');
+   const {r:ur,d:ud}=await fetchJSON(BASE+'/auth/v1/user',{
+     method:'PUT',
+     headers:{...headers,Authorization:'Bearer '+auth.access_token},
+     body:JSON.stringify({password:next})
+   });
+   if(!ur.ok)throw new Error(String(ud?.message||'Promjena passworda nije uspjela.'));
+   const p=document.getElementById('loginPass');if(p)p.value='';
+   show('PASSWORD JE PROMIJENJEN — prijavi se novim passwordom.',true);
+ }catch(e){
+   show(e?.name==='AbortError'?'SERVER NIJE ODGOVORIO — pokušaj ponovno.':String(e?.message||'Promjena passworda nije uspjela.'));
+ }finally{
+   if(b){b.disabled=false;b.removeAttribute('disabled')}
+ }
+}
+document.addEventListener('click',e=>{
+ const b=e.target.closest?.('#loginChangePasswordBtn');
+ if(!b)return;
+ e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+ change();
+},true);
+window.YardivoPasswordChange={change};
+})();
+</script>
 </body>
 </html>
