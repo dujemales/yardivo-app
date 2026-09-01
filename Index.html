@@ -7607,8 +7607,8 @@ AUTOMATSKA PREPORUKA</small>
 <section class="danger-zone">
 <div class="panel-head"><div><h2>OPASNA ZONA</h2><small>Samo Admin</small></div></div>
 <div class="danger-body">
-<p><strong>BRIŠI SVE NAJAVE</strong> briše sve najave i sve podatke vezane uz njih: statuse, promjene termina, dolaske, tablice/vozače, povezane incidente, operativnu povijest i cijelu povijest notifikacija. Dobavljači, skladišta, rampe, praznici, postavke, korisnici i EPAL ostaju sačuvani.</p>
-<button class="delete-all-btn" id="deleteAllDataBtn" type="button">BRIŠI SVE NAJAVE</button>
+<p><strong>OBRIŠI SVE PODATKE</strong> radi potpuni operativni reset: briše sve najave, incidente, nenajavljene dolaske, EPAL evidenciju, povijest kamiona i dolazaka, promjene termina, operativne logove, izvještajne cacheve, upozorenja i <strong>svu povijest notifikacija</strong>. Nakon brisanja svi operativni brojači moraju biti 0. Korisnici/autentikacija, popis dobavljača, skladišta, rampe, neradni dani i vizualne postavke ostaju sačuvani.</p>
+<button class="delete-all-btn" id="deleteAllDataBtn" type="button">OBRIŠI SVE PODATKE</button>
 </div>
 </section>
 </div>
@@ -28643,7 +28643,7 @@ window.YardivoMyYardMode={set:setMode,current:()=>{
 }
 </style>
 
-<script id="yardivo-full-reset-home-zero-v1-20260901-js">
+<script id="yardivo-full-reset-home-zero-v1-20260901-js" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
 
@@ -29329,6 +29329,477 @@ document.addEventListener('click',e=>{
 },true);
 
 window.YardivoOverviewExecutiveSimple={render:simplify};
+})();
+</script>
+
+
+<style id="yardivo-overview-hero3-v2-20260901">
+#overviewExecutive{
+  padding:28px!important;
+  border:1px solid #26435a!important;
+  border-radius:16px!important;
+  background:#07131f!important;
+}
+#overviewExecutive .overview-exec-head{
+  margin-bottom:22px!important;
+}
+#overviewExecutive .overview-exec-head h2{
+  margin:0!important;
+  font-size:20px!important;
+  font-weight:1000!important;
+  letter-spacing:.2px!important;
+  color:#edf6ff!important;
+}
+#overviewExecutive .overview-exec-head::after{
+  content:"Pregled ukupne pouzdanosti i najboljih / najlošijih dobavljača";
+  display:block;
+  margin-top:7px;
+  font-size:10px;
+  font-weight:700;
+  color:#94a9b9;
+}
+#yardivoOverviewSimple3{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:28px!important;
+  align-items:stretch!important;
+}
+#yardivoOverviewSimple3 > *{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  min-height:260px!important;
+  padding:30px 34px!important;
+  border-radius:22px!important;
+  background:#0b1826!important;
+  border:1px solid #24415a!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+}
+#yardivoOverviewSimple3 > *::before{
+  content:"";
+  position:absolute;
+  left:28px;
+  top:28px;
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  opacity:.18;
+}
+#yardivoOverviewSimple3 > *::after{
+  position:absolute;
+  left:44px;
+  top:39px;
+  font-size:24px;
+  line-height:1;
+  font-weight:1000;
+}
+#yardivoOverviewSimple3 > *:nth-child(1){
+  border-color:#24558a!important;
+}
+#yardivoOverviewSimple3 > *:nth-child(1)::before{background:#2489eb}
+#yardivoOverviewSimple3 > *:nth-child(1)::after{
+  content:"↗";
+  color:#62aaf3;
+}
+#yardivoOverviewSimple3 > *:nth-child(2){
+  border-color:#155a38!important;
+}
+#yardivoOverviewSimple3 > *:nth-child(2)::before{background:#20c76b}
+#yardivoOverviewSimple3 > *:nth-child(2)::after{
+  content:"★";
+  color:#35df82;
+  font-size:20px;
+  top:43px;
+}
+#yardivoOverviewSimple3 > *:nth-child(3){
+  border-color:#63313a!important;
+}
+#yardivoOverviewSimple3 > *:nth-child(3)::before{background:#e1535d}
+#yardivoOverviewSimple3 > *:nth-child(3)::after{
+  content:"↘";
+  color:#ff646d;
+}
+#yardivoOverviewSimple3 small{
+  margin-left:76px!important;
+  margin-bottom:24px!important;
+  font-size:10px!important;
+  line-height:1.2!important;
+  font-weight:1000!important;
+  letter-spacing:.4px!important;
+  text-transform:uppercase!important;
+}
+#yardivoOverviewSimple3 > *:nth-child(1) small{color:#62aaf3!important}
+#yardivoOverviewSimple3 > *:nth-child(2) small{color:#35df82!important}
+#yardivoOverviewSimple3 > *:nth-child(3) small{color:#ff646d!important}
+#yardivoOverviewSimple3 strong{
+  display:block!important;
+  margin:0!important;
+  color:#edf6ff!important;
+}
+#yardivoOverviewSimple3 #ovExecReliability{
+  font-size:58px!important;
+  line-height:1!important;
+  font-weight:1000!important;
+  letter-spacing:-1px!important;
+}
+#yardivoOverviewSimple3 #ovFocusBest strong,
+#yardivoOverviewSimple3 #ovFocusAttention strong{
+  font-size:30px!important;
+  line-height:1.1!important;
+  font-weight:1000!important;
+  letter-spacing:.1px!important;
+}
+#yardivoOverviewSimple3 #ovFocusBest{
+  color:#edf6ff!important;
+}
+#yardivoOverviewSimple3 #ovFocusAttention{
+  color:#edf6ff!important;
+}
+#yardivoOverviewSimple3 .yardivo-card-score{
+  margin-top:14px;
+  font-size:34px;
+  line-height:1;
+  font-weight:1000;
+}
+#yardivoOverviewSimple3 .yardivo-best-score{color:#20c76b}
+#yardivoOverviewSimple3 .yardivo-worst-score{color:#ff525d}
+#yardivoOverviewSimple3 .yardivo-card-meta{
+  margin-top:12px;
+  font-size:10px;
+  line-height:1.45;
+  color:#a8bbc8;
+}
+#yardivoOverviewSimple3 > *:nth-child(1) .yardivo-card-meta{
+  margin-top:18px;
+}
+html[data-yardivo-main-theme="light"] #overviewExecutive{
+  background:#fff!important;
+  border-color:#d7dee3!important;
+}
+html[data-yardivo-main-theme="light"] #overviewExecutive .overview-exec-head h2{
+  color:#13202a!important;
+}
+html[data-yardivo-main-theme="light"] #yardivoOverviewSimple3 > *{
+  background:#fff!important;
+  color:#13202a!important;
+}
+html[data-yardivo-main-theme="light"] #yardivoOverviewSimple3 strong{
+  color:#13202a!important;
+}
+@media(max-width:1050px){
+  #yardivoOverviewSimple3{
+    grid-template-columns:1fr!important;
+    gap:14px!important;
+  }
+  #yardivoOverviewSimple3 > *{
+    min-height:210px!important;
+  }
+}
+</style>
+
+<script id="yardivo-overview-hero3-v2-20260901-js">
+(function(){
+'use strict';
+
+function extractScore(text){
+  const m=String(text||'').match(/(\d{1,3})\s*%/);
+  return m?Math.max(0,Math.min(100,Number(m[1]))):null;
+}
+function rebuildCard(card,type){
+  if(!card)return;
+  const strong=card.querySelector('strong');
+  const raw=card.textContent||'';
+  const score=extractScore(raw);
+
+  let meta=[...card.querySelectorAll('span,p,div')]
+    .map(x=>String(x.textContent||'').trim())
+    .filter(Boolean)
+    .find(t=>t!==String(strong?.textContent||'').trim() && !/NAJBOLJI|NAJLOŠIJI|POUZDANOST/i.test(t));
+
+  if(type==='best' || type==='worst'){
+    let s=card.querySelector('.yardivo-card-score');
+    if(!s){
+      s=document.createElement('div');
+      s.className='yardivo-card-score '+(type==='best'?'yardivo-best-score':'yardivo-worst-score');
+      strong?.after(s);
+    }
+    if(score!==null)s.textContent=score+'%';
+
+    let m=card.querySelector('.yardivo-card-meta');
+    if(!m){
+      m=document.createElement('div');
+      m.className='yardivo-card-meta';
+      s.after(m);
+    }
+    if(meta)m.textContent=meta;
+  }else{
+    let m=card.querySelector('.yardivo-card-meta');
+    if(!m){
+      m=document.createElement('div');
+      m.className='yardivo-card-meta';
+      const rel=document.getElementById('ovExecReliability');
+      rel?.after(m);
+    }
+    m.textContent='evaluirani dobavljači';
+  }
+}
+function apply(){
+  const root=document.getElementById('overviewExecutive');
+  const grid=document.getElementById('yardivoOverviewSimple3');
+  if(!root||!grid)return;
+
+  const avg=document.getElementById('ovExecReliability')?.closest('.overview-exec-kpi');
+  const best=document.getElementById('ovFocusBest');
+  const worst=document.getElementById('ovFocusAttention');
+
+  if(avg){
+    const l=avg.querySelector('small');
+    if(l)l.textContent='PROSJEČNA POUZDANOST';
+  }
+  if(best){
+    const l=best.querySelector('small');
+    if(l)l.textContent='NAJBOLJI DOBAVLJAČ';
+  }
+  if(worst){
+    const l=worst.querySelector('small');
+    if(l)l.textContent='NAJLOŠIJI DOBAVLJAČ';
+  }
+
+  [avg,best,worst].filter(Boolean).forEach(x=>grid.appendChild(x));
+
+  rebuildCard(avg,'avg');
+  rebuildCard(best,'best');
+  rebuildCard(worst,'worst');
+
+  /* Hide every legacy manager-summary card that is not one of the three selected cards. */
+  root.querySelectorAll('.overview-exec-kpi,.overview-focus-card').forEach(el=>{
+    const keep=el===avg||el===best||el===worst;
+    el.style.setProperty('display',keep?'flex':'none','important');
+  });
+}
+window.addEventListener('load',()=>setTimeout(apply,1000),{once:true});
+window.addEventListener('yardivo:data-synced',()=>setTimeout(apply,40));
+window.addEventListener('yardivo:overview-refresh',()=>setTimeout(apply,40));
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-view="overview"],[data-home-target="overview"]'))setTimeout(apply,100);
+},true);
+setInterval(()=>{
+  const ov=document.getElementById('overview');
+  if(ov?.classList.contains('active'))apply();
+},1800);
+
+window.YardivoOverviewHero3={render:apply};
+})();
+</script>
+
+
+<style id="yardivo-total-operational-wipe-v2-20260901">
+#deleteAllDataBtn{font-weight:1000!important}
+</style>
+<script id="yardivo-total-operational-wipe-v2-20260901-js">
+(function(){
+'use strict';
+
+let busy=false;
+
+/* These are configuration/auth keys and MUST survive the operational wipe. */
+const PRESERVE_EXACT=new Set([
+  'yardivo_last_location','studenac_active_warehouse',
+  'yardivo_main_theme_v2','yardivo_dark_look_v2','yardivo_dark_style','yardivo_dark_style_v1',
+  'yardivo_light_style_v1','yardivo_theme','yardivo_theme_v2','yardivo_theme_v3',
+  'yardivo_theme_preset_v1','yardivo_ux_style_v1','yardivo_first_theme_initialized_v1',
+  'yardivo_font_scale','yardivo_master_font_v1','yardivo_notification_sound_v1',
+  'yardivo_ramp_qr_mobile_v1','yardivo_ramp_config_v1','yardivo_capacity_config_v1',
+  'yardivo_detention_settings_v1','yardivo_auto_replan_cfg_v1',
+  'yardivo_master_users_v1','yardivo_users','yardivo_yms_users',
+  'yardivo_remembered_session','yardivo_session','yardivo_custom_session',
+  'yardivo_real_auth_cutover_v1','yardivo_rbac_session_migrated_20260831',
+  'yardivo_client_id_v1'
+]);
+
+const OPERATIONAL_EXACT=new Set([
+  'yardivo_yms_announcements_v1','studenac_yms_announcements','studenac_announcements',
+  'yardivo_announcements','yms_announcements',
+  'studenac_yms_incidents','yardivo_incidents',
+  'yardivo_live_notifications_v1','yardivo_notification_seen_v5','yardivo_last_incident_notice',
+  'yardivo_epal_transactions_v1','yardivo_epal_initial_stock_v1',
+  'yms_trucks_v2',
+  'yardivo_auto_replan_log_v1','yardivo_supplier_scores_v1','yardivo_overview_qa_seed_v1',
+  'yardivo_data_last_saved_at',
+  'yardivo_master_notifications_v1','yardivo_master_report_v1',
+  'yardivo_supabase_offline_queue_v1','yardivo_supabase_offline_queue_v2',
+  'yardivo_supabase_sync_meta_v1','yardivo_supabase_sync_meta_v2'
+]);
+
+function operationalKey(k){
+  k=String(k||'');
+  if(!k || PRESERVE_EXACT.has(k))return false;
+  if(OPERATIONAL_EXACT.has(k))return true;
+  return /(?:^|_)(?:announcement|incident|notification|unannounced|epal|truck|arrival|history|audit|alert|replan_log|supplier_scores|overview_qa|daily_forecast_seen)(?:_|$)/i.test(k)
+      || /^yardivo_unannounced_/i.test(k)
+      || /^yardivo_incident_/i.test(k)
+      || /^yardivo_daily_forecast_seen_v1_/i.test(k);
+}
+
+function storageKeys(storage){
+  const out=[];
+  try{for(let i=0;i<storage.length;i++)out.push(storage.key(i))}catch(_){}
+  return out.filter(Boolean);
+}
+
+function clearOperationalStorage(){
+  [localStorage,sessionStorage].forEach(st=>{
+    storageKeys(st).forEach(k=>{
+      if(operationalKey(k)){try{st.removeItem(k)}catch(_){}}
+    });
+  });
+  try{safeStorage.removeItem('yardivo_yms_announcements_v1')}catch(_){}
+  try{safeStorage.removeItem('studenac_yms_announcements')}catch(_){}
+  try{safeStorage.removeItem('studenac_yms_incidents')}catch(_){}
+}
+
+function zeroDom(){
+  const ids=[
+    'notifCount','opsAlertBadge','opsAlertCount','opsLongWait','opsBigLate','opsAtDock','opsDoneToday',
+    'incidentBadge','incidentCount','unannouncedNavBadge','epalDebtBadge','ctCriticalBadge',
+    'ctTodayTotal','ctYard','ctDock','ctLate','ctIncidents','ctUnannounced',
+    'dashAttentionCount','announcementCount','annTruckCount','truckUniqueCount','truckVisitCount',
+    'truckReturningCount','incidentArchiveCount','epalKpiDebt','epalKpiInToday','epalKpiOutToday',
+    'epalKpiSuppliersDebt'
+  ];
+  ids.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    if(id==='incidentCount')el.textContent='0 incidenata';
+    else el.textContent='0';
+    if(el.classList.contains('nav-badge'))el.style.setProperty('display','none','important');
+  });
+
+  document.querySelectorAll('#homeMenuGrid .home-menu-card').forEach(card=>{
+    let b=card.querySelector('.yardivo-home-zero-count');
+    if(!b){
+      b=document.createElement('span');b.className='yardivo-home-zero-count';card.appendChild(b);
+    }
+    b.textContent='0';b.style.display='inline-flex';
+  });
+
+  const notif=document.getElementById('notifList');
+  if(notif)notif.innerHTML='<div class="notif-empty">Nema novih notifikacija.</div>';
+  const hist=document.getElementById('yardivoNotificationHistory');
+  if(hist)hist.innerHTML='<div class="notif-empty">Nema notifikacija.</div>';
+}
+
+function clearRuntimeArrays(){
+  try{announcements=[];window.announcements=announcements}catch(_){}
+  try{incidents=[];window.incidents=incidents}catch(_){}
+  /* optional module globals */
+  ['unannouncedRequests','epalTransactions','truckHistoryData','notifications'].forEach(name=>{
+    try{if(Array.isArray(window[name]))window[name].length=0}catch(_){}
+  });
+}
+
+async function clearCloudState(){
+  const keys=[...OPERATIONAL_EXACT];
+  /* State-key modules: overwrite with an empty payload so other devices do not repopulate history. */
+  if(typeof putCloudState==='function'){
+    for(const k of keys){
+      try{
+        const value=(/notifications|announcements|incidents|epal|truck|unannounced|history|log|scores/i.test(k))?'[]':'';
+        await Promise.resolve(putCloudState(k,value));
+      }catch(e){console.warn('YARDIVO wipe cloud state',k,e)}
+    }
+  }
+}
+
+async function clearNormalizedRows(){
+  /* Empty arrays drive the existing CAS normalized transport to delete every row. */
+  try{saveAnnouncements?.()}catch(_){}
+  try{saveIncidents?.()}catch(_){}
+  try{await window.YardivoSupabase?.syncNow?.()}catch(e){console.warn('YARDIVO normalized wipe sync',e)}
+}
+
+function rerenderAll(){
+  const fns=[
+    'render','renderAnnouncements','renderAnnouncementSchedule','renderDailyMap','renderWeeklyMap',
+    'renderWeeklyDeliveries','renderReceiving','renderOverview','renderDashboardSimple',
+    'renderOperationsPro','renderYmsAlerts','renderAfter14NoShowAlerts','renderIncidents',
+    'renderControlTower','renderEpal','renderUnannounced','renderTruckHistorySection',
+    'refreshRecommendation'
+  ];
+  fns.forEach(fn=>{try{if(typeof window[fn]==='function')window[fn]()}catch(_){}});
+  try{window.YardivoNotifications?.save?.([])}catch(_){}
+  try{window.YardivoNotifications?.render?.()}catch(_){}
+  try{window.YardivoOverviewMaster?.render?.()}catch(_){}
+  try{window.YardivoOverviewFullChart?.render?.()}catch(_){}
+  try{window.YardivoOverviewHero3?.render?.()}catch(_){}
+  try{window.YardivoMyYard?.render?.()}catch(_){}
+  try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+  zeroDom();
+}
+
+async function wipe(){
+  if(busy)return;
+  let r='';try{r=String(currentSession?.role||'').toLowerCase().trim()}catch(_){}
+  if(r!=='admin'){alert('Samo Admin može izvršiti potpuni reset podataka.');return}
+
+  const ok=confirm(
+    'OBRISATI SVE OPERATIVNE PODATKE?\n\n'+
+    'Brišu se SVE najave, incidenti, nenajavljeni dolasci, EPAL evidencija, kamioni/dolasci, promjene, povijesti, logovi, upozorenja i SVE NOTIFIKACIJE.\n\n'+
+    'Nakon ove radnje operativni sustav mora biti potpuno prazan.'
+  );
+  if(!ok)return;
+
+  const typed=prompt('Za konačnu potvrdu upiši: OBRISI SVE PODATKE');
+  if(typed===null)return;
+  const norm=typed.trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(norm!=='OBRISI SVE PODATKE'){alert('Brisanje nije izvršeno.');return}
+
+  busy=true;
+  const btn=document.getElementById('deleteAllDataBtn');
+  if(btn){btn.disabled=true;btn.textContent='BRIŠEM SVE…'}
+
+  clearRuntimeArrays();
+
+  /* Persist canonical empties before clearing compatibility caches. */
+  try{safeStorage.setItem('yardivo_yms_announcements_v1','[]')}catch(_){}
+  try{safeStorage.setItem('studenac_yms_announcements','[]')}catch(_){}
+  try{safeStorage.setItem('studenac_yms_incidents','[]')}catch(_){}
+  try{localStorage.setItem('yardivo_live_notifications_v1','[]')}catch(_){}
+
+  await clearNormalizedRows();
+  await clearCloudState();
+  clearOperationalStorage();
+
+  /* Recreate only canonical empty datasets so no legacy fallback can restore old records. */
+  try{safeStorage.setItem('yardivo_yms_announcements_v1','[]')}catch(_){}
+  try{safeStorage.setItem('studenac_yms_announcements','[]')}catch(_){}
+  try{safeStorage.setItem('studenac_yms_incidents','[]')}catch(_){}
+  try{localStorage.setItem('yardivo_live_notifications_v1','[]')}catch(_){}
+  try{localStorage.setItem('yardivo_operational_full_reset_v1',new Date().toISOString())}catch(_){}
+
+  rerenderAll();
+
+  if(typeof showYmsToast==='function'){
+    showYmsToast('success','SVE JE OBRISANO','Operativni podaci, sve povijesti i sve notifikacije su prazni. Brojači su vraćeni na 0.',5000);
+  }else{
+    alert('Svi operativni podaci, povijesti i notifikacije su obrisani.');
+  }
+
+  if(btn){btn.disabled=false;btn.textContent='OBRIŠI SVE PODATKE'}
+  busy=false;
+}
+
+/* Single canonical owner. Runs in capture phase and blocks all old partial reset handlers. */
+document.addEventListener('click',e=>{
+  const btn=e.target.closest?.('#deleteAllDataBtn');
+  if(!btn)return;
+  e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+  wipe();
+},true);
+
+window.YardivoTotalOperationalWipe={run:wipe,zero:zeroDom};
 })();
 </script>
 
