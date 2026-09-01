@@ -5823,6 +5823,84 @@ html.yardivo-smart-off #yardivoAutoReplanAlertStack{
 }
 </style>
 
+
+<script id="yardivo-welcome-observer-guard-v1-20260901">
+(function(){
+'use strict';
+/*
+  Startup guard: legacy modules create many MutationObservers. During the 5.2 s
+  Welcome phase their callbacks are deferred so none of them can create a
+  microtask loop that starves the Welcome progress timer.
+*/
+const NativeMO=window.MutationObserver;
+if(!NativeMO || window.__YARDIVO_WELCOME_MO_GUARD__)return;
+
+const guarded=new Set();
+
+class YardivoGuardedMutationObserver extends NativeMO{
+  constructor(callback){
+    let selfRef=null;
+    super((records,observer)=>{
+      const self=selfRef;
+      if(document.documentElement.classList.contains('yardivo-booting')){
+        if(self){
+          self.__yardivoPending=true;
+          self.__yardivoRecords=records;
+          guarded.add(self);
+        }
+        return;
+      }
+      callback(records,observer);
+    });
+    selfRef=this;
+    this.__yardivoCallback=callback;
+    this.__yardivoPending=false;
+    this.__yardivoRecords=[];
+  }
+  disconnect(){
+    guarded.delete(this);
+    this.__yardivoPending=false;
+    this.__yardivoRecords=[];
+    return super.disconnect();
+  }
+}
+
+window.MutationObserver=YardivoGuardedMutationObserver;
+window.__YARDIVO_WELCOME_MO_GUARD__={
+  flush(){
+    const pending=Array.from(guarded);
+    guarded.clear();
+    pending.forEach(obs=>{
+      if(!obs.__yardivoPending)return;
+      obs.__yardivoPending=false;
+      const records=obs.__yardivoRecords||[];
+      obs.__yardivoRecords=[];
+      try{obs.__yardivoCallback(records,obs)}catch(e){console.error(e)}
+    });
+  }
+};
+
+window.addEventListener('yardivo:welcome-complete',()=>{
+  requestAnimationFrame(()=>window.__YARDIVO_WELCOME_MO_GUARD__?.flush?.());
+},{once:true});
+})();
+</script>
+<style id="yardivo-welcome-css-progress-fallback-v1-20260901">
+/* Compositor-driven fallback: even before/without JS timer paints, the bar itself progresses. */
+@keyframes yardivoWelcomeProgressFallback{
+  from{width:0%}
+  to{width:100%}
+}
+html.yardivo-booting #yardivoWelcomeBar{
+  animation:yardivoWelcomeProgressFallback 5.2s linear forwards;
+  will-change:width;
+}
+html.yardivo-welcome-complete #yardivoWelcomeBar{
+  animation:none!important;
+  width:100%!important;
+}
+</style>
+
 </head>
 <body>
 <button aria-label="Uključi full screen" id="yardivoFullscreenBtn" title="Full screen" type="button"><span class="fs-icon">⛶</span><span class="fs-label">FULL SCREEN</span></button>
@@ -6139,12 +6217,14 @@ html[data-theme="light"] .yardivo-welcome-copy{color:#7a909f}
 let started=false;
 let finished=false;
 let timer=null;
+let rafId=0;
 const WELCOME_MS=5200;
 
 function revealLogin(){
   if(finished)return;
   finished=true;
   if(timer){clearInterval(timer);timer=null;}
+  if(rafId){cancelAnimationFrame(rafId);rafId=0;}
 
   const bar=document.getElementById('yardivoWelcomeBar');
   const pct=document.getElementById('yardivoWelcomePercent');
@@ -6177,6 +6257,7 @@ function revealLogin(){
       if(splash)splash.style.display='none';
       document.documentElement.classList.remove('yardivo-booting');
       document.documentElement.classList.add('yardivo-welcome-complete');
+      try{window.dispatchEvent(new CustomEvent('yardivo:welcome-complete'))}catch(_){}
       document.body.classList.remove('yardivo-welcome-active');
       document.body.classList.add('yardivo-prelogin');
       try{YardivoLoginNotificationFix?.clearLoginOnce?.()}catch(e){}
@@ -6223,23 +6304,30 @@ function start(){
   const startedAt=performance.now();
   let stage=0;
 
-  timer=setInterval(()=>{
+  let lastValue=-1;
+  function tick(now){
     if(finished)return;
-    const elapsed=performance.now()-startedAt;
+    const elapsed=now-startedAt;
     const value=Math.min(100,Math.round((elapsed/WELCOME_MS)*100));
-    bar.style.width=value+'%';
-    pct.textContent=value+'%';
 
-    while(stage<stages.length&&value>=stages[stage][0]){
-      if(status)status.textContent=stages[stage][1];
-      stage++;
+    if(value!==lastValue){
+      lastValue=value;
+      bar.style.width=value+'%';
+      pct.textContent=value+'%';
+      while(stage<stages.length&&value>=stages[stage][0]){
+        if(status)status.textContent=stages[stage][1];
+        stage++;
+      }
     }
 
     if(value>=100){
-      clearInterval(timer);timer=null;
+      rafId=0;
       setTimeout(revealLogin,220);
+      return;
     }
-  },50);
+    rafId=requestAnimationFrame(tick);
+  }
+  rafId=requestAnimationFrame(tick);
 }
 
 if(document.readyState==='loading'){
