@@ -13054,7 +13054,24 @@ function normRole(v){
 }
 function setLoginError(msg){
   const e=document.getElementById('loginError');
-  if(e){e.textContent=msg;e.style.borderColor='#7b3138';e.style.background='#2b1115';e.style.color='#ff9ba0'}
+  if(!e)return;
+  const text=String(msg||'Prijava nije uspjela.');
+  e.textContent=text;
+  e.style.setProperty('display','block','important');
+  e.style.setProperty('visibility','visible','important');
+  e.style.setProperty('opacity','1','important');
+  e.style.setProperty('min-height','42px','important');
+  e.style.setProperty('padding','10px 12px','important');
+  e.style.setProperty('margin-top','10px','important');
+  e.style.setProperty('border','1px solid #9b343b','important');
+  e.style.setProperty('border-radius','7px','important');
+  e.style.setProperty('background','#351317','important');
+  e.style.setProperty('color','#ffb1b5','important');
+  e.style.setProperty('font-weight','900','important');
+  e.style.setProperty('line-height','1.4','important');
+  e.style.setProperty('box-shadow','0 0 0 2px rgba(220,52,60,.08),0 8px 24px rgba(0,0,0,.18)','important');
+  e.setAttribute('role','alert');
+  e.setAttribute('aria-live','assertive');
 }
 function persistAppSession(session){
   try{
@@ -30792,6 +30809,139 @@ if(role){
 }
 
 window.YardivoLoginFeedback={feedback,changePassword:voluntaryPasswordChange,labels:LABELS};
+})();
+</script>
+
+
+<style id="yardivo-login-error-hard-visible-v2-20260901">
+#loginOverlay #loginError{
+  display:none;
+  width:100%;
+  box-sizing:border-box;
+}
+#loginOverlay #loginError:not(:empty){
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  min-height:42px!important;
+  padding:10px 12px!important;
+  margin-top:10px!important;
+  border:1px solid #9b343b!important;
+  border-radius:7px!important;
+  background:#351317!important;
+  color:#ffb1b5!important;
+  font-weight:900!important;
+  line-height:1.4!important;
+  box-shadow:0 0 0 2px rgba(220,52,60,.08),0 8px 24px rgba(0,0,0,.18)!important;
+}
+#loginOverlay.yardivo-login-error-shake .login-card,
+#loginOverlay.yardivo-login-error-shake .login-box{
+  animation:yardivoLoginErrorShake .28s linear 1;
+}
+@keyframes yardivoLoginErrorShake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-5px)}
+  75%{transform:translateX(5px)}
+}
+</style>
+
+<script id="yardivo-login-error-hard-visible-v2-20260901-js">
+(function(){
+'use strict';
+
+function errorBox(){return document.getElementById('loginError')}
+function button(){return document.getElementById('loginSubmitBtn')}
+function unlock(){
+  const b=button();
+  if(b){
+    b.disabled=false;
+    b.removeAttribute('disabled');
+    b.style.removeProperty('pointer-events');
+    b.style.removeProperty('opacity');
+  }
+  document.querySelectorAll('#loginForm input,#loginForm select,#loginForm button').forEach(el=>{
+    if(el.id!=='loginSubmitBtn' && el.id!=='loginChangePasswordBtn')el.disabled=false;
+  });
+}
+function showRed(text){
+  const e=errorBox();if(!e)return;
+  const t=String(text||'PRIJAVA NIJE USPJELA.');
+  e.textContent=t;
+  e.setAttribute('role','alert');
+  e.setAttribute('aria-live','assertive');
+  e.style.setProperty('display','block','important');
+  e.style.setProperty('visibility','visible','important');
+  e.style.setProperty('opacity','1','important');
+  e.style.setProperty('background','#351317','important');
+  e.style.setProperty('border','1px solid #9b343b','important');
+  e.style.setProperty('color','#ffb1b5','important');
+  e.style.setProperty('padding','10px 12px','important');
+  const overlay=document.getElementById('loginOverlay');
+  overlay?.classList.remove('yardivo-login-error-shake');
+  void overlay?.offsetWidth;
+  overlay?.classList.add('yardivo-login-error-shake');
+  setTimeout(()=>overlay?.classList.remove('yardivo-login-error-shake'),350);
+  unlock();
+}
+function normalize(){
+  const e=errorBox();if(!e)return;
+  const raw=String(e.textContent||'').trim();
+  if(!raw)return;
+
+  if(/KRIVA ROLA/i.test(raw)){
+    showRed(raw.replace(/^KRIVA ROLA\s*[—:-]?\s*/i,'KRIVA ROLA — '));
+    return;
+  }
+  if(/Invalid login credentials|Pogrešno korisničko ime ili lozinka|POGREŠAN PASSWORD/i.test(raw)){
+    showRed('POGREŠAN PASSWORD — ili korisničko ime ne postoji.');
+    return;
+  }
+  if(/Prijava nije uspjela|račun nije aktivan|identitet korisnika/i.test(raw)){
+    showRed(raw);
+  }
+}
+
+/* Watch every write made by any older auth layer. */
+window.addEventListener('load',()=>{
+  const e=errorBox();
+  if(e)new MutationObserver(normalize).observe(e,{childList:true,subtree:true,characterData:true,attributes:true});
+  normalize();
+},{once:true});
+
+/* On every login attempt, clear old error, then guarantee the form is never left locked.
+   12 s is only a UI fail-safe; normal Supabase failures return immediately. */
+document.addEventListener('click',ev=>{
+  if(!ev.target.closest?.('#loginSubmitBtn'))return;
+  const e=errorBox();if(e)e.textContent='';
+  const token=Date.now();
+  window.__yardivoLoginAttemptToken=token;
+  setTimeout(()=>{
+    if(window.__yardivoLoginAttemptToken!==token)return;
+    const overlay=document.getElementById('loginOverlay');
+    const stillLogin=overlay && getComputedStyle(overlay).display!=='none';
+    const b=button();
+    if(stillLogin && b?.disabled){
+      showRed('PRIJAVA NIJE USPJELA — provjeri korisničko ime, password i rolu te pokušaj ponovno.');
+    }
+  },12000);
+},true);
+
+document.addEventListener('submit',ev=>{
+  if(ev.target?.id!=='loginForm')return;
+  const e=errorBox();if(e)e.textContent='';
+},true);
+
+/* If an auth handler finishes with an error, it normally writes loginError.
+   This periodic micro-check only runs while Login is visible and never changes successful sessions. */
+setInterval(()=>{
+  const overlay=document.getElementById('loginOverlay');
+  if(!overlay || getComputedStyle(overlay).display==='none')return;
+  normalize();
+  const e=errorBox();
+  if(e && e.textContent.trim())unlock();
+},500);
+
+window.YardivoLoginErrorUI={show:showRed,unlock,normalize};
 })();
 </script>
 
