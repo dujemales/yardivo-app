@@ -28810,5 +28810,320 @@ window.YardivoFullOperationalReset={run:fullDelete,homeZero:updateHomeZero};
 })();
 </script>
 
+
+<style id="yardivo-home-original-blue-dark-v1-20260901">
+/* Početni izbornik u Dark modeu uvijek koristi autentični ORIGINAL PLAVI YARDIVO izgled. */
+html[data-yardivo-main-theme="dark"] body.home-menu-mode,
+html[data-yardivo-main-theme="dark"] body.home-menu-mode #homeMenu,
+html[data-yardivo-main-theme="dark"] body.home-menu-mode .main,
+html[data-yardivo-main-theme="dark"] body.home-menu-mode .main-content{
+  background:#07131f!important;
+  background-image:none!important;
+  color:#edf6ff!important;
+}
+html[data-yardivo-main-theme="dark"] body.home-menu-mode .topbar,
+html[data-yardivo-main-theme="dark"] body.home-menu-mode .app-header{
+  background:#091827!important;
+  border-color:#26435a!important;
+  color:#edf6ff!important;
+}
+html[data-yardivo-main-theme="dark"] body.home-menu-mode #homeMenu .home-menu-wrap{
+  background:#07131f!important;
+  background-image:none!important;
+}
+html[data-yardivo-main-theme="dark"] body.home-menu-mode #homeMenu .home-menu-card{
+  background:#0d1b29!important;
+  background-image:none!important;
+  border-color:#26435a!important;
+  color:#edf6ff!important;
+  box-shadow:none!important;
+}
+html[data-yardivo-main-theme="dark"] body.home-menu-mode #homeMenu .home-menu-card:hover{
+  background:#102b42!important;
+  border-color:#2489eb!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.22)!important;
+}
+html[data-yardivo-main-theme="dark"] body.home-menu-mode #homeMenu .home-menu-card h3,
+html[data-yardivo-main-theme="dark"] body.home-menu-mode #homeMenu .home-selected-location.selected{
+  color:#edf6ff!important;
+}
+html[data-yardivo-main-theme="dark"] body.home-menu-mode #homeMenu .home-menu-card p,
+html[data-yardivo-main-theme="dark"] body.home-menu-mode #homeMenu .home-menu-card small,
+html[data-yardivo-main-theme="dark"] body.home-menu-mode #homeMenu #homeMenuSubtitle{
+  color:#94a9b9!important;
+}
+html[data-yardivo-main-theme="dark"] body.home-menu-mode #homeMenu .home-menu-card .icon{
+  color:#2489eb!important;
+}
+html[data-yardivo-main-theme="dark"] body.home-menu-mode #homeMenu .yardivo-home-zero-count{
+  background:#10263a!important;
+  border-color:#26435a!important;
+  color:#edf6ff!important;
+}
+</style>
+
+
+<style id="yardivo-notification-delete-read-style-v1-20260901">
+/* Pročitane notifikacije više ne glowaju. */
+#notifList .notif-item:not(.y5-unread),
+#yardivoNotificationHistory .y5-history-card.read{
+  box-shadow:none!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+#yardivoNotificationHistory .y5-history-card.read{
+  border-left-color:var(--theme-border,#315166)!important;
+  background:var(--theme-panel,#0a1c29)!important;
+  opacity:.72!important;
+}
+#yardivoNotificationHistory .y5-history-card.read::before,
+#yardivoNotificationHistory .y5-history-card.read::after{
+  box-shadow:none!important;
+  filter:none!important;
+}
+
+/* Novi gumb za potpuno brisanje povijesti notifikacija. */
+#yardivoNotificationHistory .y5-clear-all{
+  background:#fff5f5!important;
+  color:#a52c35!important;
+  border:1px solid #dfa3a8!important;
+  font-weight:1000!important;
+}
+html[data-yardivo-main-theme="dark"] #yardivoNotificationHistory .y5-clear-all{
+  background:#321419!important;
+  color:#ffb3b8!important;
+  border-color:#8f3b43!important;
+}
+</style>
+
+<script id="yardivo-notification-delete-read-style-v1-20260901-js">
+(function(){
+'use strict';
+const KEY='yardivo_live_notifications_v1';
+const SEEN='yardivo_notification_seen_v5';
+
+function clearUi(){
+  try{localStorage.setItem(KEY,'[]')}catch(_){}
+  try{sessionStorage.removeItem(SEEN)}catch(_){}
+  try{window.YardivoNotifications?.save?.([])}catch(_){}
+  try{window.YardivoNotifications?.render?.()}catch(_){}
+
+  ['notifCount','opsAlertBadge'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){
+      el.textContent='0';
+      el.style.setProperty('display','none','important');
+    }
+  });
+
+  const list=document.getElementById('notifList');
+  if(list)list.innerHTML='<div class="notif-empty">Nema novih notifikacija.</div>';
+
+  const hist=document.getElementById('yardivoNotificationHistory');
+  if(hist){
+    hist.innerHTML='<div class="notif-empty">Nema notifikacija.</div>';
+  }
+}
+async function clearAll(){
+  const ok=confirm('Izbrisati cijelu povijest notifikacija?');
+  if(!ok)return;
+
+  clearUi();
+
+  try{
+    if(typeof putCloudState==='function'){
+      await Promise.resolve(putCloudState(KEY,'[]'));
+    }
+  }catch(e){
+    console.warn('YARDIVO notification clear cloud',e);
+  }
+
+  try{window.YardivoNotifications?.render?.()}catch(_){}
+}
+function addClearButton(){
+  const host=document.getElementById('yardivoNotificationHistory');
+  if(!host)return;
+  const toolbar=host.querySelector('.y5-notif-toolbar');
+  if(!toolbar || toolbar.querySelector('.y5-clear-all'))return;
+
+  const b=document.createElement('button');
+  b.type='button';
+  b.className='action y5-clear-all';
+  b.textContent='IZBRIŠI SVE NOTIFIKACIJE';
+  b.addEventListener('click',e=>{
+    e.preventDefault();
+    e.stopPropagation();
+    clearAll();
+  });
+  toolbar.appendChild(b);
+}
+function cleanupReadGlow(){
+  document.querySelectorAll('#yardivoNotificationHistory .y5-history-card.read').forEach(el=>{
+    el.classList.remove('unread','y5-unread');
+    el.style.setProperty('box-shadow','none','important');
+    el.style.setProperty('filter','none','important');
+  });
+}
+
+/* Hook existing notification render without replacing its data model. */
+const oldRender=window.YardivoNotifications?.render;
+if(window.YardivoNotifications && typeof oldRender==='function'){
+  window.YardivoNotifications.render=function(){
+    const out=oldRender.apply(this,arguments);
+    setTimeout(()=>{addClearButton();cleanupReadGlow()},0);
+    return out;
+  };
+}
+
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-view="operations"],[data-home-target="operations"],#notifBell')){
+    setTimeout(()=>{addClearButton();cleanupReadGlow()},60);
+  }
+},true);
+
+window.addEventListener('load',()=>setTimeout(()=>{addClearButton();cleanupReadGlow()},900),{once:true});
+setInterval(()=>{addClearButton();cleanupReadGlow()},1200);
+
+window.YardivoNotificationAdmin={clearAll,cleanupReadGlow};
+})();
+</script>
+
+
+<style id="yardivo-notification-sound-v1-20260901">
+#yardivoNotifSoundToggle{
+  margin-left:8px!important;
+  min-height:32px!important;
+  padding:0 10px!important;
+  border-radius:7px!important;
+  font-size:8px!important;
+  font-weight:1000!important;
+}
+</style>
+
+<script id="yardivo-notification-sound-v1-20260901-js">
+(function(){
+'use strict';
+
+const KEY='yardivo_notification_sound_v1';
+let audioCtx=null,lastPlayed=0;
+
+function enabled(){
+  try{return localStorage.getItem(KEY)!=='off'}catch(_){return true}
+}
+function setEnabled(v){
+  try{localStorage.setItem(KEY,v?'on':'off')}catch(_){}
+  updateToggle();
+}
+function ctx(){
+  if(audioCtx)return audioCtx;
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC)return null;
+  try{audioCtx=new AC()}catch(_){audioCtx=null}
+  return audioCtx;
+}
+function unlock(){
+  const c=ctx();
+  if(c&&c.state==='suspended'){try{c.resume()}catch(_){}}
+}
+function chime(){
+  if(!enabled())return;
+  const now=Date.now();
+  if(now-lastPlayed<900)return;
+  lastPlayed=now;
+
+  const c=ctx();
+  if(!c)return;
+  try{
+    if(c.state==='suspended')c.resume();
+
+    const master=c.createGain();
+    master.gain.setValueAtTime(.0001,c.currentTime);
+    master.gain.exponentialRampToValueAtTime(.15,c.currentTime+.015);
+    master.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.72);
+    master.connect(c.destination);
+
+    const notes=[
+      {f:880,t:0,d:.18},
+      {f:1174.66,t:.20,d:.22},
+      {f:1567.98,t:.43,d:.24}
+    ];
+    notes.forEach(n=>{
+      const o=c.createOscillator();
+      const g=c.createGain();
+      o.type='sine';
+      o.frequency.setValueAtTime(n.f,c.currentTime+n.t);
+      g.gain.setValueAtTime(.0001,c.currentTime+n.t);
+      g.gain.exponentialRampToValueAtTime(.9,c.currentTime+n.t+.01);
+      g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+n.t+n.d);
+      o.connect(g);g.connect(master);
+      o.start(c.currentTime+n.t);
+      o.stop(c.currentTime+n.t+n.d+.02);
+    });
+  }catch(e){
+    console.warn('YARDIVO notification sound',e);
+  }
+}
+function updateToggle(){
+  const b=document.getElementById('yardivoNotifSoundToggle');
+  if(!b)return;
+  b.textContent=enabled()?'🔔 ZVUK UKLJUČEN':'🔕 ZVUK ISKLJUČEN';
+  b.setAttribute('aria-pressed',enabled()?'true':'false');
+}
+function addToggle(){
+  const host=document.getElementById('yardivoNotificationHistory');
+  const toolbar=host?.querySelector('.y5-notif-toolbar');
+  if(!toolbar||document.getElementById('yardivoNotifSoundToggle'))return;
+
+  const b=document.createElement('button');
+  b.type='button';
+  b.id='yardivoNotifSoundToggle';
+  b.className='action';
+  b.onclick=e=>{
+    e.preventDefault();
+    e.stopPropagation();
+    unlock();
+    setEnabled(!enabled());
+    if(enabled())setTimeout(chime,50);
+  };
+  toolbar.appendChild(b);
+  updateToggle();
+}
+
+/* Browser audio policies require a user gesture before sound can play.
+   Any first click/key interaction unlocks the AudioContext. */
+['pointerdown','keydown','touchstart'].forEach(ev=>{
+  window.addEventListener(ev,unlock,{once:true,capture:true});
+});
+
+/* Hook the notification toast path: a genuinely new unread notification plays the bell.
+   Existing history and read actions never play a sound. */
+function hookToast(){
+  if(window.YardivoNotificationSoundHooked)return;
+  const orig=window.YardivoNotifications;
+  if(!orig)return;
+
+  let prev=0;
+  try{prev=orig.unreadCount?.()||0}catch(_){}
+
+  setInterval(()=>{
+    let n=0;
+    try{n=orig.unreadCount?.()||0}catch(_){}
+    if(n>prev && document.visibilityState!=='prerender')chime();
+    prev=n;
+  },450);
+
+  window.YardivoNotificationSoundHooked=true;
+}
+
+window.addEventListener('load',()=>setTimeout(()=>{hookToast();addToggle()},1000),{once:true});
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-view="operations"],[data-home-target="operations"]'))setTimeout(addToggle,80);
+},true);
+setInterval(addToggle,1400);
+
+window.YardivoNotificationSound={play:chime,enabled,setEnabled};
+})();
+</script>
+
 </body>
 </html>
