@@ -24949,6 +24949,7 @@ window.YardivoLoginFinalizer={finalize:finalizeLogin};
 })();
 </script>
 <script id="yardivo-canonical-login-router-v1-20260901">
+
 (function(){
 'use strict';
 
@@ -25073,27 +25074,20 @@ async function canonicalLogin(){
   if(btn)btn.disabled=true;
   message('Provjera podataka i prijava…','work');
 
+  const timeout=(promise,ms=8000)=>Promise.race([
+    Promise.resolve(promise),
+    new Promise((_,reject)=>setTimeout(()=>reject(new Error('AUTH_TIMEOUT')),ms))
+  ]);
+
   try{
     let ok=false;
-    let primaryError=null;
 
-    /* Use the existing server-authoritative auth path first. */
-    if(window.YardivoAuth?.login){
-      try{
-        ok=await window.YardivoAuth.login();
-      }catch(e){
-        primaryError=e;
-      }
-    }
-
-    /* If the Supabase JS library did not load, use direct Supabase REST auth.
-       This makes Login independent from the external supabase-js CDN. */
-    if(!ok){
-      const errText=document.getElementById('loginError')?.textContent||'';
-      const libraryMissing=!window.supabase?.createClient || /biblioteka nije učitana/i.test(errText);
-      if(libraryMissing || primaryError){
-        ok=await directSupabaseLogin();
-      }
+    /* Exactly one authentication path per click.
+       Do not retry wrong credentials through a second auth owner. */
+    if(window.YardivoAuth?.login && window.supabase?.createClient){
+      ok=await timeout(window.YardivoAuth.login(),8000);
+    }else{
+      ok=await timeout(directSupabaseLogin(),8000);
     }
 
     if(ok){
@@ -25110,16 +25104,27 @@ async function canonicalLogin(){
       return;
     }
 
-    /* Existing authoritativeLogin normally writes the exact server error itself. */
-    const current=document.getElementById('loginError')?.textContent||'';
+    const current=String(document.getElementById('loginError')?.textContent||'').trim();
     if(!current || /Provjera podataka/i.test(current)){
-      message('Prijava nije uspjela. Provjeri podatke i odabranu rolu.','error');
+      message('POGREŠAN PASSWORD — ili korisničko ime ne postoji.','error');
     }
   }catch(e){
-    message(e?.message||'Prijava nije uspjela.','error');
+    const msg=String(e?.message||'');
+    if(msg==='AUTH_TIMEOUT'){
+      message('PRIJAVA NIJE USPJELA — server nije odgovorio. Pokušaj ponovno.','error');
+    }else if(/invalid login credentials/i.test(msg)){
+      message('POGREŠAN PASSWORD — ili korisničko ime ne postoji.','error');
+    }else{
+      message(msg||'PRIJAVA NIJE USPJELA.','error');
+    }
   }finally{
     busy=false;
-    if(btn)btn.disabled=false;
+    if(btn){
+      btn.disabled=false;
+      btn.removeAttribute('disabled');
+      btn.style.removeProperty('pointer-events');
+      btn.style.removeProperty('opacity');
+    }
   }
 }
 
@@ -30909,7 +30914,7 @@ window.addEventListener('load',()=>{
 },{once:true});
 
 /* On every login attempt, clear old error, then guarantee the form is never left locked.
-   12 s is only a UI fail-safe; normal Supabase failures return immediately. */
+   9 s is only a UI fail-safe; normal Supabase failures return immediately. */
 document.addEventListener('click',ev=>{
   if(!ev.target.closest?.('#loginSubmitBtn'))return;
   const e=errorBox();if(e)e.textContent='';
@@ -30923,7 +30928,7 @@ document.addEventListener('click',ev=>{
     if(stillLogin && b?.disabled){
       showRed('PRIJAVA NIJE USPJELA — provjeri korisničko ime, password i rolu te pokušaj ponovno.');
     }
-  },12000);
+  },9000);
 },true);
 
 document.addEventListener('submit',ev=>{
@@ -30931,17 +30936,50 @@ document.addEventListener('submit',ev=>{
   const e=errorBox();if(e)e.textContent='';
 },true);
 
-/* If an auth handler finishes with an error, it normally writes loginError.
-   This periodic micro-check only runs while Login is visible and never changes successful sessions. */
-setInterval(()=>{
-  const overlay=document.getElementById('loginOverlay');
-  if(!overlay || getComputedStyle(overlay).display==='none')return;
-  normalize();
-  const e=errorBox();
-  if(e && e.textContent.trim())unlock();
-},500);
-
 window.YardivoLoginErrorUI={show:showRed,unlock,normalize};
+})();
+</script>
+
+
+<script id="yardivo-login-no-freeze-final-v1-20260901-js">
+(function(){
+'use strict';
+let attempt=0;
+function err(){return document.getElementById('loginError')}
+function btn(){return document.getElementById('loginSubmitBtn')}
+function unlock(){
+ const b=btn();if(!b)return;
+ b.disabled=false;b.removeAttribute('disabled');
+ b.style.removeProperty('pointer-events');b.style.removeProperty('opacity');
+}
+function fail(text){
+ const e=err();
+ if(e){
+   e.textContent=text;
+   e.style.setProperty('display','block','important');
+   e.style.setProperty('visibility','visible','important');
+   e.style.setProperty('opacity','1','important');
+   e.style.setProperty('background','#351317','important');
+   e.style.setProperty('border','1px solid #d94a52','important');
+   e.style.setProperty('color','#ffb1b5','important');
+ }
+ unlock();
+}
+document.addEventListener('click',e=>{
+ if(!e.target.closest?.('#loginSubmitBtn'))return;
+ const mine=++attempt;
+ setTimeout(()=>{
+   if(mine!==attempt)return;
+   const overlay=document.getElementById('loginOverlay');
+   if(!overlay||getComputedStyle(overlay).display==='none')return;
+   const t=String(err()?.textContent||'');
+   if(/Provjera podataka|prijava…|prijava\.\.\./i.test(t) || btn()?.disabled){
+     fail('PRIJAVA NIJE USPJELA — server nije odgovorio. Pokušaj ponovno.');
+   }
+ },8500);
+},true);
+window.addEventListener('yardivo:login',()=>{attempt++;unlock()});
+window.YardivoLoginNoFreeze={fail,unlock};
 })();
 </script>
 
