@@ -24975,84 +24975,171 @@ html.yardivo-welcome-complete #yardivoWelcomeSplash,
 }
 </style>
 
-<script id="yardivo-login-interaction-hardening-v1-20260901">
+
+<style id="yardivo-login-safe-isolation-v2-20260901">
+/* Login owns the top interaction layer after Welcome. */
+html.yardivo-welcome-complete,
+html.yardivo-welcome-complete body{
+  pointer-events:auto!important;
+}
+html.yardivo-welcome-complete #loginOverlay{
+  z-index:2147483647!important;
+  pointer-events:auto!important;
+  isolation:isolate!important;
+}
+html.yardivo-welcome-complete #loginOverlay .login-card{
+  position:relative!important;
+  z-index:2147483647!important;
+  pointer-events:auto!important;
+}
+html.yardivo-welcome-complete #loginOverlay .login-card *{
+  pointer-events:auto!important;
+}
+html.yardivo-welcome-complete #loginUser,
+html.yardivo-welcome-complete #loginPass{
+  pointer-events:auto!important;
+  user-select:text!important;
+  -webkit-user-select:text!important;
+  cursor:text!important;
+}
+html.yardivo-welcome-complete #loginRole,
+html.yardivo-welcome-complete #rememberMe,
+html.yardivo-welcome-complete #loginSubmitBtn,
+html.yardivo-welcome-complete #loginChangePasswordBtn{
+  pointer-events:auto!important;
+  cursor:pointer!important;
+}
+</style>
+
+<script id="yardivo-login-safe-isolation-v2-20260901-js">
 (function(){
 'use strict';
 
-function unlock(){
-  if(!document.documentElement.classList.contains('yardivo-welcome-complete'))return false;
+function sessionActive(){
+  try{return !!window.currentSession?.role}catch(_){return false}
+}
 
-  document.documentElement.classList.remove('yardivo-booting');
-  document.body.classList.remove('yardivo-welcome-active');
-
-  /* Restore the native observer constructor after startup. */
-  try{
-    const g=window.__YARDIVO_WELCOME_MO_GUARD__;
-    if(g?.native){
-      window.MutationObserver=g.native;
-    }
-  }catch(_){}
+function forceInteractive(){
+  if(sessionActive())return false;
 
   const splash=document.getElementById('yardivoWelcomeSplash');
-  if(splash){
-    splash.classList.add('hide');
-    splash.style.setProperty('display','none','important');
-    splash.style.setProperty('pointer-events','none','important');
-  }
-
   const overlay=document.getElementById('loginOverlay');
   const form=document.getElementById('loginForm');
   if(!overlay||!form)return false;
 
-  [overlay,form].forEach(el=>{
+  /* Do not unlock before Welcome has actually finished. */
+  const welcomeDone=
+    document.documentElement.classList.contains('yardivo-welcome-complete') ||
+    (splash && (splash.classList.contains('hide') || splash.style.display==='none'));
+  if(!welcomeDone)return false;
+
+  document.documentElement.classList.remove('yardivo-booting');
+  document.documentElement.classList.add('yardivo-welcome-complete','yardivo-login-ready');
+  document.body.classList.remove('yardivo-welcome-active');
+  document.body.classList.add('yardivo-prelogin');
+
+  /* Remove Welcome from the DOM entirely. It can no longer intercept anything. */
+  if(splash)splash.remove();
+
+  /* Move the real ORIGINAL login node to the end of BODY.
+     Existing auth listeners stay attached because the same DOM node is moved, not cloned. */
+  if(overlay.parentElement!==document.body || overlay!==document.body.lastElementChild){
+    document.body.appendChild(overlay);
+  }
+
+  [document.documentElement,document.body,overlay,form].forEach(el=>{
+    if(!el)return;
     el.removeAttribute('inert');
     el.removeAttribute('aria-disabled');
     el.style.setProperty('pointer-events','auto','important');
   });
+
   overlay.setAttribute('aria-hidden','false');
   overlay.style.setProperty('display','flex','important');
   overlay.style.setProperty('visibility','visible','important');
   overlay.style.setProperty('opacity','1','important');
+  overlay.style.setProperty('z-index','2147483647','important');
 
-  ['loginUser','loginPass','loginRole','rememberMe','loginSubmitBtn','loginChangePasswordBtn'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el)return;
+  const controls=[
+    document.getElementById('loginUser'),
+    document.getElementById('loginPass'),
+    document.getElementById('loginRole'),
+    document.getElementById('rememberMe'),
+    document.getElementById('loginSubmitBtn'),
+    document.getElementById('loginChangePasswordBtn')
+  ].filter(Boolean);
+
+  controls.forEach(el=>{
     el.disabled=false;
     el.removeAttribute('disabled');
+    el.removeAttribute('readonly');
     el.removeAttribute('inert');
     el.removeAttribute('aria-disabled');
     el.removeAttribute('aria-hidden');
     el.style.setProperty('pointer-events','auto','important');
   });
+
+  const u=document.getElementById('loginUser');
+  const p=document.getElementById('loginPass');
+  if(u){
+    u.tabIndex=0;
+    u.style.setProperty('user-select','text','important');
+    u.style.setProperty('-webkit-user-select','text','important');
+  }
+  if(p){
+    p.tabIndex=0;
+    p.style.setProperty('user-select','text','important');
+    p.style.setProperty('-webkit-user-select','text','important');
+  }
+
   return true;
 }
 
-/* Extra hardening: even if a transparent legacy layer catches the pointer,
-   clicking inside username/password geometry focuses the intended real input. */
+/* Coordinate fallback:
+   even if a stale transparent legacy element becomes the event target,
+   clicking where username/password physically are focuses the real input. */
 document.addEventListener('pointerdown',function(e){
-  if(!document.documentElement.classList.contains('yardivo-welcome-complete'))return;
+  if(sessionActive())return;
+  const overlay=document.getElementById('loginOverlay');
+  if(!overlay || getComputedStyle(overlay).display==='none')return;
+
   for(const id of ['loginUser','loginPass']){
     const el=document.getElementById(id);
     if(!el)continue;
     const r=el.getBoundingClientRect();
-    if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom){
-      if(document.activeElement!==el){
-        try{el.focus({preventScroll:true})}catch(_){el.focus()}
-      }
+    if(e.clientX>=r.left && e.clientX<=r.right && e.clientY>=r.top && e.clientY<=r.bottom){
+      el.disabled=false;
+      el.removeAttribute('readonly');
+      try{el.focus({preventScroll:true})}catch(_){el.focus()}
       return;
     }
   }
 },true);
 
+/* Keyboard fallback makes the login usable even before first mouse interaction. */
+document.addEventListener('keydown',function(e){
+  if(sessionActive())return;
+  const overlay=document.getElementById('loginOverlay');
+  if(!overlay || getComputedStyle(overlay).display==='none')return;
+  if(e.key==='Tab' && !overlay.contains(document.activeElement)){
+    const u=document.getElementById('loginUser');
+    if(u){e.preventDefault();u.focus()}
+  }
+},true);
+
 window.addEventListener('yardivo:welcome-complete',()=>{
-  requestAnimationFrame(()=>requestAnimationFrame(unlock));
+  requestAnimationFrame(()=>requestAnimationFrame(forceInteractive));
 });
+
+/* Independent fallback: after Welcome duration, unlock if the Login is present.
+   This deliberately does not depend on a body class being correct. */
 window.addEventListener('load',()=>{
-  setTimeout(unlock,5800);
-  setTimeout(unlock,6800);
+  setTimeout(forceInteractive,5700);
+  setTimeout(forceInteractive,6200);
+  setTimeout(forceInteractive,7000);
 },{once:true});
 
-window.YardivoLoginInteraction={unlock};
+window.YardivoLoginSafeIsolation={forceInteractive};
 })();
 </script>
 
