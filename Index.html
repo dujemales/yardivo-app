@@ -24732,30 +24732,30 @@ function cleanSettings(){
   if(panel){
     const head=panel.querySelector('h2');
     const small=panel.querySelector('.panel-head small');
-    if(head)head.textContent='DARK MODE';
-    if(small)small.textContent='Odaberi ORIGINAL PLAVI ili DARK GREY. Mape uvijek ostaju plave.';
+    if(head&&head.textContent!=='DARK MODE')head.textContent='DARK MODE';
+    if(small&&small.textContent!=='Odaberi ORIGINAL PLAVI ili DARK GREY. Mape uvijek ostaju plave.')small.textContent='Odaberi ORIGINAL PLAVI ili DARK GREY. Mape uvijek ostaju plave.';
     const original=panel.querySelector('[data-dark-style="original"]');
     const graphite=panel.querySelector('[data-dark-style="graphite"]');
     if(original){
       const strong=original.querySelector('strong'), sm=original.querySelector('small');
-      if(strong)strong.textContent='ORIGINAL PLAVI';
-      if(sm)sm.textContent='Prvotni YARDIVO tamno-plavi izgled, bez zelenih detalja.';
+      if(strong&&strong.textContent!=='ORIGINAL PLAVI')strong.textContent='ORIGINAL PLAVI';
+      if(sm&&sm.textContent!=='Prvotni YARDIVO tamno-plavi izgled, bez zelenih detalja.')sm.textContent='Prvotni YARDIVO tamno-plavi izgled, bez zelenih detalja.';
     }
     if(graphite){
       const strong=graphite.querySelector('strong'), sm=graphite.querySelector('small');
-      if(strong)strong.textContent='DARK GREY';
-      if(sm)sm.textContent='Tamno-sivi izgled sa sitnim zelenim hover detaljima.';
+      if(strong&&strong.textContent!=='DARK GREY')strong.textContent='DARK GREY';
+      if(sm&&sm.textContent!=='Tamno-sivi izgled sa sitnim zelenim hover detaljima.')sm.textContent='Tamno-sivi izgled sa sitnim zelenim hover detaljima.';
     }
   }
 
   const v2=document.getElementById('yardivoThemeSettingsV2');
   if(v2){
     const title=v2.querySelector('.yt-title');
-    if(title)title.textContent='DARK MODE';
+    if(title&&title.textContent!=='DARK MODE')title.textContent='DARK MODE';
     const original=v2.querySelector('[data-dark-look="original"]');
     const graphite=v2.querySelector('[data-dark-look="graphite"]');
-    if(original)original.textContent='ORIGINAL PLAVI';
-    if(graphite)graphite.textContent='DARK GREY';
+    if(original&&original.textContent!=='ORIGINAL PLAVI')original.textContent='ORIGINAL PLAVI';
+    if(graphite&&graphite.textContent!=='DARK GREY')graphite.textContent='DARK GREY';
   }
   apply();
 }
@@ -24778,7 +24778,9 @@ document.addEventListener('click',e=>{
 
 window.addEventListener('load',()=>setTimeout(()=>{cleanSettings();apply()},500));
 window.addEventListener('yardivo:login',()=>setTimeout(()=>{cleanSettings();apply()},80));
-new MutationObserver(()=>cleanSettings()).observe(document.body,{childList:true,subtree:true});
+/* Do not observe the whole DOM here: cleanSettings() changes textContent itself,
+   which can create a self-triggering MutationObserver loop and block Welcome timers. */
+document.addEventListener('yardivo:settings-open',()=>{cleanSettings();apply();});
 
 window.YardivoSimpleTheme={apply,setDark,getMain,getDark};
 apply();
