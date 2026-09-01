@@ -7607,7 +7607,7 @@ AUTOMATSKA PREPORUKA</small>
 <section class="danger-zone">
 <div class="panel-head"><div><h2>OPASNA ZONA</h2><small>Samo Admin</small></div></div>
 <div class="danger-body">
-<p><strong>BRIŠI SVE NAJAVE</strong> briše samo sve najave i podatke vezane uz njih: statuse, promjene termina, dolaske, tablice/vozače i povijest najava. Dobavljači, incidenti, skladišta, rampe, praznici, postavke i korisnička prijava ostaju sačuvani.</p>
+<p><strong>BRIŠI SVE NAJAVE</strong> briše sve najave i sve podatke vezane uz njih: statuse, promjene termina, dolaske, tablice/vozače, povezane incidente, operativnu povijest i cijelu povijest notifikacija. Dobavljači, skladišta, rampe, praznici, postavke, korisnici i EPAL ostaju sačuvani.</p>
 <button class="delete-all-btn" id="deleteAllDataBtn" type="button">BRIŠI SVE NAJAVE</button>
 </div>
 </section>
@@ -28617,6 +28617,196 @@ window.addEventListener('load',()=>setTimeout(()=>{
 window.YardivoMyYardMode={set:setMode,current:()=>{
   try{return localStorage.getItem(KEY)==='2d'?'2d':'3d'}catch(_){return'3d'}
 }};
+})();
+</script>
+
+
+<style id="yardivo-full-reset-home-zero-v1-20260901">
+#homeMenuGrid .home-menu-card{position:relative!important}
+#homeMenuGrid .yardivo-home-zero-count{
+  position:absolute;
+  top:12px;
+  right:12px;
+  min-width:24px;
+  height:24px;
+  padding:0 7px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--theme-border,#cfd9df);
+  border-radius:999px;
+  background:var(--theme-panel,#fff);
+  color:var(--theme-text,#17384d);
+  font-size:9px;
+  font-weight:1000;
+  box-sizing:border-box;
+}
+</style>
+
+<script id="yardivo-full-reset-home-zero-v1-20260901-js">
+(function(){
+'use strict';
+
+const RESET_FLAG='yardivo_operational_full_reset_v1';
+let busy=false;
+
+function allAnnouncementIds(){
+  try{return new Set((Array.isArray(announcements)?announcements:[]).map(a=>String(a?.id??a?.announcement_id??'')).filter(Boolean))}
+  catch(_){return new Set()}
+}
+function setHomeZero(force){
+  const empty=force || (()=>{try{return !Array.isArray(announcements)||announcements.length===0}catch(_){return true}})();
+  const grid=document.getElementById('homeMenuGrid');
+  if(!grid)return;
+  grid.querySelectorAll('.home-menu-card').forEach(card=>{
+    let b=card.querySelector('.yardivo-home-zero-count');
+    if(!b){
+      b=document.createElement('span');
+      b.className='yardivo-home-zero-count';
+      card.appendChild(b);
+    }
+    b.textContent=empty?'0':'';
+    b.style.display=empty?'inline-flex':'none';
+  });
+}
+function clearNotificationUi(){
+  try{localStorage.setItem('yardivo_live_notifications_v1','[]')}catch(_){}
+  try{sessionStorage.removeItem('yardivo_notification_seen_v5')}catch(_){}
+  try{window.YardivoNotifications?.save?.([])}catch(_){}
+  try{window.YardivoNotifications?.render?.()}catch(_){}
+  ['notifCount','opsAlertBadge','opsAlertCount','opsLongWait','opsBigLate','opsAtDock','opsDoneToday',
+   'incidentBadge','unannouncedNavBadge','ctCriticalBadge','dashAttentionCount'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.textContent='0';if(el.classList.contains('nav-badge'))el.style.display='none'}
+  });
+  const list=document.getElementById('notifList');if(list)list.innerHTML='<div class="notif-empty">Nema novih notifikacija.</div>';
+  const hist=document.getElementById('yardivoNotificationHistory');if(hist)hist.innerHTML='<div class="notif-empty">Nema notifikacija.</div>';
+  const alerts=document.getElementById('operationsAlerts');if(alerts)alerts.innerHTML='<div class="notice-result good" style="margin:12px"><h3>NEMA UPOZORENJA</h3><p>Trenutno nema aktivnih operativnih alarma.</p></div>';
+}
+function clearAnnouncementStorage(){
+  const exact=[
+    'yardivo_yms_announcements_v1','studenac_yms_announcements','studenac_announcements',
+    'yardivo_announcements','yms_announcements',
+    'yardivo_live_notifications_v1','yardivo_notification_seen_v5'
+  ];
+  exact.forEach(k=>{
+    try{localStorage.removeItem(k)}catch(_){}
+    try{sessionStorage.removeItem(k)}catch(_){}
+  });
+
+  /* Remove only caches/history derived from announcements/notifications.
+     User settings, suppliers, holidays, ramps, auth and EPAL stay intact. */
+  try{
+    const keys=[];
+    for(let i=0;i<localStorage.length;i++)keys.push(localStorage.key(i));
+    keys.filter(Boolean).forEach(k=>{
+      if(/(?:announcement.*history|history.*announcement|notification.*history|overview.*score|supplier.*reliability.*cache)/i.test(k)){
+        localStorage.removeItem(k);
+      }
+    });
+  }catch(_){}
+}
+async function deleteRemoteRows(ids){
+  /* Primary path: normal save transport sees [] and deletes every normalized announcement row. */
+  try{saveAnnouncements?.()}catch(_){}
+  try{await window.YardivoSupabase?.syncNow?.()}catch(_){}
+
+  /* Notification history is a separate cloud state key. */
+  try{
+    if(typeof putCloudState==='function'){
+      await Promise.resolve(putCloudState('yardivo_live_notifications_v1','[]'));
+    }
+  }catch(_){}
+}
+function refreshEverything(){
+  [
+    'render','renderAnnouncements','renderAnnouncementSchedule','renderDailyMap','renderWeeklyMap',
+    'renderWeeklyDeliveries','renderReceiving','renderOverview','renderDashboardSimple',
+    'renderOperationsPro','renderYmsAlerts','renderAfter14NoShowAlerts','renderIncidents',
+    'refreshRecommendation'
+  ].forEach(fn=>{try{if(typeof window[fn]==='function')window[fn]()}catch(_){}})
+  try{window.YardivoOverviewFullChart?.render?.()}catch(_){}
+  try{window.YardivoOverviewMaster?.render?.()}catch(_){}
+  try{window.YardivoMyYard?.render?.()}catch(_){}
+  try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+  clearNotificationUi();
+  setHomeZero(true);
+}
+async function fullDelete(){
+  if(busy)return;
+  let role='';try{role=String(currentSession?.role||'').toLowerCase()}catch(_){}
+  if(role!=='admin'){alert('Samo Admin može obrisati sve najave.');return}
+
+  const first=confirm(
+    'OBRIŠI SVE NAJAVE I SVE PODATKE VEZANE UZ NJIH?\n\n'+
+    'Brišu se najave, statusi, dolasci, promjene, vozači/tablice, operativna povijest i cijela povijest notifikacija.\n'+
+    'Dobavljači, rampe, neradni dani, postavke, korisnici i EPAL ostaju sačuvani.'
+  );
+  if(!first)return;
+  const typed=prompt('Za konačnu potvrdu upiši: OBRISI SVE');
+  if(typed===null)return;
+  const normalized=typed.trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(normalized!=='OBRISI SVE'){alert('Brisanje nije izvršeno.');return}
+
+  busy=true;
+  const btn=document.getElementById('deleteAllDataBtn');
+  if(btn){btn.disabled=true;btn.textContent='BRIŠEM…'}
+
+  const ids=allAnnouncementIds();
+
+  /* Incidents directly attached to deleted announcements are also announcement data.
+     Standalone incidents remain. */
+  try{
+    if(Array.isArray(incidents)){
+      incidents=incidents.filter(i=>!i?.announcementId || !ids.has(String(i.announcementId)));
+      try{saveIncidents?.()}catch(_){}
+    }
+  }catch(_){}
+
+  try{announcements=[]}catch(_){}
+  try{window.announcements=announcements}catch(_){}
+
+  clearAnnouncementStorage();
+  clearNotificationUi();
+
+  /* Write canonical empty announcement arrays before transport sync. */
+  try{safeStorage.setItem('yardivo_yms_announcements_v1','[]')}catch(_){}
+  try{safeStorage.setItem('studenac_yms_announcements','[]')}catch(_){}
+  try{localStorage.setItem(RESET_FLAG,new Date().toISOString())}catch(_){}
+
+  try{await deleteRemoteRows(ids)}catch(e){console.warn('YARDIVO full reset sync',e)}
+  refreshEverything();
+
+  if(typeof showYmsToast==='function'){
+    showYmsToast('success','OPERATIVNI PODACI OBRISANI','Sve najave i povijest notifikacija su prazni. Početni izbornik je vraćen na 0.',4500);
+  }else{
+    alert('Sve najave, podaci uz njih i povijest notifikacija su obrisani.');
+  }
+
+  if(btn){btn.disabled=false;btn.textContent='BRIŠI SVE NAJAVE'}
+  busy=false;
+}
+
+/* Capture-phase canonical owner prevents the old partial-delete handler from running. */
+document.addEventListener('click',e=>{
+  const b=e.target.closest?.('#deleteAllDataBtn');
+  if(!b)return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+  fullDelete();
+},true);
+
+function updateHomeZero(){
+  setHomeZero(false);
+}
+window.addEventListener('load',()=>setTimeout(updateHomeZero,900),{once:true});
+window.addEventListener('yardivo:data-synced',updateHomeZero);
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-view="homeMenu"],[data-home-target="homeMenu"],.brand-home,.home-link'))setTimeout(updateHomeZero,80);
+},true);
+
+window.YardivoFullOperationalReset={run:fullDelete,homeZero:updateHomeZero};
 })();
 </script>
 
