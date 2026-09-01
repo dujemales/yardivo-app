@@ -11549,7 +11549,7 @@ function allowedViewsForRole(role){
     admin:[],
     inventory:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','announcements','weeklyDeliveries','overview','suppliers','calendar','heatmap','controltower','controlTower','plannerPro','incidents','incidentArchive','reports','settings','unannounced','epal','orderSearch'],
     reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','docks','operations','incidents','incidentArchive','plannerPro','controltower','controlTower','settings','unannounced','epal','orderSearch'],
-    gate:['checkin','unannounced','myYard','docks'],
+    gate:['homeMenu','checkin','unannounced','myYard','docks'],
     management:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','overview','reports','calendar','heatmap','controltower','controlTower','suppliers','incidents','incidentArchive','settings']
   };
   if(role==='admin'){
@@ -12378,7 +12378,7 @@ const ROLE_VIEWS={
  admin:['homeMenu','dashboard','receiving','weeklyMap','dailyMap','settings','checkin','myYard','docks','trucks','suppliers','announcements','weeklyDeliveries','overview','incidents','incidentArchive','shipments','operations','reports','plannerPro','controltower','calendar','heatmap'],
  inventory:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','announcements','weeklyDeliveries','overview','suppliers','calendar','heatmap','controltower','controlTower','plannerPro','incidents','incidentArchive','reports','settings','unannounced','epal','orderSearch'],
  reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','plannerPro','controltower','controlTower','settings','unannounced','epal','orderSearch'],
- gate:['checkin','unannounced','myYard','docks'],
+ gate:['homeMenu','checkin','unannounced','myYard','docks'],
  management:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','overview','reports','calendar','heatmap','controltower','suppliers','incidents','incidentArchive','settings']
 };
 function jget(k,d){try{return JSON.parse(LS.getItem(k)||'null')??d}catch(e){return d}}
@@ -12886,7 +12886,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       'dailyMap','weeklyMap','suppliers','overview','incidents',
       'incidentArchive','notifications','settings'
     ]),
-    gate:new Set(['homeMenu','checkin','yard','docks','settings'])
+    gate:new Set(['homeMenu','checkin','unannounced','myYard','docks'])
   };
 
   function role(){
@@ -13086,10 +13086,10 @@ async function forcePasswordRotation(c,user){
   if(user?.user_metadata?.yardivo_password_rotated===true)return;
   let next='';
   while(true){
-    next=window.prompt('SIGURNOSNA NADOGRADNJA\nPostavi novu YARDIVO lozinku (najmanje 10 znakova). Privremena/stara lozinka više se neće koristiti.')||'';
-    if(next.length>=10)break;
+    next=window.prompt('SIGURNOSNA NADOGRADNJA\nPostavi novu YARDIVO lozinku (najmanje 8 znakova). Privremena/stara lozinka više se neće koristiti.')||'';
+    if(next.length>=8)break;
     if(!next)throw new Error('Promjena lozinke je obavezna prije ulaska u YARDIVO.');
-    alert('Nova lozinka mora imati najmanje 10 znakova.');
+    alert('Nova lozinka mora imati najmanje 8 znakova.');
   }
   const meta={...(user?.user_metadata||{}),yardivo_password_rotated:true};
   const {data,error}=await c.auth.updateUser({password:next,data:meta});
@@ -13117,11 +13117,9 @@ async function authoritativeLogin(){
     await forcePasswordRotation(c,data.user);
     const p=await loadServerProfile(c);
     if(p.username.toLowerCase()!==username)throw new Error('Identitet korisnika se ne podudara.');
-    const chosenRole=normRole(document.getElementById('loginRole')?.value||'');
-    if(chosenRole!==p.role){
-      const labels={admin:'Admin',inventory:'Upravljanje zalihama',reception:'Prijam',gate:'Porta'};
-      throw new Error(`Ovom korisniku je dodijeljena rola "${labels[p.role]||p.role}". Odaberi tu rolu za prijavu.`);
-    }
+    const chosenRole=p.role;
+    const roleSelect=document.getElementById('loginRole');
+    if(roleSelect)roleSelect.value=p.role;
     const session={user:p.username,username:p.username,role:p.role,location:p.location,authUserId:data.user.id,loginAt:new Date().toISOString(),rememberMe:true,serverAuthorized:true};
     persistAppSession(session);
     try{localStorage.setItem('yardivo_last_location',p.location)}catch(e){}
@@ -13230,7 +13228,7 @@ const KEY='yardivo_yms_announcements_v1', LEG='studenac_yms_announcements';
 const HOME={
  reception:new Set(['dashboard','docks','yard','trucks','receiving','dailyMap','weeklyMap','incidents','suppliers','incidentArchive','notifications','settings']),
  inventory:new Set(['dashboard','yard','docks','announcements','dailyMap','weeklyMap','suppliers','overview','incidents','incidentArchive','notifications','settings']),
- gate:new Set(['checkin','yard','docks','settings'])
+ gate:new Set(['homeMenu','checkin','unannounced','myYard','docks'])
 };
 function role(){let r='';try{r=String(currentSession?.role||'').toLowerCase().trim()}catch(e){};if(r==='porta')r='gate';if(r==='prijam')r='reception';if(r==='zalihe'||r==='upravljanje zalihama')r='inventory';return r}
 function load(){let best=[];for(const k of [KEY,LEG])try{const x=JSON.parse(localStorage.getItem(k)||'[]');if(Array.isArray(x)&&x.length>best.length)best=x}catch(e){};return best.length?best:(Array.isArray(announcements)?announcements:[])}
@@ -20290,7 +20288,7 @@ const ROLE={
  admin:['homeMenu','dashboard','receiving','weeklyMap','dailyMap','settings','checkin','myYard','docks','trucks','suppliers','announcements','weeklyDeliveries','overview','incidents','incidentArchive','shipments','operations','reports','plannerPro','controltower','controlTower','calendar','heatmap','unannounced','epal','orderSearch','liveYard','yardivoWarRoom'],
  inventory:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','announcements','weeklyDeliveries','overview','suppliers','calendar','heatmap','controltower','controlTower','plannerPro','incidents','incidentArchive','reports','settings','unannounced','epal','orderSearch','liveYard'],
  reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','plannerPro','controltower','controlTower','settings','unannounced','epal','orderSearch','liveYard'],
- gate:['checkin','unannounced','myYard','docks'],
+ gate:['homeMenu','checkin','unannounced','myYard','docks'],
  management:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','overview','reports','calendar','heatmap','controltower','controlTower','suppliers','incidents','incidentArchive','settings']
 };
 function norm(r){r=String(r||'').toLowerCase();if(r==='prijam')return'reception';if(r==='porta'||r==='portir')return'gate';if(r==='zalihe'||r.includes('zalih'))return'inventory';return r}
@@ -20311,7 +20309,7 @@ window.addEventListener('load',()=>setTimeout(apply,100));document.addEventListe
 })();</script>
 <script id="yardivo-v3102-porta-only-views">
 (function(){
- const PORTA_ALLOWED=new Set(['checkin','unannounced','myYard','docks']);
+ const PORTA_ALLOWED=new Set(['homeMenu','checkin','unannounced','myYard','docks']);
  function role(){
    const r=String((window.currentSession&&window.currentSession.role)||'').toLowerCase();
    return r==='porta'?'gate':r;
@@ -20507,7 +20505,7 @@ const MATRIX={
  admin:'ALL',
  inventory:new Set(['homeMenu','dashboard','weeklyMap','dailyMap','myYard','announcements','yardivoMyAnnouncements','overview','suppliers','calendar','heatmap','controltower','controlTower','incidents','incidentArchive','reports','settings','unannounced','epal','orderSearch','liveYard']),
  reception:new Set(['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','controltower','controlTower','settings','unannounced','epal','orderSearch','liveYard']),
- gate:new Set(['checkin','unannounced','myYard','docks'])
+ gate:new Set(['homeMenu','checkin','unannounced','myYard','docks'])
 };
 const norm=r=>{r=String(r||'').toLowerCase().trim();if(r==='porta'||r==='portir')return'gate';if(r==='prijam')return'reception';if(r==='zalihe'||r.includes('zalih'))return'inventory';return r};
 function role(){return norm(window.currentSession?.role)}
@@ -21087,7 +21085,7 @@ async function save(){
 
  if(!/^[a-z0-9._-]{3,40}$/.test(username)){msg('Upiši valjano korisničko ime.','error');return}
  if(!current){msg('Upiši trenutnu lozinku.','error');return}
- if(next.length<10){msg('Nova lozinka mora imati najmanje 10 znakova.','error');return}
+ if(next.length<10){msg('Nova lozinka mora imati najmanje 8 znakova.','error');return}
  if(next!==confirm){msg('Nova lozinka i potvrda nisu iste.','error');return}
  if(next===current){msg('Nova lozinka mora biti različita od trenutne.','error');return}
 
@@ -22237,7 +22235,7 @@ body.light-mode.yardivo-light-green #yardivoLightStyleSettings{
   border-color:#cfe1d3!important;
 }
 </style>
-<script id="yardivo-light-green-choice-20260831">
+<script id="yardivo-light-green-choice-20260831" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
 const BASE_KEY='yardivo_light_style_v1';
@@ -24993,10 +24991,10 @@ async function directSupabaseLogin(){
   if(auth.user?.user_metadata?.yardivo_password_rotated!==true){
     let next='';
     while(true){
-      next=window.prompt('SIGURNOSNA NADOGRADNJA\nPostavi novu YARDIVO lozinku (najmanje 10 znakova).')||'';
-      if(next.length>=10)break;
+      next=window.prompt('SIGURNOSNA NADOGRADNJA\nPostavi novu YARDIVO lozinku (najmanje 8 znakova).')||'';
+      if(next.length>=8)break;
       if(!next)throw new Error('Promjena lozinke je obavezna prije ulaska u YARDIVO.');
-      alert('Nova lozinka mora imati najmanje 10 znakova.');
+      alert('Nova lozinka mora imati najmanje 8 znakova.');
     }
     const upd=await fetch(base+'/auth/v1/user',{
       method:'PUT',
@@ -25019,12 +25017,9 @@ async function directSupabaseLogin(){
 
   const aliases={porta:'gate',gate:'gate',inventory:'inventory',reception:'reception',admin:'admin'};
   const role=aliases[String(p.app_role||'').toLowerCase()]||String(p.app_role||'').toLowerCase();
-  const selected=aliases[String(chosen||'').toLowerCase()]||String(chosen||'').toLowerCase();
-
-  if(selected!==role){
-    const labels={admin:'Admin',inventory:'Upravljanje zalihama',reception:'Prijam',gate:'Porta'};
-    throw new Error('Ovom korisniku je dodijeljena rola "'+(labels[role]||role)+'". Odaberi tu rolu za prijavu.');
-  }
+  const selected=role;
+  const roleSelect=document.getElementById('loginRole');
+  if(roleSelect)roleSelect.value=role;
 
   /* Synchronize the official Supabase client too, when the CDN library is available. */
   try{
@@ -29800,6 +29795,672 @@ document.addEventListener('click',e=>{
 },true);
 
 window.YardivoTotalOperationalWipe={run:wipe,zero:zeroDom};
+})();
+</script>
+
+
+<style id="yardivo-overview-reset-empty-fix-v1-20260901">
+#yardivoOverviewSimple3 .yardivo-card-score:empty{display:none!important}
+#yardivoOverviewSimple3 .yardivo-card-meta.empty-state{color:#7f93a2!important}
+</style>
+
+<script id="yardivo-overview-reset-empty-fix-v1-20260901-js">
+(function(){
+'use strict';
+
+function noOperationalData(){
+  try{
+    const a=Array.isArray(announcements)?announcements:[];
+    const i=Array.isArray(incidents)?incidents:[];
+    return a.length===0 && i.length===0;
+  }catch(_){return true}
+}
+
+function clearHeroDerivedValues(){
+  if(!noOperationalData())return;
+
+  const rel=document.getElementById('ovExecReliability');
+  if(rel)rel.textContent='—';
+
+  const best=document.getElementById('ovFocusBest');
+  const worst=document.getElementById('ovFocusAttention');
+
+  [best,worst].forEach(card=>{
+    if(!card)return;
+    const strong=card.querySelector('strong');
+    const span=card.querySelector('span');
+    const score=card.querySelector('.yardivo-card-score');
+    const meta=card.querySelector('.yardivo-card-meta');
+
+    if(strong)strong.textContent='—';
+    if(span)span.textContent='Nema evaluiranih dobavljača';
+    if(score){
+      score.textContent='';
+      score.style.setProperty('display','none','important');
+    }
+    if(meta){
+      meta.textContent='Nema operativnih podataka';
+      meta.classList.add('empty-state');
+    }
+  });
+
+  const avgCard=rel?.closest('.overview-exec-kpi');
+  const avgMeta=avgCard?.querySelector('.yardivo-card-meta');
+  if(avgMeta){
+    avgMeta.textContent='Nema operativnih podataka';
+    avgMeta.classList.add('empty-state');
+  }
+}
+
+function clearOverviewSurfaces(){
+  if(!noOperationalData())return;
+
+  const select=document.getElementById('overviewSupplierSelect');
+  if(select){
+    select.value='';
+    /* Master renderer may repopulate supplier names; this only clears the selected supplier. */
+  }
+
+  const table=document.getElementById('supplierPerformance');
+  if(table)table.innerHTML='<tr><td colspan="7"><div class="overview-empty">Nema operativnih podataka za dobavljače.</div></td></tr>';
+
+  const best=document.getElementById('overviewBest10');
+  if(best)best.innerHTML='<div class="overview-empty">Nema evaluiranih dobavljača.</div>';
+
+  const worst=document.getElementById('overviewWorst10');
+  if(worst)worst.innerHTML='<div class="overview-empty">Nema evaluiranih dobavljača.</div>';
+
+  const detail=document.getElementById('overviewSupplierDetail');
+  if(detail)detail.innerHTML='<div class="overview-empty">Nema operativnih podataka.</div>';
+
+  ['ovTotal','ovIncidents','ovChanges'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.textContent='0';
+  });
+  const on=document.getElementById('ovOnTime');if(on)on.textContent='0%';
+  const delay=document.getElementById('ovAvgDelay');if(delay)delay.textContent='—';
+  const unload=document.getElementById('ovAvgUnload');if(unload)unload.textContent='—';
+
+  clearHeroDerivedValues();
+}
+
+function repairHeroRenderer(){
+  const hero=window.YardivoOverviewHero3;
+  if(!hero || hero.__yardivoEmptyFixed)return;
+  const old=hero.render;
+  if(typeof old!=='function')return;
+
+  hero.render=function(){
+    const out=old.apply(this,arguments);
+
+    /* Old visual helper kept the previous 100% / 41% custom score node
+       when the source stats became empty. Explicitly clear it. */
+    if(noOperationalData()){
+      queueMicrotask(()=>{
+        clearHeroDerivedValues();
+        clearOverviewSurfaces();
+      });
+    }else{
+      document.querySelectorAll('#yardivoOverviewSimple3 .yardivo-card-score').forEach(el=>{
+        el.style.removeProperty('display');
+      });
+      document.querySelectorAll('#yardivoOverviewSimple3 .yardivo-card-meta').forEach(el=>el.classList.remove('empty-state'));
+    }
+    return out;
+  };
+  hero.__yardivoEmptyFixed=true;
+}
+
+function refresh(){
+  repairHeroRenderer();
+
+  try{window.YardivoOverviewManagerSummary?.render?.()}catch(_){}
+  try{window.YardivoOverviewMaster?.render?.()}catch(_){}
+  try{window.YardivoOverviewFullChart?.render?.()}catch(_){}
+  try{window.YardivoOverviewHero3?.render?.()}catch(_){}
+
+  setTimeout(()=>{
+    if(noOperationalData())clearOverviewSurfaces();
+  },20);
+}
+
+/* The wipe is asynchronous. Wrap it so Overview is forcibly invalidated after completion. */
+function hookWipe(){
+  const w=window.YardivoTotalOperationalWipe;
+  if(!w || w.__overviewHooked || typeof w.run!=='function')return;
+  const old=w.run;
+  w.run=async function(){
+    const out=await old.apply(this,arguments);
+    refresh();
+    return out;
+  };
+  w.__overviewHooked=true;
+}
+
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    repairHeroRenderer();
+    hookWipe();
+    if(noOperationalData())refresh();
+  },1150);
+},{once:true});
+
+window.addEventListener('yardivo:data-synced',()=>setTimeout(refresh,30));
+window.addEventListener('yardivo:overview-refresh',()=>setTimeout(refresh,30));
+
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-view="overview"],[data-home-target="overview"]')){
+    setTimeout(refresh,120);
+  }
+},true);
+
+/* Also catch the reset button independently; after old async handler finishes,
+   repeat the empty-state invalidation a few times to beat delayed renderers/sync. */
+document.addEventListener('click',e=>{
+  if(!e.target.closest?.('#deleteAllDataBtn'))return;
+  [250,700,1500].forEach(ms=>setTimeout(()=>{
+    hookWipe();
+    if(noOperationalData())refresh();
+  },ms));
+},false);
+
+window.YardivoOverviewEmptyResetFix={refresh,clear:clearOverviewSurfaces};
+})();
+</script>
+
+
+<style id="yardivo-settings-cleanup-light-sheets-v1-20260901">
+/* Requested Settings cleanup: no Light appearance chooser and no legacy Google Sheets central DB panel. */
+#yardivoLightStyleSettings,
+#settings section:has(#sheetUrl),
+#settings section:has(#sheetState),
+#settings section:has(#sheetSave),
+#settings section:has(#sheetTest),
+#settings section:has(#sheetPush){
+  display:none!important;
+}
+</style>
+
+<script id="yardivo-settings-cleanup-light-sheets-v1-20260901-js">
+(function(){
+'use strict';
+
+function removePanelContaining(el){
+  const panel=el?.closest?.('section.panel,.panel,.settings-card,.card');
+  if(panel)panel.remove();
+}
+function cleanup(){
+  /* Light mode itself stays available from the main moon/sun switch.
+     Only the Settings panel for choosing a Light appearance is removed. */
+  document.getElementById('yardivoLightStyleSettings')?.remove();
+
+  /* Remove the complete legacy Google Sheets / Centralna baza settings block. */
+  ['sheetUrl','sheetState','sheetSave','sheetTest','sheetPush'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)removePanelContaining(el);
+  });
+
+  /* Safety for dynamically rebuilt Settings markup. */
+  document.querySelectorAll('#settings section.panel,#settings .settings-card').forEach(panel=>{
+    const t=String(panel.textContent||'').toLocaleUpperCase('hr-HR');
+    if(t.includes('GOOGLE SHEETS') && t.includes('CENTRALNA BAZA'))panel.remove();
+    if(t.includes('IZGLED LIGHT MODEA'))panel.remove();
+  });
+}
+window.addEventListener('load',()=>setTimeout(cleanup,700),{once:true});
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-view="settings"],[data-home-target="settings"]')){
+    [30,120,350].forEach(ms=>setTimeout(cleanup,ms));
+  }
+},true);
+window.addEventListener('yardivo:login',()=>setTimeout(cleanup,100));
+window.YardivoSettingsCleanup={run:cleanup};
+})();
+</script>
+
+
+<style id="yardivo-gate-stable-access-v1-20260901">
+body[data-yardivo-role="gate"] [data-view="checkin"],
+body[data-yardivo-role="gate"] [data-view="unannounced"],
+body[data-yardivo-role="gate"] [data-view="myYard"],
+body[data-yardivo-role="gate"] [data-view="docks"]{
+  display:flex!important;
+  visibility:visible!important;
+}
+body[data-yardivo-role="gate"] [data-home-target="checkin"],
+body[data-yardivo-role="gate"] [data-home-target="unannounced"],
+body[data-yardivo-role="gate"] [data-home-target="myYard"],
+body[data-yardivo-role="gate"] [data-home-target="docks"]{
+  display:block!important;
+  visibility:visible!important;
+}
+body[data-yardivo-role="gate"] #uaGateCreatePanel{
+  display:block!important;
+}
+</style>
+
+<script id="yardivo-gate-stable-access-v1-20260901-js" type="application/x-yardivo-disabled">
+(function(){
+'use strict';
+
+const GATE_VIEWS=new Set(['homeMenu','checkin','unannounced','myYard','docks']);
+
+function norm(r){
+  r=String(r||'').toLowerCase().trim();
+  if(r==='porta'||r==='portir')return 'gate';
+  return r;
+}
+function role(){
+  try{return norm(window.currentSession?.role||currentSession?.role)}catch(_){return''}
+}
+function isGate(){return role()==='gate'}
+
+function ensureHomeAllowed(){
+  /* Gate must be able to return to the initial menu; otherwise old access
+     filters redirect an active homeMenu to a hidden/non-allowed view. */
+  try{
+    if(window.YARDIVO_ROLE_VIEWS_V3101?.gate && !window.YARDIVO_ROLE_VIEWS_V3101.gate.includes('homeMenu')){
+      window.YARDIVO_ROLE_VIEWS_V3101.gate.unshift('homeMenu');
+    }
+  }catch(_){}
+  try{
+    if(typeof ROLE_VIEWS!=='undefined' && Array.isArray(ROLE_VIEWS.gate) && !ROLE_VIEWS.gate.includes('homeMenu')){
+      ROLE_VIEWS.gate.unshift('homeMenu');
+    }
+  }catch(_){}
+}
+
+function expose(){
+  if(!isGate())return;
+  document.body.dataset.yardivoRole='gate';
+  ensureHomeAllowed();
+
+  document.querySelectorAll('[data-view],[data-home-target]').forEach(el=>{
+    const v=el.dataset.view||el.dataset.homeTarget||'';
+    const ok=GATE_VIEWS.has(v);
+    if(el.dataset.view){
+      el.classList.toggle('role-hidden',!ok);
+      if(ok){
+        el.style.setProperty('display','flex','important');
+        el.style.setProperty('visibility','visible','important');
+        el.style.removeProperty('pointer-events');
+      }else{
+        el.style.setProperty('display','none','important');
+      }
+    }else{
+      if(ok){
+        el.style.setProperty('display','block','important');
+        el.style.setProperty('visibility','visible','important');
+        el.style.removeProperty('pointer-events');
+      }else{
+        el.style.setProperty('display','none','important');
+      }
+    }
+  });
+
+  const create=document.getElementById('uaGateCreatePanel');
+  if(create){
+    create.style.setProperty('display','block','important');
+    create.style.setProperty('visibility','visible','important');
+  }
+
+  try{window.YardivoUnannouncedGateV2?.populateForm?.()}catch(_){}
+}
+
+function openGateView(view){
+  if(!isGate()||!GATE_VIEWS.has(view))return;
+  expose();
+
+  try{
+    if(typeof window.openAppView==='function'){
+      window.openAppView(view);
+    }else{
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      document.getElementById(view)?.classList.add('active');
+    }
+  }catch(_){}
+
+  /* Old role owners can run during openAppView; restore visibility after them. */
+  queueMicrotask(expose);
+  setTimeout(expose,20);
+
+  if(view==='unannounced'){
+    try{window.YardivoUnannouncedGateV2?.populateForm?.()}catch(_){}
+    try{window.YardivoUnannouncedSection?.render?.()}catch(_){}
+    try{window.renderUnannouncedComplete?.()}catch(_){}
+  }
+  if(view==='myYard'){
+    try{window.YardivoMyYard?.render?.()}catch(_){}
+    try{window.YardivoMyYardWebGL?.boot?.()}catch(_){}
+    try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+  }
+}
+
+/* Exact Gate navigation owner. This prevents an older role handler from
+   hiding the target between click and view activation. */
+document.addEventListener('click',e=>{
+  if(!isGate())return;
+  const target=e.target.closest?.('[data-view],[data-home-target]');
+  if(!target)return;
+  const view=target.dataset.view||target.dataset.homeTarget;
+  if(!GATE_VIEWS.has(view))return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+  openGateView(view);
+},true);
+
+/* Make the dedicated Nenajavljeni form submit deterministic for Gate. */
+document.addEventListener('click',e=>{
+  if(!isGate() || !e.target.closest?.('#uaGateSubmit'))return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+  expose();
+  try{
+    window.YardivoUnannouncedGateV2?.create?.();
+  }catch(err){
+    console.error('YARDIVO Gate unannounced create',err);
+    alert('Nenajavljeni dolazak nije spremljen. Pokušaj ponovno.');
+  }
+},true);
+
+function hookRoleOwners(){
+  ensureHomeAllowed();
+  const old=window.applyRoleAccess;
+  if(typeof old==='function' && !old.__yardivoGateStable){
+    const wrapped=function(){
+      const out=old.apply(this,arguments);
+      expose();
+      return out;
+    };
+    wrapped.__yardivoGateStable=true;
+    window.applyRoleAccess=wrapped;
+  }
+}
+
+window.addEventListener('load',()=>setTimeout(()=>{hookRoleOwners();expose()},850),{once:true});
+window.addEventListener('yardivo:login',()=>setTimeout(()=>{hookRoleOwners();expose()},50));
+window.addEventListener('yardivo:data-synced',expose);
+setInterval(()=>{if(isGate())expose()},1500);
+
+window.YardivoGateStableAccess={apply:expose,open:openGateView,views:[...GATE_VIEWS]};
+})();
+</script>
+
+
+<style id="yardivo-gate-and-users-final-v3-20260901">
+/* Gate: one stable matrix, no blinking. */
+body[data-yardivo-role="gate"] [data-view="homeMenu"],
+body[data-yardivo-role="gate"] [data-view="checkin"],
+body[data-yardivo-role="gate"] [data-view="unannounced"],
+body[data-yardivo-role="gate"] [data-view="myYard"],
+body[data-yardivo-role="gate"] [data-view="docks"]{
+  visibility:visible!important;
+}
+body[data-yardivo-role="gate"] [data-home-target="checkin"],
+body[data-yardivo-role="gate"] [data-home-target="unannounced"],
+body[data-yardivo-role="gate"] [data-home-target="myYard"],
+body[data-yardivo-role="gate"] [data-home-target="docks"]{
+  visibility:visible!important;
+}
+body[data-yardivo-role="gate"] #uaGateCreatePanel{display:block!important}
+
+/* Admin user management: form left, all real server profiles right. */
+body[data-yardivo-role="admin"] #masterUserAdmin .master-admin-grid{
+  grid-template-columns:minmax(360px,.9fr) minmax(520px,1.25fr)!important;
+  gap:22px!important;
+  align-items:start!important;
+}
+#masterUserAdmin #masterUserList{
+  min-height:170px;
+  max-height:520px;
+  overflow:auto;
+  padding-right:4px;
+}
+#masterUserAdmin .yardivo-profile-list-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:0 0 10px;
+  font-size:11px;
+  font-weight:1000;
+  letter-spacing:.3px;
+}
+#masterUserAdmin .yardivo-profile-count{
+  display:inline-flex;
+  min-width:28px;
+  height:24px;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  border:1px solid #285077;
+  background:#0d2133;
+  color:#69b3f5;
+  padding:0 8px;
+}
+#masterUserAdmin .master-user-row{
+  grid-template-columns:minmax(140px,1.25fr) minmax(110px,.8fr) 95px 95px minmax(125px,.9fr)!important;
+}
+@media(max-width:1100px){
+  body[data-yardivo-role="admin"] #masterUserAdmin .master-admin-grid{
+    grid-template-columns:1fr!important;
+  }
+}
+
+/* Role is determined by the server profile; no manual role mismatch at login. */
+#loginRole{opacity:.82}
+</style>
+
+<script id="yardivo-gate-and-users-final-v3-20260901-js">
+(function(){
+'use strict';
+
+const GATE_ALLOWED=new Set(['homeMenu','checkin','unannounced','myYard','docks']);
+
+function normRole(r){
+  r=String(r||'').toLowerCase().trim();
+  if(r==='porta'||r==='portir')return'gate';
+  if(r==='prijam')return'reception';
+  if(r==='zalihe'||r.includes('zalih'))return'inventory';
+  return r;
+}
+function role(){
+  try{return normRole(window.currentSession?.role||currentSession?.role)}catch(_){return''}
+}
+function gate(){return role()==='gate'}
+
+function syncGate(){
+  if(!gate())return;
+  document.body.dataset.yardivoRole='gate';
+  document.documentElement.dataset.yardivoRole='gate';
+
+  /* Existing matrices are patched statically above. This function only normalizes
+     the final DOM state; it does not run a competing hide/show loop. */
+  document.querySelectorAll('[data-view]').forEach(el=>{
+    const v=el.dataset.view||'';
+    const ok=GATE_ALLOWED.has(v);
+    el.classList.toggle('role-hidden',!ok);
+    if(ok){
+      el.style.removeProperty('display');
+      el.style.removeProperty('visibility');
+      el.removeAttribute('hidden');
+      el.removeAttribute('aria-disabled');
+    }
+  });
+  document.querySelectorAll('[data-home-target]').forEach(el=>{
+    const v=el.dataset.homeTarget||'';
+    const ok=GATE_ALLOWED.has(v);
+    if(ok){
+      el.style.removeProperty('display');
+      el.style.removeProperty('visibility');
+      el.removeAttribute('hidden');
+      el.removeAttribute('aria-disabled');
+    }
+  });
+
+  const panel=document.getElementById('uaGateCreatePanel');
+  if(panel)panel.style.setProperty('display','block','important');
+}
+
+function enterGateView(view){
+  if(!gate()||!GATE_ALLOWED.has(view))return false;
+  syncGate();
+  try{
+    const ok=window.openAppView?.(view);
+    if(ok===false)return false;
+  }catch(e){
+    console.error('YARDIVO Gate navigation',e);
+    return false;
+  }
+  if(view==='unannounced'){
+    setTimeout(()=>{
+      try{window.YardivoUnannouncedGateV2?.populateForm?.()}catch(_){}
+      try{window.YardivoUnannouncedSection?.render?.()}catch(_){}
+      try{window.renderUnannouncedComplete?.()}catch(_){}
+    },0);
+  }
+  if(view==='myYard'){
+    setTimeout(()=>{
+      try{window.YardivoMyYardMode?.set?.(window.YardivoMyYardMode.current?.()||'3d')}catch(_){}
+      try{window.YardivoMyYardWebGL?.boot?.()}catch(_){}
+      try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+      try{window.__YARDIVO_MYYARD_ENGINE__?.resize?.()}catch(_){}
+    },20);
+  }
+  return true;
+}
+
+/* Gate-click owner is intentionally narrow: only these five destinations. */
+document.addEventListener('click',e=>{
+  if(!gate())return;
+  const el=e.target.closest?.('[data-view],[data-home-target]');
+  if(!el)return;
+  const v=el.dataset.view||el.dataset.homeTarget||'';
+  if(!GATE_ALLOWED.has(v))return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+  enterGateView(v);
+},true);
+
+/* Dedicated Gate create button remains writable. */
+document.addEventListener('click',e=>{
+  if(!gate()||!e.target.closest?.('#uaGateSubmit'))return;
+  e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+  try{window.YardivoUnannouncedGateV2?.create?.()}catch(err){
+    console.error(err);alert('Nenajavljeni dolazak nije spremljen.');
+  }
+},true);
+
+/* ===== SERVER-AUTHORITATIVE USER PROFILES ===== */
+function admin(){return role()==='admin'}
+async function invokeUsers(action,payload={}){
+  const c=await window.YardivoAuth.client();
+  const {data,error}=await c.functions.invoke('yardivo-admin-users',{body:{action,...payload}});
+  if(error)throw error;
+  if(data?.error)throw new Error(data.error);
+  return data||{};
+}
+function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function roleLabel(r){return ({admin:'Admin',inventory:'Upravljanje zalihama',reception:'Prijam',gate:'Porta'})[normRole(r)]||r||'—'}
+function locLabel(l){return l==='DU'?'Dugopolje':l==='VG'?'Velika Gorica':l||'—'}
+
+async function renderProfiles(){
+  const host=document.getElementById('masterUserList');
+  if(!host||!admin())return;
+  host.innerHTML='<div class="master-note">Učitavanje profila sa servera…</div>';
+  try{
+    const res=await invokeUsers('list');
+    const users=Array.isArray(res.users)?res.users:[];
+    host.innerHTML=
+      `<div class="yardivo-profile-list-title"><span>PROFILI NA SERVERU</span><span class="yardivo-profile-count">${users.length}</span></div>`+
+      '<div class="master-user-row"><strong>Korisnik</strong><strong>Rola</strong><strong>Lokacija</strong><strong>Status</strong><strong>Akcije</strong></div>'+
+      users.map(u=>`<div class="master-user-row">
+        <div><strong>${esc(u.username)}</strong></div>
+        <div>${esc(roleLabel(u.app_role))}</div>
+        <div>${esc(locLabel(u.location))}</div>
+        <div>${u.active?'AKTIVAN':'DEAKTIVIRAN'}</div>
+        <div>
+          <button class="action" data-profile-toggle="${esc(u.auth_user_id)}" data-active="${u.active?'1':'0'}">${u.active?'DEAKT.':'AKTIV.'}</button>
+          ${u.username==='dujemales'?'':` <button class="action danger" data-profile-delete="${esc(u.auth_user_id)}">OBRIŠI</button>`}
+        </div>
+      </div>`).join('');
+
+    host.querySelectorAll('[data-profile-toggle]').forEach(btn=>{
+      btn.onclick=async()=>{
+        try{
+          await invokeUsers('update',{auth_user_id:btn.dataset.profileToggle,active:btn.dataset.active!=='1'});
+          await renderProfiles();
+        }catch(e){alert(e.message)}
+      };
+    });
+    host.querySelectorAll('[data-profile-delete]').forEach(btn=>{
+      btn.onclick=async()=>{
+        if(!confirm('Trajno obrisati ovaj korisnički profil?'))return;
+        try{await invokeUsers('delete',{auth_user_id:btn.dataset.profileDelete});await renderProfiles()}
+        catch(e){alert(e.message)}
+      };
+    });
+  }catch(e){
+    host.innerHTML=`<div class="master-note warn">Ne mogu učitati profile: ${esc(e.message)}</div>`;
+  }
+}
+
+async function createProfile(){
+  if(!admin())return;
+  const username=(document.getElementById('muUser')?.value||'').trim().toLowerCase();
+  const password=document.getElementById('muPass')?.value||'';
+  const assignedRole=normRole(document.getElementById('muRole')?.value||'');
+  const location=document.getElementById('muLocation')?.value||'VG';
+
+  if(!/^[a-z0-9._-]{3,40}$/.test(username)){alert('Username mora imati najmanje 3 znaka.');return}
+  if(password.length<8){alert('Lozinka mora imati najmanje 8 znakova.');return}
+  if(!['admin','inventory','reception','gate'].includes(assignedRole)){alert('Odaberi valjanu rolu.');return}
+
+  try{
+    await invokeUsers('create',{username,password,role:assignedRole,location});
+    const u=document.getElementById('muUser'),p=document.getElementById('muPass'),n=document.getElementById('muName');
+    if(u)u.value='';if(p)p.value='';if(n)n.value='';
+    await renderProfiles();
+    try{showYmsToast?.('success','KORISNIK KREIRAN',`${username} · ${roleLabel(assignedRole)}`)}catch(_){}
+  }catch(e){
+    alert('Kreiranje korisnika nije uspjelo: '+e.message);
+  }
+}
+
+/* Block the old local-user create handler. Only Supabase Auth + server mapping can create users. */
+document.addEventListener('click',e=>{
+  const btn=e.target.closest?.('#muSave');
+  if(!btn||!admin())return;
+  e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+  createProfile();
+},true);
+
+function setupUsers(){
+  if(!admin())return;
+  const roleSelect=document.getElementById('muRole');
+  roleSelect?.querySelector('option[value="management"]')?.remove();
+  const btn=document.getElementById('muSave');
+  if(btn)btn.textContent='KREIRAJ KORISNIČKI PROFIL';
+  renderProfiles();
+}
+
+/* Login role is informational; server profile chooses the real role. */
+function setupLoginRole(){
+  const s=document.getElementById('loginRole');
+  if(!s)return;
+  s.title='Rola se potvrđuje automatski prema korisničkom profilu na serveru.';
+}
+
+window.addEventListener('load',()=>setTimeout(()=>{syncGate();setupUsers();setupLoginRole()},900),{once:true});
+window.addEventListener('yardivo:login',()=>setTimeout(()=>{syncGate();setupUsers()},80));
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-view="settings"],[data-home-target="settings"]'))setTimeout(setupUsers,120);
+},true);
+
+window.YardivoGateCanonical={apply:syncGate,open:enterGateView};
+window.YardivoServerProfiles={render:renderProfiles,create:createProfile};
 })();
 </script>
 
