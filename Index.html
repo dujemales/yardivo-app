@@ -20205,8 +20205,16 @@ function ensure(){
  s.querySelector('[data-today]').onclick=e=>{e.stopPropagation();st.date=isoToday();render()};
  s.querySelector('.myy-date').onchange=e=>{if(e.target.value){st.date=e.target.value;render()}};
  s.addEventListener('pointerdown',e=>{if(st.mode!=='3d'||e.button!==0||e.target.closest('button,input'))return;st.drag=true;st.x=e.clientX});
- s.addEventListener('pointermove',e=>{if(!st.drag)return;st.rz+=(e.clientX-st.x)*.16;st.x=e.clientX;requestAnimationFrame(apply)});
- window.addEventListener('pointerup',()=>st.drag=false);
+ s.addEventListener('pointermove',e=>{
+   if(!st.drag)return;
+   if((e.buttons&1)!==1){st.drag=false;return}
+   st.rz+=(e.clientX-st.x)*.16;st.x=e.clientX;requestAnimationFrame(apply)
+ });
+ const stopLegacyDrag=()=>{st.drag=false};
+ window.addEventListener('pointerup',stopLegacyDrag,true);
+ window.addEventListener('blur',stopLegacyDrag,true);
+ s.addEventListener('pointercancel',stopLegacyDrag);
+ s.addEventListener('lostpointercapture',stopLegacyDrag);
  s.addEventListener('wheel',e=>{if(st.mode!=='3d')return;e.preventDefault();st.sc=Math.max(.5,Math.min(1.08,st.sc-e.deltaY*.0006));requestAnimationFrame(apply)},{passive:false});
  apply();
 }
@@ -23160,10 +23168,33 @@ function buildEngine(T,host){
  let currentRamps=0,currentWh='',yaw=-.64,pitch=.70,dist=82,drag=false,moved=false,px=0,py=0;
  function cameraApply(){const cp=Math.cos(pitch);camera.position.set(Math.sin(yaw)*cp*dist,Math.sin(pitch)*dist,Math.cos(yaw)*cp*dist);camera.lookAt(0,0,-2)}
  cameraApply();
- renderer.domElement.addEventListener('pointerdown',e=>{if(e.button!==0)return;drag=true;moved=false;px=e.clientX;py=e.clientY;renderer.domElement.setPointerCapture?.(e.pointerId)});
- renderer.domElement.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-px,dy=e.clientY-py;if(Math.abs(dx)+Math.abs(dy)>3)moved=true;yaw-=dx*.0075;pitch=Math.max(.28,Math.min(1.18,pitch+dy*.005));px=e.clientX;py=e.clientY;cameraApply()});
- const stop=e=>{drag=false;try{renderer.domElement.releasePointerCapture?.(e.pointerId)}catch(_){}};
- renderer.domElement.addEventListener('pointerup',stop);renderer.domElement.addEventListener('pointercancel',stop);
+ let dragPointerId=null;
+ const stop=e=>{
+   drag=false;
+   const id=e?.pointerId??dragPointerId;
+   dragPointerId=null;
+   try{if(id!=null&&renderer.domElement.hasPointerCapture?.(id))renderer.domElement.releasePointerCapture(id)}catch(_){}
+ };
+ renderer.domElement.addEventListener('pointerdown',e=>{
+   if(e.button!==0)return;
+   drag=true;moved=false;dragPointerId=e.pointerId;px=e.clientX;py=e.clientY;
+   try{renderer.domElement.setPointerCapture?.(e.pointerId)}catch(_){}
+ });
+ renderer.domElement.addEventListener('pointermove',e=>{
+   if(!drag)return;
+   /* If the physical left button is no longer down, terminate rotation immediately.
+      This prevents a lost pointer-up from leaving the camera "stuck" to the mouse. */
+   if((e.buttons&1)!==1){stop(e);return}
+   const dx=e.clientX-px,dy=e.clientY-py;
+   if(Math.abs(dx)+Math.abs(dy)>3)moved=true;
+   yaw-=dx*.0075;pitch=Math.max(.28,Math.min(1.18,pitch+dy*.005));
+   px=e.clientX;py=e.clientY;cameraApply()
+ });
+ renderer.domElement.addEventListener('pointerup',stop);
+ renderer.domElement.addEventListener('pointercancel',stop);
+ renderer.domElement.addEventListener('lostpointercapture',stop);
+ window.addEventListener('pointerup',stop,true);
+ window.addEventListener('blur',()=>stop(),true);
  renderer.domElement.addEventListener('wheel',e=>{if(!e.ctrlKey)return;e.preventDefault();dist=Math.max(35,Math.min(125,dist+e.deltaY*.055));cameraApply()},{passive:false});
  renderer.domElement.addEventListener('click',e=>{
    if(moved)return;const r=renderer.domElement.getBoundingClientRect();mouse.x=((e.clientX-r.left)/r.width)*2-1;mouse.y=-((e.clientY-r.top)/r.height)*2+1;ray.setFromCamera(mouse,camera);
@@ -23810,8 +23841,87 @@ async function boot(){
      host.appendChild(mirrorRenderer.domElement);
 
      const c=mirrorRenderer.domElement;
-     /* War Room is a presentation mirror: camera navigation stays owned by My Yard. */
-     c.style.pointerEvents='none';
+     c.style.pointerEvents='auto';
+     c.style.cursor='grab';
+
+     /* War Room has the SAME camera controls as My Yard.
+        We manipulate the canonical My Yard camera, while the mirror camera remains
+        an aspect-safe clone that copies it every frame. */
+     let wrDrag=false,wrMoved=false,wrPointerId=null,wrX=0,wrY=0;
+
+     function wrStop(ev){
+       wrDrag=false;
+       c.style.cursor='grab';
+       const id=ev?.pointerId??wrPointerId;
+       wrPointerId=null;
+       try{if(id!=null&&c.hasPointerCapture?.(id))c.releasePointerCapture(id)}catch(_){}
+     }
+     c.addEventListener('pointerdown',ev=>{
+       if(ev.button!==0)return;
+       wrDrag=true;wrMoved=false;wrPointerId=ev.pointerId;wrX=ev.clientX;wrY=ev.clientY;
+       c.style.cursor='grabbing';
+       try{c.setPointerCapture?.(ev.pointerId)}catch(_){}
+     });
+     c.addEventListener('pointermove',ev=>{
+       if(!wrDrag)return;
+       if((ev.buttons&1)!==1){wrStop(ev);return}
+       const dx=ev.clientX-wrX,dy=ev.clientY-wrY;
+       if(Math.abs(dx)+Math.abs(dy)>3)wrMoved=true;
+       const canonical=window.__YARDIVO_MYYARD_ENGINE__;
+       const cam=canonical?.camera;
+       if(cam){
+         const target=new T.Vector3(0,0,-2);
+         const off=cam.position.clone().sub(target);
+         const sph=new T.Spherical().setFromVector3(off);
+         sph.theta-=dx*.0075;
+         sph.phi=Math.max(.28,Math.min(1.18,sph.phi+dy*.005));
+         cam.position.copy(new T.Vector3().setFromSpherical(sph).add(target));
+         cam.lookAt(target);
+         cam.updateMatrixWorld();
+       }
+       wrX=ev.clientX;wrY=ev.clientY;
+     });
+     c.addEventListener('pointerup',wrStop);
+     c.addEventListener('pointercancel',wrStop);
+     c.addEventListener('lostpointercapture',wrStop);
+     window.addEventListener('pointerup',wrStop,true);
+     window.addEventListener('blur',()=>wrStop(),true);
+
+     c.addEventListener('wheel',ev=>{
+       if(!ev.ctrlKey)return;
+       ev.preventDefault();
+       const canonical=window.__YARDIVO_MYYARD_ENGINE__;
+       const cam=canonical?.camera;
+       if(!cam)return;
+       const target=new T.Vector3(0,0,-2),off=cam.position.clone().sub(target);
+       const len=Math.max(35,Math.min(125,off.length()+(ev.deltaY*.055)));
+       cam.position.copy(off.normalize().multiplyScalar(len).add(target));
+       cam.lookAt(target);
+       cam.updateMatrixWorld();
+     },{passive:false});
+
+     /* Truck click behaves exactly like My Yard. */
+     const wrRay=new T.Raycaster(),wrMouse=new T.Vector2();
+     c.addEventListener('click',ev=>{
+       if(wrMoved){wrMoved=false;return}
+       const canonical=window.__YARDIVO_MYYARD_ENGINE__;
+       const cam=canonical?.camera;
+       if(!cam)return;
+       const r=c.getBoundingClientRect();
+       wrMouse.x=((ev.clientX-r.left)/r.width)*2-1;
+       wrMouse.y=-((ev.clientY-r.top)/r.height)*2+1;
+       wrRay.setFromCamera(wrMouse,cam);
+       const objs=[];
+       canonical?.trucks?.forEach?.(g=>g.traverse(o=>{if(o.isMesh)objs.push(o)}));
+       const hit=wrRay.intersectObjects(objs,true)[0];
+       const a=hit?.object?.userData?.a || hit?.object?.userData?.announcement;
+       if(a){
+         try{
+           const legacy=document.querySelector(`#myYard .myy-truck[data-id="${CSS.escape(String(a.id))}"]`);
+           legacy?.click();
+         }catch(_){}
+       }
+     });
 
      ro=new ResizeObserver(()=>{
        const w=Math.max(10,host.clientWidth),hh=Math.max(10,host.clientHeight);
@@ -28087,6 +28197,136 @@ document.addEventListener('click',e=>{
 },true);
 window.addEventListener('yardivo:login',()=>setTimeout(normalizeSettings,120));
 window.YardivoSettingsCleanup={apply:normalizeSettings,refreshHolidays};
+})();
+</script>
+
+
+<style id="yardivo-canonical-logout-fix-v1-20260901">
+#logoutBtn,#homeLogoutBtn{
+  display:inline-flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+}
+</style>
+<script id="yardivo-canonical-logout-fix-v1-20260901-js">
+(function(){
+'use strict';
+let busy=false;
+
+function clearLocalSession(){
+  try{
+    localStorage.removeItem('yardivo_custom_session');
+    localStorage.removeItem('yardivo_remembered_session');
+    sessionStorage.removeItem('studenac_demo_session');
+  }catch(_){}
+  try{window.currentSession=null;if(typeof currentSession!=='undefined')currentSession=null}catch(_){window.currentSession=null}
+}
+
+function showLoggedOutUI(){
+  const html=document.documentElement,body=document.body;
+  html.classList.remove('yardivo-app-authenticated');
+  html.classList.add('yardivo-login-ready','yardivo-welcome-complete');
+  body.classList.remove('yardivo-role-switching','home-menu-mode');
+  body.classList.add('yardivo-prelogin');
+
+  document.querySelectorAll('.view.active').forEach(v=>v.classList.remove('active'));
+
+  const overlay=document.getElementById('loginOverlay');
+  if(overlay){
+    overlay.style.setProperty('display','flex','important');
+    overlay.style.setProperty('visibility','visible','important');
+    overlay.style.setProperty('opacity','1','important');
+    overlay.style.setProperty('pointer-events','auto','important');
+    overlay.setAttribute('aria-hidden','false');
+  }
+
+  const splash=document.getElementById('yardivoWelcomeSplash');
+  if(splash){
+    splash.style.setProperty('display','none','important');
+    splash.style.setProperty('pointer-events','none','important');
+  }
+
+  const pass=document.getElementById('loginPass');
+  if(pass)pass.value='';
+  const err=document.getElementById('loginError');
+  if(err){err.textContent='';err.style.display='none'}
+
+  requestAnimationFrame(()=>document.getElementById('loginUser')?.focus());
+}
+
+async function logout(){
+  if(busy)return;
+  busy=true;
+
+  /* First remove application access synchronously. Even if network sign-out is slow,
+     the user can never remain visually inside YARDIVO after pressing ODJAVA. */
+  clearLocalSession();
+  showLoggedOutUI();
+
+  try{
+    if(window.YardivoAuth?.logout){
+      await window.YardivoAuth.logout();
+    }else if(window.__yardivoAuthClient?.auth?.signOut){
+      await window.__yardivoAuthClient.auth.signOut({scope:'local'});
+    }
+  }catch(e){
+    console.warn('YARDIVO logout',e);
+  }finally{
+    clearLocalSession();
+    showLoggedOutUI();
+    busy=false;
+  }
+}
+
+/* Capture before all historic logout listeners. */
+document.addEventListener('click',e=>{
+  const b=e.target.closest?.('#logoutBtn,#homeLogoutBtn');
+  if(!b)return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+  logout();
+},true);
+
+window.YardivoCanonicalLogout={logout};
+})();
+</script>
+
+
+<style id="yardivo-warroom-interactive-same-as-myyard-v1-20260901">
+#yardivoWarRoom #yardivoWarRoomMyYardMirror canvas{
+  pointer-events:auto!important;
+  cursor:grab!important;
+  touch-action:none!important;
+}
+#yardivoWarRoom #yardivoWarRoomMyYardMirror canvas:active{cursor:grabbing!important}
+#yardivoWarRoom .wr-twin-title{
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+}
+#yardivoWarRoom .wr-twin-title::after{
+  content:"DRŽI LIJEVI KLIK I VUCI · CTRL + KOTAČIĆ = ZOOM"!important;
+  color:#8eabba!important;
+  font-size:7px!important;
+  font-weight:800!important;
+  letter-spacing:.3px!important;
+}
+</style>
+<script id="yardivo-warroom-interactive-same-as-myyard-v1-20260901-js">
+(function(){
+'use strict';
+function sync(){
+  try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+  try{window.YardivoWarRoomExactMirror?.boot?.()}catch(_){}
+}
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('#yardivoWarButton,[data-view="yardivoWarRoom"],[data-home-target="yardivoWarRoom"]')){
+    setTimeout(sync,120);
+  }
+},true);
+window.addEventListener('yardivo:data-synced',sync);
 })();
 </script>
 
