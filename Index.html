@@ -4982,48 +4982,6 @@ html[data-theme="light"] .srp-kpi,html[data-theme="light"] .srp-history,html[dat
 html[data-theme="light"] .srp-reason,html[data-theme="light"] .srp-detail p,html[data-theme="light"] .srp-alert p{color:#526f80}
 @media(max-width:1050px){.srp-board{grid-template-columns:1fr}.srp-kpis{grid-template-columns:repeat(2,1fr)}}
 </style>
-<style id="yardivo-war-room-v1-style">
-/* Admin setting card */
-#srpAdminSettingsCard{margin-top:14px;border:1px solid #24485d;border-radius:10px;background:#081b28;padding:14px}
-#srpAdminSettingsCard h3{margin:0 0 4px;font-size:10px}#srpAdminSettingsCard p{margin:0 0 12px;color:#7896a8;font-size:8px;line-height:1.5}
-.srp-setting-line{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:10px;border:1px solid #294a5d;border-radius:7px;background:#0a2230}
-.srp-setting-line strong{font-size:8px}.srp-setting-line small{display:block;margin-top:3px;color:#7895a6;font-size:7px}
-.srp-toggle{position:relative;width:52px;height:28px;flex:0 0 auto}.srp-toggle input{display:none}.srp-toggle span{position:absolute;inset:0;border-radius:999px;background:#263d4a;border:1px solid #365567;cursor:pointer;transition:.2s}.srp-toggle span:after{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;border-radius:50%;background:#8ba1ad;transition:.2s}.srp-toggle input:checked+span{background:#123c27;border-color:#3b7e57}.srp-toggle input:checked+span:after{left:27px;background:#66dc91;box-shadow:0 0 12px rgba(102,220,145,.5)}
-
-/* WAR ROOM */
-#yardivoWarRoom{position:fixed;inset:0;z-index:25000;background:#030a10;color:#dcecf4;display:none;overflow:hidden;font-family:inherit}
-#yardivoWarRoom.active{display:block}
-.wr-bg{position:absolute;inset:0;background:
- radial-gradient(circle at 50% 45%,rgba(17,69,96,.32),transparent 36%),
- linear-gradient(rgba(41,94,122,.055) 1px,transparent 1px),
- linear-gradient(90deg,rgba(41,94,122,.055) 1px,transparent 1px);background-size:auto,42px 42px,42px 42px}
-.wr-scan{position:absolute;inset:0;background:linear-gradient(180deg,transparent 0,rgba(70,180,230,.035) 50%,transparent 100%);animation:wrscan 8s linear infinite;pointer-events:none}
-@keyframes wrscan{from{transform:translateY(-100%)}to{transform:translateY(100%)}}
-.wr-shell{position:relative;height:100%;display:grid;grid-template-rows:86px 1fr 62px;padding:18px 22px 14px;box-sizing:border-box}
-.wr-header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;border-bottom:1px solid #173448;padding-bottom:12px}
-.wr-brand{display:flex;align-items:center;gap:13px}.wr-logo3d{width:54px;height:54px;perspective:700px;display:grid;place-items:center}.wr-y{font-size:42px;font-weight:1000;line-height:1;color:#7fd3ff;text-shadow:0 0 12px rgba(83,186,236,.7),0 0 34px rgba(83,186,236,.3);animation:wry 5.5s linear infinite;transform-style:preserve-3d}
-@keyframes wry{0%{transform:rotateY(0deg) rotateX(8deg)}50%{transform:rotateY(180deg) rotateX(-8deg)}100%{transform:rotateY(360deg) rotateX(8deg)}}
-.wr-brand h1{margin:0;font-size:19px;letter-spacing:2px}.wr-brand small{display:block;margin-top:3px;color:#63899e;font-size:7px;letter-spacing:1.5px}
-.wr-center{text-align:center}.wr-center strong{display:block;font-size:11px;letter-spacing:2px}.wr-center small{display:block;margin-top:4px;color:#688da0;font-size:7px}
-.wr-actions{display:flex;justify-content:flex-end;gap:7px}.wr-actions button{min-height:34px;padding:0 11px;border:1px solid #285169;border-radius:6px;background:#071923;color:#b8d8e7;font-size:7px;font-weight:1000;cursor:pointer}
-.wr-main{display:grid;grid-template-columns:250px minmax(0,1fr) 270px;gap:14px;min-height:0;padding:14px 0}
-.wr-col{display:grid;gap:10px;min-height:0}.wr-panel{border:1px solid #173a4e;border-radius:9px;background:rgba(5,20,30,.86);overflow:hidden;box-shadow:inset 0 0 40px rgba(14,64,88,.08)}
-.wr-panel-head{padding:9px 11px;border-bottom:1px solid #173a4e;font-size:7px;font-weight:1000;letter-spacing:1.2px;color:#7aa7bc}
-.wr-kpis{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:9px}.wr-kpi{padding:9px;border:1px solid #173a4e;border-radius:6px;background:#061824}.wr-kpi small{display:block;color:#65889b;font-size:6px;font-weight:1000}.wr-kpi strong{display:block;font-size:19px;margin-top:4px}.wr-kpi.alert strong{color:#ff927f}.wr-kpi.good strong{color:#74d99b}
-.wr-list{padding:8px;display:grid;gap:6px;max-height:255px;overflow:hidden}.wr-row{padding:7px 8px;border-left:2px solid #2d6682;background:#071b28;font-size:7px;line-height:1.45}.wr-row.warn{border-left-color:#e0ad4c}.wr-row.bad{border-left-color:#dc625e}.wr-row strong{font-size:7px}.wr-row span{color:#7191a3}
-.wr-twin{position:relative;border:1px solid #174158;border-radius:10px;background:radial-gradient(circle at 50% 10%,#0d3043,#04111b 68%);overflow:hidden;min-height:0}
-.wr-twin-title{position:absolute;left:14px;top:11px;z-index:5;font-size:7px;color:#6f99ae;letter-spacing:1.2px}
-.wr-yard{position:absolute;inset:50px 30px 25px;transform:perspective(1100px) rotateX(53deg) rotateZ(-7deg) scale(.9);transform-origin:50% 50%;transition:.5s}
-.wr-wh{position:absolute;left:8%;right:8%;top:4%;height:26%;border:1px solid #285a72;background:linear-gradient(180deg,#10374b,#071d2b);box-shadow:0 34px 0 #020b11,0 52px 55px rgba(0,0,0,.5);border-radius:6px}
-.wr-wh b{position:absolute;left:14px;top:10px;font-size:12px;letter-spacing:1px}.wr-docks{position:absolute;left:10%;right:10%;top:25%;display:grid;gap:6px;z-index:3}.wr-dock{height:52px;border:1px solid #2d5b72;background:#092436;display:grid;place-items:center;border-radius:5px;font-size:7px;font-weight:1000;box-shadow:0 9px 0 #020b11}.wr-dock.busy{border-color:#4da5d0;background:#0c3348}.wr-dock.closed{border-color:#ce5b5d;background:#32161b;color:#ff9b9b}
-.wr-road{position:absolute;left:8%;right:8%;top:45%;bottom:10%;border:1px dashed #244b60;border-radius:80px;background:#071a26}.wr-road:after{content:"";position:absolute;left:7%;right:7%;top:50%;border-top:1px dashed #31566b}
-.wr-truck{position:absolute;width:80px;height:29px;padding:4px 5px;border:1px solid #3c7795;border-radius:5px;background:#0d3145;box-shadow:0 9px 0 #020b11,0 12px 20px rgba(0,0,0,.35);z-index:5;overflow:hidden;transition:.4s}.wr-truck b{display:block;font-size:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wr-truck small{display:block;font-size:5px;color:#7fa0b2;margin-top:2px}.wr-truck.late{border-color:#e0705d;background:#3a211f}
-.wr-congestion{padding:12px}.wr-meter{height:12px;border:1px solid #1d465b;border-radius:999px;overflow:hidden;background:#05131d}.wr-meter>i{display:block;height:100%;background:linear-gradient(90deg,#276c88,#55b4d7);transition:.5s width}.wr-congestion strong{display:flex;justify-content:space-between;font-size:8px;margin-bottom:7px}
-.wr-replan{padding:9px;display:grid;gap:7px}.wr-replan-card{border:1px solid #20485d;border-radius:6px;background:#071c29;padding:8px}.wr-replan-card b{font-size:7px}.wr-replan-card small{display:block;color:#7898a9;font-size:6px;margin-top:3px;line-height:1.4}
-.wr-footer{display:grid;grid-template-columns:auto 1fr auto;gap:15px;align-items:center;border-top:1px solid #173448}.wr-live{font-size:7px;font-weight:1000;color:#7ddba1}.wr-live i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4cda7f;box-shadow:0 0 10px #4cda7f;margin-right:6px}.wr-ticker{overflow:hidden;white-space:nowrap;font-size:7px;color:#7b9cac}.wr-ticker-inner{display:inline-block;padding-left:100%;animation:wrticker 30s linear infinite}.wr-clock{text-align:right}.wr-clock strong{display:block;font-size:16px;letter-spacing:1px}.wr-clock small{font-size:6px;color:#66899c}
-@keyframes wrticker{to{transform:translateX(-100%)}}
-@media(max-width:1100px){.wr-main{grid-template-columns:210px minmax(0,1fr) 220px}.wr-shell{padding:12px}.wr-brand h1{font-size:15px}}
-</style>
 <style id="yardivo-live-yard-tv-v5-style">
 /* =========================================================
    YARDIVO LIVE YARD TV 3D V5 — single stable renderer
@@ -18686,121 +18644,6 @@ setInterval(()=>{
 window.YardivoSmartReplanning={scanNow:()=>scan(true),render:renderSection,logs,applyState:()=>applySmartUiState(loadCfg())};
 })();
 </script>
-<script id="yardivo-war-room-v1">
-(function(){
-'use strict';
-const SRP_CFG='yardivo_auto_replan_cfg_v1',SRP_LOG='yardivo_auto_replan_log_v1';
-let wrTimer=null,wrWarehouse=null;
-
-function role(){let r='';try{r=String(currentSession?.role||'').toLowerCase().trim()}catch(e){}if(r==='zalihe')r='inventory';return r}
-function admin(){return role()==='admin'}
-function A(){try{return Array.isArray(announcements)?announcements:[]}catch(e){return[]}}
-function logs(){try{const a=JSON.parse(localStorage.getItem(SRP_LOG)||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}}
-function cfg(){try{return {enabled:true,mode:'AUTO_SAFE',lateThreshold:20,...JSON.parse(localStorage.getItem(SRP_CFG)||'{}')}}catch(e){return {enabled:true,mode:'AUTO_SAFE',lateThreshold:20}}}
-function saveCfg(c){localStorage.setItem(SRP_CFG,JSON.stringify(c))}
-function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
-function plate(a){try{return effectivePlate(a)||'—'}catch(e){return a.plannedPlate||a.arrivalPlate||'—'}}
-function phase(a){const s=String(a.status||'').toLowerCase();if(a.receivedAt||a.rejectedAt||/zaprim|odbij|zavr/.test(s))return'done';if(a.dockArrivalAt||/rampi/.test(s))return'dock';if(a.yardArrivalAt||/dvori/.test(s))return'yard';if(a.gateCheckedAt||a.actualDate||a.actualTime)return'gate';return'incoming'}
-function delay(a){try{return delayMinutes(a)||0}catch(e){const p=new Date(`${a.date}T${a.time}:00`).getTime();return Math.max(0,Math.floor((Date.now()-p)/60000))}}
-function whCfg(w){try{return WAREHOUSES?.[w]||{ramps:6,label:w}}catch(e){return {ramps:6,label:w}}}
-function locked(w,d){try{return !!YardivoRampConfig?.isLocked?.(w,d)}catch(e){return false}}
-function currentWh(){return wrWarehouse||((typeof activeWarehouse!=='undefined'&&activeWarehouse!=='ALL')?activeWarehouse:(currentSession?.location==='DU'?'W201':'W101'))}
-
-function injectAdminSetting(){
- if(!admin())return;
- const settings=document.getElementById('settings');if(!settings||document.getElementById('srpAdminSettingsCard'))return;
- settings.insertAdjacentHTML('beforeend',`<div id="srpAdminSettingsCard"><h3>⚡ YARDIVO SMART REPLANNING</h3><p>Admin određuje smije li YARDIVO automatski primjenjivati sigurne promjene termina i rampi. Kad je isključeno, engine je pauziran i ne radi automatske promjene.</p><div class="srp-setting-line"><div><strong>AUTO SAFE MODE</strong><small>Kašnjenja, zatvorene rampe, blokade i konflikti → automatski izračun i sigurna promjena.</small></div><label class="srp-toggle"><input type="checkbox" id="srpAdminAutoSafe"><span></span></label></div></div>`);
- const cb=document.getElementById('srpAdminAutoSafe');cb.checked=!!cfg().enabled;
- cb.addEventListener('change',()=>{
- const c=cfg();c.enabled=cb.checked;c.mode=cb.checked?'AUTO_SAFE':'PAUSED';saveCfg(c);
- try{
-   document.documentElement.classList.toggle('yardivo-smart-off',!cb.checked);
-   document.documentElement.classList.toggle('yardivo-smart-on',cb.checked);
-   const nav=document.querySelector('.nav-btn[data-view="smartReplanning"]');
-   const view=document.getElementById('smartReplanning');
-   if(!cb.checked){
-     nav?.style.setProperty('display','none','important');
-     nav?.classList.add('role-hidden');
-     view?.classList.remove('active');
-     view?.style.setProperty('display','none','important');
-     document.getElementById('yardivoAutoReplanAlertStack')?.replaceChildren();
-   }else{
-     nav?.style.removeProperty('display');
-     view?.style.removeProperty('display');
-     setTimeout(()=>YardivoSmartReplanning?.render?.(),0);
-   }
- }catch(e){}
- try{YardivoSmartReplanning?.render?.()}catch(e){}
- try{showYmsToast?.('info','SMART REPLANNING',cb.checked?'AUTO SAFE je uključen.':'AUTO SAFE je pauziran.')}catch(e){}
-});
-}
-function enforceAdminControl(){
- const mode=document.getElementById('srpMode');if(mode){mode.disabled=!admin();mode.title=admin()?'':'AUTO SAFE može mijenjati samo Admin u Postavkama.'}
- const late=document.getElementById('srpLate');if(late)late.disabled=!admin();
-}
-
-function injectWar(){
- if(document.getElementById('yardivoWarRoom'))return;
- document.body.insertAdjacentHTML('beforeend',`<div id="yardivoWarRoom"><div class="wr-bg"></div><div class="wr-scan"></div><div class="wr-shell">
- <header class="wr-header"><div class="wr-brand"><div class="wr-logo3d"><div class="wr-y">Y</div></div><div><h1>YARDIVO</h1><small>LOGISTICS CONTROL TOWER · WAR ROOM</small></div></div><div class="wr-center"><strong>LIVE OPERATIONS COMMAND</strong><small id="wrSubtitle">REAL-TIME YARD INTELLIGENCE</small></div><div class="wr-actions"><button id="wrCycleWh">PROMIJENI SKLADIŠTE</button><button id="wrFull">FULL SCREEN</button><button id="wrExit">IZLAZ</button></div></header>
- <div class="wr-main">
-  <div class="wr-col">
-   <section class="wr-panel"><div class="wr-panel-head">OPERATIONS · DANAS</div><div class="wr-kpis"><div class="wr-kpi"><small>NAJAVE</small><strong id="wrAnn">0</strong></div><div class="wr-kpi good"><small>ZAPRIMLJENO</small><strong id="wrRec">0</strong></div><div class="wr-kpi alert"><small>KASNI</small><strong id="wrLate">0</strong></div><div class="wr-kpi alert"><small>INCIDENTI</small><strong id="wrInc">0</strong></div><div class="wr-kpi"><small>U DVORIŠTU</small><strong id="wrYard">0</strong></div><div class="wr-kpi"><small>NA RAMPI</small><strong id="wrDock">0</strong></div></div></section>
-   <section class="wr-panel"><div class="wr-panel-head">ARRIVALS · PRIORITET</div><div class="wr-list" id="wrArrivals"></div></section>
-  </div>
-  <section class="wr-twin"><div class="wr-twin-title" id="wrTwinTitle">LIVE YARD · 3D DIGITAL TWIN</div><div class="wr-yard" id="wrYardCanvas"></div></section>
-  <div class="wr-col">
-   <section class="wr-panel"><div class="wr-panel-head">YARD CONGESTION INDEX</div><div class="wr-congestion"><strong><span>OPTEREĆENJE</span><span id="wrCongText">0 / 100</span></strong><div class="wr-meter"><i id="wrCongBar"></i></div></div></section>
-   <section class="wr-panel"><div class="wr-panel-head">⚡ SMART REPLANNING · ZADNJE ODLUKE</div><div class="wr-replan" id="wrReplans"></div></section>
-   <section class="wr-panel"><div class="wr-panel-head">RAMPE · STATUS</div><div class="wr-list" id="wrDockStatus"></div></section>
-  </div>
- </div>
- <footer class="wr-footer"><div class="wr-live"><i></i>LIVE · AUTO REFRESH 10s</div><div class="wr-ticker"><div class="wr-ticker-inner" id="wrTicker">YARDIVO Control Tower aktivan.</div></div><div class="wr-clock"><strong id="wrClock">--:--:--</strong><small id="wrDate"></small></div></footer>
- </div></div>`);
- document.getElementById('wrExit').onclick=closeWar;
- document.getElementById('wrFull').onclick=()=>{try{document.documentElement.requestFullscreen?.()}catch(e){}};
- document.getElementById('wrCycleWh').onclick=cycleWarehouse;
-}
-function ensureWarButton(){
- if(document.getElementById('yardivoWarButton'))return;
- const header=document.querySelector('.topbar')||document.querySelector('header')||document.body;
- const b=document.createElement('button');b.id='yardivoWarButton';b.className='secondary';b.type='button';b.textContent='◈ WAR ROOM';b.style.cssText='min-height:34px;margin-left:7px;font-size:7px;font-weight:1000;';
- b.onclick=openWar;
- const anchor=document.getElementById('yardivoFullscreenBtn')||header.lastElementChild;
- if(anchor?.parentNode)anchor.parentNode.insertBefore(b,anchor);else header.appendChild(b);
-}
-function openWar(){injectWar();document.getElementById('yardivoWarRoom').classList.add('active');document.body.style.overflow='hidden';renderWar();clearInterval(wrTimer);wrTimer=setInterval(renderWar,10000)}
-function closeWar(){document.getElementById('yardivoWarRoom')?.classList.remove('active');document.body.style.overflow='';clearInterval(wrTimer);wrTimer=null;try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}}
-function cycleWarehouse(){const ks=Object.keys(typeof WAREHOUSES!=='undefined'?WAREHOUSES:{});if(!ks.length)return;const i=Math.max(0,ks.indexOf(currentWh()));wrWarehouse=ks[(i+1)%ks.length];renderWar()}
-function renderWar(){
- const host=document.getElementById('yardivoWarRoom');if(!host?.classList.contains('active'))return;
- const w=currentWh(),wc=whCfg(w),d=today(),list=A().filter(a=>(a.warehouse||'W101')===w&&a.date===d),ramps=Number(wc.ramps||6);
- const counts={received:0,late:0,yard:0,dock:0};list.forEach(a=>{const p=phase(a);if(p==='done'&&a.receivedAt)counts.received++;if(delay(a)>15&&!['done','dock','yard'].includes(p))counts.late++;if(p==='yard')counts.yard++;if(p==='dock')counts.dock++});
- let inc=0;try{inc=incidents.filter(i=>i.date===d&&(i.warehouse||w)===w).length}catch(e){}
- document.getElementById('wrAnn').textContent=list.length;document.getElementById('wrRec').textContent=counts.received;document.getElementById('wrLate').textContent=counts.late;document.getElementById('wrInc').textContent=inc;document.getElementById('wrYard').textContent=counts.yard;document.getElementById('wrDock').textContent=counts.dock;
- document.getElementById('wrSubtitle').textContent=`${wc.label||w} · ${d}`;
- const congestion=Math.min(100,Math.round((counts.yard*12)+(counts.dock/Math.max(1,ramps))*55+(counts.late*5)+(inc*7)));
- document.getElementById('wrCongText').textContent=`${congestion} / 100 · ${congestion>=80?'CRITICAL':congestion>=55?'HIGH':congestion>=30?'MODERATE':'NORMAL'}`;document.getElementById('wrCongBar').style.width=congestion+'%';
- const arr=list.filter(a=>!['done'].includes(phase(a))).sort((a,b)=>String(a.time).localeCompare(String(b.time))).slice(0,7);
- document.getElementById('wrArrivals').innerHTML=arr.length?arr.map(a=>`<div class="wr-row ${delay(a)>15?'bad':''}"><strong>${esc(a.time)} · ${esc(a.supplier||'—')}</strong><br><span>${esc(plate(a))} · R${a.dock||'—'}${delay(a)>15?' · KASNI +'+delay(a)+' min':''}</span></div>`).join(''):'<div class="wr-row"><span>Nema aktivnih dolazaka.</span></div>';
- const recent=logs().filter(x=>x.status==='APPLIED').slice(-4).reverse();document.getElementById('wrReplans').innerHTML=recent.length?recent.map(x=>`<div class="wr-replan-card"><b>${esc(x.supplier)}</b><small>${esc(x.old.time)} R${x.old.dock} → ${esc(x.newSlot.time)} R${x.newSlot.dock}<br>${esc(x.problemType)} · ${x.confidence||0}%</small></div>`).join(''):'<div class="wr-replan-card"><small>Nema automatskih promjena.</small></div>';
- let ds='';for(let dock=1;dock<=ramps;dock++){const active=list.find(a=>Number(a.dock)===dock&&phase(a)==='dock');ds+=`<div class="wr-row ${locked(w,dock)?'bad':''}"><strong>R${dock} · ${locked(w,dock)?'ZATVORENA':active?'ZAUZETA':'SLOBODNA'}</strong><br><span>${active?esc(active.supplier)+' · '+esc(plate(active)):'—'}</span></div>`}document.getElementById('wrDockStatus').innerHTML=ds;
- renderTwin(list,w,wc);
- const events=[];arr.slice(0,4).forEach(a=>events.push(`${a.time} · ${a.supplier} · R${a.dock||'—'}${delay(a)>15?' · kasni +'+delay(a)+' min':''}`));recent.slice(0,3).forEach(x=>events.push(`YARDIVO replan · ${x.supplier} · R${x.old.dock} → R${x.newSlot.dock}`));document.getElementById('wrTicker').textContent=events.join('     ◈     ')||'YARDIVO Control Tower · operacija stabilna';
- const n=new Date();document.getElementById('wrClock').textContent=n.toLocaleTimeString('hr-HR');document.getElementById('wrDate').textContent=n.toLocaleDateString('hr-HR');
-}
-function renderTwin(list,w,wc){
- const ramps=Number(wc.ramps||6),canvas=document.getElementById('wrYardCanvas');let out=`<div class="wr-wh"><b>${esc(wc.label||w)}</b></div><div class="wr-docks" style="grid-template-columns:repeat(${ramps},1fr)">`;
- for(let d=1;d<=ramps;d++){const busy=list.some(a=>Number(a.dock)===d&&phase(a)==='dock');out+=`<div class="wr-dock ${busy?'busy':''} ${locked(w,d)?'closed':''}">R${d}</div>`}out+='</div><div class="wr-road"></div>';
- list.filter(a=>phase(a)!=='done').forEach((a,i)=>{const p=phase(a),dock=Math.max(1,Math.min(ramps,Number(a.dock||1)));let left=20+(i%6)*10,top=53+Math.floor(i/6)*7;if(p==='dock'){left=10+((dock-.5)/ramps)*80-6;top=28}else if(p==='yard'){left=58+(i%4)*8;top=63}else if(p==='gate'){left=12+(i%3)*9;top=77}out+=`<div class="wr-truck ${delay(a)>15?'late':''}" style="left:${left}%;top:${top}%"><b>${esc(a.supplier||'—')}</b><small>${esc(plate(a))} · R${a.dock||'—'}</small></div>`});canvas.innerHTML=out;
-}
-window.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('yardivoWarRoom')?.classList.contains('active'))closeWar()});
-window.addEventListener('load',()=>setTimeout(()=>{injectAdminSetting();injectWar();ensureWarButton();enforceAdminControl()},1800));
-setInterval(()=>{injectAdminSetting();ensureWarButton();enforceAdminControl()},3000);
-window.YardivoWarRoom={open:openWar,close:closeWar,render:renderWar};
-})();
-</script>
 <script data-disabled-by="yardivo-v30" id="yardivo-live-yard-tv-v5" type="text/plain">
 (function(){
 'use strict';
@@ -23291,196 +23134,6 @@ window.YardivoMyYardWebGL={boot,refresh:()=>engine?.sync()};
 body.light-mode #yardivoWarRoomWebGL{background:#dfe9e3}
 body.light-mode #yardivoWarRoomWebGL .wr3-hud,body.light-mode #yardivoWarRoomWebGL .wr3-legend{background:#fffffff0;color:#435249;border-color:#b9c9bf}
 </style>
-<script id="yardivo-warroom-webgl-sync-v1-20260831">
-(function(){
-'use strict';
-let engine=null,loading=null;
-const CDN='https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
-
-function today(){const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
-function data(){try{return Array.isArray(announcements)?announcements:[]}catch(_){return[]}}
-function warehouse(){
- try{
-   const wrSel=document.querySelector('#yardivoWarRoom select[data-warehouse],#yardivoWarRoom #wrWarehouse,#yardivoWarRoom select');
-   const val=wrSel?.value;
-   if(val&&val!=='ALL')return val;
-   return activeWarehouse&&activeWarehouse!=='ALL'?activeWarehouse:(currentSession?.location==='DU'?'W201':'W101')
- }catch(_){return'W101'}
-}
-function selectedDate(){
- const wrDate=document.querySelector('#yardivoWarRoom input[type="date"]');
- return wrDate?.value||document.querySelector('#myYard .myy-date')?.value||today()
-}
-function rampCount(w){try{return Math.max(1,Number(YardivoRampConfig?.count?.(w)||WAREHOUSES?.[w]?.ramps||6))}catch(_){return 6}}
-function phase(a,d){
- const s=String(a?.status||'').toLowerCase();
- /* Status is authoritative for the selected appointment date.
-    Never force historical days back to U DOLASKU. */
- if(a?.rejectedAt||s.includes('odbij'))return'rejected';
- if(a?.gateOutAt||a?.completedAt||a?.receivedAt||s.includes('zaprim')||s.includes('završ')||s.includes('izašao')||s.includes('izasao'))return'done';
- if(a?.dockArrivalAt||s.includes('rampi')||s.includes('dock'))return'dock';
- if(a?.yardArrivalAt||s.includes('dvori')||s.includes('ček'))return'yard';
- if(a?.gateCheckedAt||a?.actualDate||a?.actualTime||s.includes('porta')||s.includes('gate')||s.includes('ulaz'))return'gate';
- return'incoming'
-}
-function ensureHost(){
- const stage=document.querySelector('#yardivoWarRoom #wrYardCanvas');if(!stage)return null;
- let host=document.getElementById('yardivoWarRoomWebGL');
- if(!host){
-  host=document.createElement('div');host.id='yardivoWarRoomWebGL';
-  host.innerHTML='<div class="wr3-load">YARDIVO · UČITAVAM WAR ROOM WEBGL…</div><div class="wr3-hud"><i></i><b>WAR ROOM · 3D DIGITAL TWIN</b><span>SYNC S MY YARD</span></div><div class="wr3-legend"><b>STATUS</b> · U DOLASKU / PORTA / DVORIŠTE / RAMPA / IZLAZ</div>';
-  stage.prepend(host);
- }
- return host
-}
-async function loadThree(){
- if(window.__YARDIVO_THREE_MODULE__)return window.__YARDIVO_THREE_MODULE__;
- if(loading)return loading;
- loading=import(CDN).then(T=>{window.__YARDIVO_THREE_MODULE__=T;return T});
- return loading;
-}
-function canvasLabel(T,text,color='#eaf3ed',border='#3d9c64'){
- const c=document.createElement('canvas');c.width=512;c.height=96;const x=c.getContext('2d');
- x.fillStyle='rgba(5,10,7,.88)';x.roundRect(5,5,502,86,14);x.fill();
- x.strokeStyle=border;x.lineWidth=3;x.stroke();
- x.fillStyle=color;x.font='900 29px Arial';x.textAlign='center';x.textBaseline='middle';x.fillText(String(text||'').slice(0,28),256,48);
- const tex=new T.CanvasTexture(c);tex.colorSpace=T.SRGBColorSpace;
- const s=new T.Sprite(new T.SpriteMaterial({map:tex,transparent:true,depthTest:false}));s.scale.set(9,1.7,1);return s
-}
-function buildEngine(T,host){
- host.querySelector('.wr3-load')?.remove();
- const scene=new T.Scene();scene.background=new T.Color(0x09100c);scene.fog=new T.FogExp2(0x09100c,.0105);
- const camera=new T.PerspectiveCamera(42,1,.1,350);
- let renderer;
- try{renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})}
- catch(e){host.insertAdjacentHTML('beforeend','<div class="wr3-error">WEBGL nije dostupan u ovom browseru.</div>');return null}
- renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
- renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;host.appendChild(renderer.domElement);
-
- scene.add(new T.HemisphereLight(0xe7f0ea,0x172019,1.65));
- const sun=new T.DirectionalLight(0xffffff,2.4);sun.position.set(-32,45,24);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
- sun.shadow.camera.left=-70;sun.shadow.camera.right=70;sun.shadow.camera.top=60;sun.shadow.camera.bottom=-60;scene.add(sun);
- const fill=new T.DirectionalLight(0x8dc9a5,.75);fill.position.set(35,18,30);scene.add(fill);
-
- const mat=(color,rough=.72,metal=.06)=>new T.MeshStandardMaterial({color,roughness:rough,metalness:metal});
- function mesh(g,m,x,y,z,shadow=true){const o=new T.Mesh(g,m);o.position.set(x,y,z);o.castShadow=shadow;o.receiveShadow=shadow;scene.add(o);return o}
- function box(w,h,d,color,x,y,z,rough=.72,metal=.06){return mesh(new T.BoxGeometry(w,h,d),mat(color,rough,metal),x,y,z)}
- const ground=mesh(new T.PlaneGeometry(112,72),mat(0x29332e,.98,.01),0,0,0);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;
- const road=mesh(new T.PlaneGeometry(101,19),mat(0x1c2320,.96,.01),0,.018,14,false);road.rotation.x=-Math.PI/2;
- const apron=mesh(new T.PlaneGeometry(75,15),mat(0x343e39,.94,.01),7,.022,-10,false);apron.rotation.x=-Math.PI/2;
- const lineMat=new T.MeshBasicMaterial({color:0xd9d8bf});
- for(let x=-47;x<49;x+=7){const l=mesh(new T.PlaneGeometry(3.2,.15),lineMat,x,.035,14,false);l.rotation.x=-Math.PI/2}
- for(let i=0;i<8;i++){const l=mesh(new T.PlaneGeometry(.14,10),lineMat,-25+i*7.5,.036,-9,false);l.rotation.x=-Math.PI/2}
-
- box(70,9,14,0xd6ddda,8,4.5,-24,.68,.10);
- box(71,.35,15,0xf0f3f1,8,9.1,-24,.45,.18);
- for(let x=-20;x<=34;x+=9)box(5,.08,2.2,0x9db5b0,x,9.31,-24,.28,.28);
- box(13,5.5,9,0x66736c,37,2.75,-13.5,.8,.04);
-
- const staticObjects=[];
- function rebuildRamps(n){
-   staticObjects.splice(0).forEach(o=>scene.remove(o));
-   for(let i=1;i<=n;i++){
-     const x=-22+(i-1)*(49/Math.max(1,n-1));
-     const door=box(5.1,4.4,.22,0x1a201d,x,2.25,-16.9,.65,.12);staticObjects.push(door);
-     const dock=box(5.5,.55,3.1,0x0d110f,x,.28,-15.3,.7,.15);staticObjects.push(dock);
-     const b1=box(.35,.8,.5,0xc62f36,x-2.15,.55,-13.7,.6,.08),b2=box(.35,.8,.5,0xc62f36,x+2.15,.55,-13.7,.6,.08);staticObjects.push(b1,b2);
-     const lab=canvasLabel(T,'R'+i);lab.scale.set(3.2,.64,1);lab.position.set(x,5.25,-16.6);scene.add(lab);staticObjects.push(lab);
-   }
- }
- box(8,4.2,6.5,0x46524c,-39,2.1,24,.76,.06);
- box(8.5,.25,.28,0xe5e8e5,-31,1.1,21,.45,.12);
- box(8.5,.25,.28,0xe5e8e5,-31,1.1,27,.45,.12);
- const gateLab=canvasLabel(T,'PORTA','#f7e7ae','#c9a747');gateLab.scale.set(4.6,.88,1);gateLab.position.set(-39,5.2,24);scene.add(gateLab);
- const inLab=canvasLabel(T,'ULAZ','#d9efe1','#4eb47a');inLab.scale.set(4,.78,1);inLab.position.set(-48,2.4,14);scene.add(inLab);
- const outLab=canvasLabel(T,'IZLAZ','#f1d9da','#c95a60');outLab.scale.set(4,.78,1);outLab.position.set(-48,2.4,29);scene.add(outLab);
- for(let x=-42;x<=42;x+=12){const pole=box(.18,5,.18,0x5b6660,x,2.5,5,.55,.45);const lamp=box(1.1,.18,.5,0xe6e3c7,x,5,5,.3,.3);staticObjects.push(pole,lamp)}
-
- const trucks=new Map(),ray=new T.Raycaster(),mouse=new T.Vector2();
- function truck(a){
-   const g=new T.Group();g.userData={a,opacity:1};
-   const trailer=new T.Mesh(new T.BoxGeometry(7.4,2.6,2.55),mat(0xe8ece9,.42,.14));trailer.position.set(-1.25,1.7,0);trailer.castShadow=true;g.add(trailer);
-   const side=new T.Mesh(new T.BoxGeometry(7.1,1.45,.04),mat(0xf7f8f7,.36,.12));side.position.set(-1.25,1.8,1.295);g.add(side);
-   const cab=new T.Mesh(new T.BoxGeometry(2.5,2.85,2.45),mat(0xf3f5f3,.38,.17));cab.position.set(3.65,1.48,0);cab.castShadow=true;g.add(cab);
-   const glass=new T.Mesh(new T.BoxGeometry(.06,1.15,1.75),mat(0x233942,.18,.3));glass.position.set(4.93,1.9,0);g.add(glass);
-   const chassis=new T.Mesh(new T.BoxGeometry(8.7,.42,2.15),mat(0x151a17,.88,.16));chassis.position.set(.2,.48,0);g.add(chassis);
-   const wg=new T.CylinderGeometry(.49,.49,.4,20),wm=mat(0x090b0a,.9,.04);
-   [[-3.2,.5,-1.25],[-3.2,.5,1.25],[1.65,.5,-1.25],[1.65,.5,1.25],[3.7,.5,-1.25],[3.7,.5,1.25]].forEach(p=>{const w=new T.Mesh(wg,wm);w.rotation.x=Math.PI/2;w.position.set(...p);w.castShadow=true;g.add(w)});
-   const label=canvasLabel(T,a.supplier||'DOBAVLJAČ');label.position.set(0,4.1,0);g.add(label);
-   g.traverse(o=>{if(o.isMesh)o.userData.a=a});return g
- }
- function target(a,i,n,d){
-   const q=phase(a,d),dock=Math.max(1,Math.min(n,Number(a.dock)||1)),rx=-22+(dock-1)*(49/Math.max(1,n-1));
-   if(q==='dock')return{q,p:new T.Vector3(rx,.05,-11.9),r:-Math.PI/2,op:1};
-   if(q==='yard')return{q,p:new T.Vector3(-7+(i%5)*9,.05,-1+Math.floor(i/5)*6.3),r:Math.PI,op:1};
-   if(q==='gate')return{q,p:new T.Vector3(-31+(i%2)*8,.05,20+(i%2)*5.5),r:-Math.PI/2,op:1};
-   if(q==='done'||q==='rejected')return{q,p:new T.Vector3(-55,.05,29-(i%3)*4),r:Math.PI,op:0};
-   return{q,p:new T.Vector3(-62-(i%4)*10,.05,10+(i%5)*4.2),r:-Math.PI/2,op:1}
- }
- let currentRamps=0,currentWh='',yaw=-.64,pitch=.70,dist=82,drag=false,moved=false,px=0,py=0;
- function cameraApply(){const cp=Math.cos(pitch);camera.position.set(Math.sin(yaw)*cp*dist,Math.sin(pitch)*dist,Math.cos(yaw)*cp*dist);camera.lookAt(0,0,-2)}
- cameraApply();
- renderer.domElement.addEventListener('pointerdown',e=>{if(e.button!==0)return;drag=true;moved=false;px=e.clientX;py=e.clientY;renderer.domElement.setPointerCapture?.(e.pointerId)});
- renderer.domElement.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-px,dy=e.clientY-py;if(Math.abs(dx)+Math.abs(dy)>3)moved=true;yaw-=dx*.0075;pitch=Math.max(.28,Math.min(1.18,pitch+dy*.005));px=e.clientX;py=e.clientY;cameraApply()});
- const stop=e=>{drag=false;try{renderer.domElement.releasePointerCapture?.(e.pointerId)}catch(_){}};
- renderer.domElement.addEventListener('pointerup',stop);renderer.domElement.addEventListener('pointercancel',stop);
- renderer.domElement.addEventListener('wheel',e=>{if(!e.ctrlKey)return;e.preventDefault();dist=Math.max(35,Math.min(125,dist+e.deltaY*.055));cameraApply()},{passive:false});
- renderer.domElement.addEventListener('click',e=>{
-   if(moved)return;const r=renderer.domElement.getBoundingClientRect();mouse.x=((e.clientX-r.left)/r.width)*2-1;mouse.y=-((e.clientY-r.top)/r.height)*2+1;ray.setFromCamera(mouse,camera);
-   const objs=[];trucks.forEach(g=>g.traverse(o=>{if(o.isMesh)objs.push(o)}));const hit=ray.intersectObjects(objs,true)[0];const a=hit?.object?.userData?.a;
-   if(a){
-     try{
-       if(window.YardivoMyYard?.show){
-         const legacy=document.querySelector(`#myYard .myy-truck[data-id="${CSS.escape(String(a.id))}"]`);
-         if(legacy)legacy.click();
-       }
-     }catch(_){}
-   }
- });
- const ro=new ResizeObserver(()=>{const w=Math.max(10,host.clientWidth),hh=Math.max(10,host.clientHeight);renderer.setSize(w,hh,false);camera.aspect=w/hh;camera.updateProjectionMatrix()});ro.observe(host);
- function sync(){
-   const w=warehouse(),d=selectedDate(),n=rampCount(w);
-   if(w!==currentWh||n!==currentRamps){rebuildRamps(n);currentWh=w;currentRamps=n}
-   const list=data().filter(a=>(a.warehouse||'W101')===w&&a.date===d).slice(-80),alive=new Set();
-   list.forEach((a,i)=>{const id=String(a.id);alive.add(id);let g=trucks.get(id);const t=target(a,i,n,d);
-     if(!g){g=truck(a);g.position.copy(t.q==='incoming'?t.p:t.p.clone().add(new T.Vector3(-15,0,12)));g.rotation.y=t.r;scene.add(g);trucks.set(id,g)}
-     g.userData.a=a;g.userData.target=t.p;g.userData.targetRot=t.r;g.userData.targetOpacity=t.op;
-     g.traverse(o=>{if(o.isMesh)o.userData.a=a});
-   });
-   trucks.forEach((g,id)=>{if(!alive.has(id)){scene.remove(g);trucks.delete(id)}})
- }
- function loop(){
-   trucks.forEach(g=>{
-     if(g.userData.target)g.position.lerp(g.userData.target,.055);
-     if(g.userData.targetRot!=null){let d=g.userData.targetRot-g.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));g.rotation.y+=d*.055}
-     const want=g.userData.targetOpacity??1;g.userData.opacity+=(want-g.userData.opacity)*.045;g.visible=g.userData.opacity>.025;
-     g.traverse(o=>{if(o.material){o.material.transparent=g.userData.opacity<.995;o.material.opacity=g.userData.opacity}});
-   });
-   renderer.render(scene,camera);requestAnimationFrame(loop)
- }
- sync();loop();
- return{sync,renderer,scene,camera}
-}
-async function boot(){
- const room=document.getElementById('yardivoWarRoom');
- if(!room)return;
- const host=ensureHost();if(!host)return;
- try{
-   const T=await loadThree();
-   if(!engine)engine=buildEngine(T,host);
-   engine?.sync();
- }catch(err){
-   console.error('YARDIVO War Room WebGL',err);
-   host.querySelector('.wr3-load')?.remove();
-   if(!host.querySelector('.wr3-error'))host.insertAdjacentHTML('beforeend','<div class="wr3-error">3D engine se nije mogao učitati.</div>');
- }
-}
-document.addEventListener('click',e=>{if(e.target.closest('[data-view="yardivoWarRoom"],[data-home-target="yardivoWarRoom"],[data-view="controltower"],[data-view="controlTower"]'))setTimeout(boot,100)},true);
-window.addEventListener('load',()=>setTimeout(boot,1200));
-setInterval(()=>{const r=document.getElementById('yardivoWarRoom');if(r?.classList.contains('active')||r?.offsetParent)boot()},1300);
-window.YardivoWarRoomWebGL={boot,refresh:()=>engine?.sync()};
-})();
-</script>
 <style id="yardivo-myyard-webgl-lighten-v1-20260831">
 /* Brighten My Yard only; keep War Room darker for control-room contrast. */
 #yardivoMyYardWebGL{background:#cfdad3!important}
@@ -23799,165 +23452,6 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{
  }
  window.addEventListener('load',enhance);
  new MutationObserver(enhance).observe(document.documentElement,{childList:true,subtree:true});
-})();
-</script>
-<style id="yardivo-warroom-exact-myyard-mirror-v1-20260831">
-/* WAR ROOM = exact visual mirror of MY YARD */
-#yardivoWarRoom #wrYardCanvas{position:relative!important;overflow:hidden!important;min-height:560px}
-#yardivoWarRoomWebGL{display:none!important}
-#yardivoWarRoomMyYardMirror{position:absolute;inset:0;z-index:30;background:#cfdad3;overflow:hidden}
-#yardivoWarRoomMyYardMirror canvas{display:block;width:100%!important;height:100%!important;cursor:grab;touch-action:none}
-#yardivoWarRoomMyYardMirror .wrmirror-badge{
- position:absolute;left:16px;top:16px;z-index:5;padding:7px 11px;border:1px solid #9bb2a5;border-radius:999px;
- background:#f8fbf9e8;color:#2d3b34;font:900 8px Arial;letter-spacing:.05em;pointer-events:none
-}
-</style>
-<script id="yardivo-warroom-exact-myyard-mirror-v1-20260831-js">
-(function(){
-'use strict';
-let mirrorRenderer=null,mirrorScene=null,mirrorCamera=null,ro=null,raf=0;
-
-async function boot(){
- const stage=document.querySelector('#yardivoWarRoom #wrYardCanvas');
- if(!stage)return;
- let host=document.getElementById('yardivoWarRoomMyYardMirror');
- if(!host){
-   host=document.createElement('div');host.id='yardivoWarRoomMyYardMirror';
-   host.innerHTML='<div class="wrmirror-badge">WAR ROOM · MY YARD DIGITAL TWIN</div>';
-   stage.prepend(host);
- }
- try{
-   // Ensure the canonical My Yard engine exists. War Room renders the SAME scene and camera.
-   if(window.YardivoMyYardWebGL?.boot) await window.YardivoMyYardWebGL.boot();
-   const e=window.__YARDIVO_MYYARD_ENGINE__;
-   const T=window.__YARDIVO_THREE_MODULE__;
-   if(!e||!T)return;
-
-   mirrorScene=e.scene; if(!mirrorCamera)mirrorCamera=e.camera.clone();
-   if(mirrorRenderer && mirrorRenderer.domElement.parentElement!==host) host.appendChild(mirrorRenderer.domElement);
-   if(!mirrorRenderer){
-     mirrorRenderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-     mirrorRenderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));
-     mirrorRenderer.shadowMap.enabled=true;mirrorRenderer.shadowMap.type=T.PCFSoftShadowMap;
-     mirrorRenderer.outputColorSpace=T.SRGBColorSpace;
-     mirrorRenderer.toneMapping=T.ACESFilmicToneMapping;
-     mirrorRenderer.toneMappingExposure=e.renderer?.toneMappingExposure||1.22;
-     host.appendChild(mirrorRenderer.domElement);
-
-     const c=mirrorRenderer.domElement;
-     c.style.pointerEvents='auto';
-     c.style.cursor='grab';
-
-     /* War Room has the SAME camera controls as My Yard.
-        We manipulate the canonical My Yard camera, while the mirror camera remains
-        an aspect-safe clone that copies it every frame. */
-     let wrDrag=false,wrMoved=false,wrPointerId=null,wrX=0,wrY=0;
-
-     function wrStop(ev){
-       wrDrag=false;
-       c.style.cursor='grab';
-       const id=ev?.pointerId??wrPointerId;
-       wrPointerId=null;
-       try{if(id!=null&&c.hasPointerCapture?.(id))c.releasePointerCapture(id)}catch(_){}
-     }
-     c.addEventListener('pointerdown',ev=>{
-       if(ev.button!==0)return;
-       wrDrag=true;wrMoved=false;wrPointerId=ev.pointerId;wrX=ev.clientX;wrY=ev.clientY;
-       c.style.cursor='grabbing';
-       try{c.setPointerCapture?.(ev.pointerId)}catch(_){}
-     });
-     c.addEventListener('pointermove',ev=>{
-       if(!wrDrag)return;
-       if((ev.buttons&1)!==1){wrStop(ev);return}
-       const dx=ev.clientX-wrX,dy=ev.clientY-wrY;
-       if(Math.abs(dx)+Math.abs(dy)>3)wrMoved=true;
-       const canonical=window.__YARDIVO_MYYARD_ENGINE__;
-       const cam=canonical?.camera;
-       if(cam){
-         const target=new T.Vector3(0,0,-2);
-         const off=cam.position.clone().sub(target);
-         const sph=new T.Spherical().setFromVector3(off);
-         sph.theta-=dx*.0075;
-         sph.phi=Math.max(.28,Math.min(1.18,sph.phi+dy*.005));
-         cam.position.copy(new T.Vector3().setFromSpherical(sph).add(target));
-         cam.lookAt(target);
-         cam.updateMatrixWorld();
-       }
-       wrX=ev.clientX;wrY=ev.clientY;
-     });
-     c.addEventListener('pointerup',wrStop);
-     c.addEventListener('pointercancel',wrStop);
-     c.addEventListener('lostpointercapture',wrStop);
-     window.addEventListener('pointerup',wrStop,true);
-     window.addEventListener('blur',()=>wrStop(),true);
-
-     c.addEventListener('wheel',ev=>{
-       if(!ev.ctrlKey)return;
-       ev.preventDefault();
-       const canonical=window.__YARDIVO_MYYARD_ENGINE__;
-       const cam=canonical?.camera;
-       if(!cam)return;
-       const target=new T.Vector3(0,0,-2),off=cam.position.clone().sub(target);
-       const len=Math.max(35,Math.min(125,off.length()+(ev.deltaY*.055)));
-       cam.position.copy(off.normalize().multiplyScalar(len).add(target));
-       cam.lookAt(target);
-       cam.updateMatrixWorld();
-     },{passive:false});
-
-     /* Truck click behaves exactly like My Yard. */
-     const wrRay=new T.Raycaster(),wrMouse=new T.Vector2();
-     c.addEventListener('click',ev=>{
-       if(wrMoved){wrMoved=false;return}
-       const canonical=window.__YARDIVO_MYYARD_ENGINE__;
-       const cam=canonical?.camera;
-       if(!cam)return;
-       const r=c.getBoundingClientRect();
-       wrMouse.x=((ev.clientX-r.left)/r.width)*2-1;
-       wrMouse.y=-((ev.clientY-r.top)/r.height)*2+1;
-       wrRay.setFromCamera(wrMouse,cam);
-       const objs=[];
-       canonical?.trucks?.forEach?.(g=>g.traverse(o=>{if(o.isMesh)objs.push(o)}));
-       const hit=wrRay.intersectObjects(objs,true)[0];
-       const a=hit?.object?.userData?.a || hit?.object?.userData?.announcement;
-       if(a){
-         try{
-           const legacy=document.querySelector(`#myYard .myy-truck[data-id="${CSS.escape(String(a.id))}"]`);
-           legacy?.click();
-         }catch(_){}
-       }
-     });
-
-     ro=new ResizeObserver(()=>{
-       const w=Math.max(10,host.clientWidth),hh=Math.max(10,host.clientHeight);
-       mirrorRenderer.setSize(w,hh,false);mirrorCamera.aspect=w/hh;mirrorCamera.updateProjectionMatrix();
-     });ro.observe(host);
-   }
-   window.YardivoMyYardWebGL?.refresh?.();
-   if(!raf){
-     const draw=()=>{
-       raf=requestAnimationFrame(draw);
-       const canonical=window.__YARDIVO_MYYARD_ENGINE__;
-       if(mirrorRenderer&&mirrorScene&&mirrorCamera&&canonical?.camera){
-         const src=canonical.camera;
-         mirrorCamera.position.copy(src.position);
-         mirrorCamera.quaternion.copy(src.quaternion);
-         mirrorCamera.fov=src.fov;
-         mirrorCamera.near=src.near;mirrorCamera.far=src.far;
-         mirrorCamera.updateProjectionMatrix();
-         mirrorRenderer.toneMappingExposure=canonical.renderer?.toneMappingExposure||mirrorRenderer.toneMappingExposure;
-         mirrorRenderer.render(mirrorScene,mirrorCamera);
-       }
-     };
-     draw();
-   }
- }catch(err){console.error('YARDIVO exact War Room mirror',err)}
-}
-document.addEventListener('click',e=>{
- if(e.target.closest('[data-view="yardivoWarRoom"],[data-home-target="yardivoWarRoom"],[data-view="controltower"],[data-view="controlTower"]'))setTimeout(boot,120)
-},true);
-window.addEventListener('load',()=>setTimeout(boot,1400));
-setInterval(()=>{const r=document.getElementById('yardivoWarRoom');if(r?.classList.contains('active')||r?.offsetParent)boot()},1600);
-window.YardivoWarRoomExactMirror={boot};
 })();
 </script>
 <style id="yardivo-ux-original-option-v1-20260831">
@@ -24384,66 +23878,6 @@ document.addEventListener('click',e=>{
  if(e.target.closest('[data-view="myYard"],[data-home-target="myYard"],#yardivoUxStyleSetting'))setTimeout(()=>apply(true),180);
 },true);
 new MutationObserver(()=>apply(false)).observe(document.documentElement,{attributes:true,attributeFilter:['data-yardivo-ux']});
-})();
-</script>
-<style id="yardivo-warroom-blank-fix-v2-20260831">
-/* Older War Room CSS hid every child except the obsolete renderer.
-   Explicitly make the canonical My Yard mirror visible. */
-#yardivoWarRoom #wrYardCanvas>#yardivoWarRoomMyYardMirror{
- display:block!important;visibility:visible!important;opacity:1!important;
- position:absolute!important;inset:0!important;z-index:60!important;
- min-height:560px!important;background:#263c31!important
-}
-#yardivoWarRoom #wrYardCanvas>#yardivoWarRoomMyYardMirror canvas{
- display:block!important;visibility:visible!important;opacity:1!important
-}
-#yardivoWarRoom #wrYardCanvas>#yardivoWarRoomWebGL,
-#yardivoWarRoom #wrYardCanvas>#yardivoFinalWarYard{display:none!important}
-</style>
-<script id="yardivo-warroom-blank-fix-v2-20260831-js">
-(function(){
-'use strict';
-let obs=null;
-function repair(){
- const room=document.getElementById('yardivoWarRoom'),stage=document.getElementById('wrYardCanvas');
- if(!room||!stage)return;
- let host=document.getElementById('yardivoWarRoomMyYardMirror');
- if(!host){
-   host=document.createElement('div');host.id='yardivoWarRoomMyYardMirror';
-   host.innerHTML='<div class="wrmirror-badge">WAR ROOM · MY YARD DIGITAL TWIN</div>';
-   stage.appendChild(host);
- }
- // The legacy War Room renderer rewrites wrYardCanvas. Re-run canonical mirror boot
- // after every such rewrite so its canvas is re-mounted instead of staying detached.
- Promise.resolve(window.YardivoWarRoomExactMirror?.boot?.()).then(()=>{
-   const canvas=[...document.querySelectorAll('canvas')].find(c=>{
-     const e=window.__YARDIVO_MYYARD_ENGINE__;
-     return c!==e?.renderer?.domElement && c.parentElement?.id==='yardivoWarRoomMyYardMirror';
-   });
-   if(canvas&&canvas.parentElement!==host)host.appendChild(canvas);
- }).catch(()=>{});
-}
-function watch(){
- const stage=document.getElementById('wrYardCanvas');if(!stage)return;
- if(obs)obs.disconnect();
- let busy=false;
- obs=new MutationObserver(()=>{
-   if(busy)return;busy=true;
-   setTimeout(()=>{repair();busy=false},30);
- });
- obs.observe(stage,{childList:true});
- repair();
-}
-window.addEventListener('load',()=>setTimeout(watch,1500));
-document.addEventListener('click',e=>{
- if(e.target.closest('#yardivoWarButton,[data-view="yardivoWarRoom"],[data-home-target="yardivoWarRoom"],[data-view="controltower"],[data-view="controlTower"]'))
-   setTimeout(watch,160);
-},true);
-setInterval(()=>{
- const r=document.getElementById('yardivoWarRoom');
- if(r?.classList.contains('active'))repair();
-},1200);
-window.YardivoWarRoomBlankRepair={repair,watch};
 })();
 </script>
 <style id="yardivo-theme-switch-clean-v2-20260831">
@@ -26977,7 +26411,7 @@ html[data-yardivo-main-theme="light"] #overview .overview-full-chart-scroll{
 <script id="yardivo-overview-fullwidth-chart-v1-20260901-js">
 (function(){
 'use strict';
-let raf=0;
+let raf=0,wheelBound=false;
 
 function esc(v){
   return String(v??'').replace(/[&<>"']/g,m=>({
@@ -26985,11 +26419,11 @@ function esc(v){
   }[m]));
 }
 function color(v){
-  if(v==null||!Number.isFinite(Number(v)))return '#7d8991';
+  if(v==null||!Number.isFinite(Number(v)))return '#aeb8bf';
   const n=Math.max(0,Math.min(100,Number(v)));
   return `hsl(${Math.round(n*1.2)} 76% ${n>=75?39:44}%)`;
 }
-function rows(){
+function statsRows(){
   try{
     const x=window.YardivoOverviewMaster?.currentStats?.();
     return Array.isArray(x)?x:[];
@@ -26998,6 +26432,79 @@ function rows(){
     return [];
   }
 }
+function allSupplierNames(){
+  const set=new Set();
+
+  /* Authoritative master supplier catalog. */
+  try{
+    if(Array.isArray(suppliers)){
+      suppliers.forEach(x=>{
+        const n=String(x||'').trim();
+        if(n)set.add(n);
+      });
+    }
+  }catch(_){}
+
+  /* Also include dynamically discovered suppliers so nobody disappears from Overview. */
+  try{
+    const extra=window.YardivoCleanCore?.supplierNames?.();
+    if(Array.isArray(extra))extra.forEach(x=>{
+      const n=String(x||'').trim();
+      if(n)set.add(n);
+    });
+  }catch(_){}
+
+  /* Always retain names already present in the reliability engine. */
+  statsRows().forEach(x=>{
+    const n=String(x?.name||'').trim();
+    if(n)set.add(n);
+  });
+
+  return [...set].sort((a,b)=>a.localeCompare(b,'hr'));
+}
+function mergedRows(){
+  const stats=statsRows();
+  const byName=new Map(stats.filter(Boolean).map(x=>[String(x.name||'').trim(),x]));
+
+  return allSupplierNames().map(name=>{
+    const x=byName.get(name);
+    if(x)return x;
+    return {
+      name,
+      reliability:null,
+      score10:null,
+      evaluated:0,
+      total:0,
+      noInfo:true
+    };
+  }).sort((a,b)=>{
+    /* Suppliers without information start on the left at zero.
+       Rated suppliers then rise naturally from weakest to strongest. */
+    const ai=a.reliability==null?-1:Number(a.reliability);
+    const bi=b.reliability==null?-1:Number(b.reliability);
+    return ai-bi || String(a.name).localeCompare(String(b.name),'hr');
+  });
+}
+function bindHorizontalWheel(){
+  if(wheelBound)return;
+  const scroller=document.getElementById('overviewFullChartScroll');
+  if(!scroller)return;
+  wheelBound=true;
+
+  scroller.addEventListener('wheel',e=>{
+    /* Normal mouse wheel moves this wide supplier graph horizontally.
+       Ctrl+wheel is left untouched for browser zoom conventions. */
+    if(e.ctrlKey)return;
+    const max=scroller.scrollWidth-scroller.clientWidth;
+    if(max<=0)return;
+
+    const delta=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;
+    if(!delta)return;
+
+    e.preventDefault();
+    scroller.scrollLeft+=delta;
+  },{passive:false});
+}
 function renderNow(){
   raf=0;
   const host=document.getElementById('overviewFullSupplierBars');
@@ -27005,19 +26512,14 @@ function renderNow(){
 
   const sel=document.getElementById('overviewSupplierSelect');
   const selected=sel?.value||'';
-
-  /* Every supplier in the current Overview master scope is shown.
-     Weakest on the left, strongest on the right. */
-  const data=rows().filter(Boolean).sort((a,b)=>{
-    const ar=a.reliability==null?-1:Number(a.reliability);
-    const br=b.reliability==null?-1:Number(b.reliability);
-    return ar-br || a.name.localeCompare(b.name,'hr');
-  });
+  const data=mergedRows();
 
   const subtitle=document.getElementById('overviewFullChartSubtitle');
   if(subtitle){
     const rated=data.filter(x=>x.reliability!=null).length;
-    subtitle.textContent=`${data.length} dobavljača · ${rated} s izračunatom pouzdanošću · svaki stupac = jedan dobavljač`;
+    const noInfo=data.length-rated;
+    subtitle.textContent=
+      `${data.length} dobavljača u sustavu · ${rated} s izračunatom pouzdanošću · ${noInfo} bez podataka · kotačić miša = lijevo/desno`;
   }
 
   if(!data.length){
@@ -27025,19 +26527,22 @@ function renderNow(){
     return;
   }
 
+  /* One physical column for every supplier in the system; never truncate. */
   host.style.minWidth=Math.max(1200,data.length*92)+'px';
   host.innerHTML=data.map(x=>{
-    const raw=x.reliability==null?0:Number(x.reliability);
-    const r=Math.max(0,Math.min(100,Number.isFinite(raw)?raw:0));
-    const c=color(x.reliability);
-    const pct=x.reliability==null?'—':`${Math.round(r)}%`;
-    const score=x.score10==null?'—':`${x.score10}/10`;
-    const cls=selected===x.name?' selected':'';
+    const hasInfo=x.reliability!=null && Number.isFinite(Number(x.reliability));
+    const r=hasInfo?Math.max(0,Math.min(100,Number(x.reliability))):0;
+    const c=color(hasInfo?r:null);
+    const pct=hasInfo?`${Math.round(r)}%`:'NEMA INFO';
+    const score=hasInfo && x.score10!=null?`${x.score10}/10`:'—';
+    const cls=(selected===x.name?' selected':'')+(hasInfo?' has-info':' no-info');
+
     return `<div class="overview-full-bar-item${cls}" data-overview-full-supplier="${esc(x.name)}"
-      title="${esc(x.name)} · ${pct} · ${score} · ${x.evaluated||0} obrađeno">
+      title="${esc(x.name)} · ${hasInfo?(Math.round(r)+'% · '+score):'Nema info / nema obrađenih najava'}">
       <div class="overview-full-bar-value" style="color:${c}">${pct}</div>
-      <div class="overview-full-bar-track">
-        <div class="overview-full-bar" style="height:${x.reliability==null?1:Math.max(2,r)}%;--bar:${c};background:${c}"></div>
+      <div class="overview-full-bar-track" aria-label="${esc(x.name)}">
+        <div class="overview-full-bar" style="height:${r}%;--bar:${c};background:${c}"></div>
+        ${hasInfo?'':'<div class="overview-full-no-info-zero">0</div>'}
       </div>
       <div class="overview-full-bar-score">${score}</div>
       <div class="overview-full-bar-name">${esc(x.name)}</div>
@@ -27054,11 +26559,14 @@ function renderNow(){
       }
     });
   });
+
+  bindHorizontalWheel();
 }
 function schedule(){
   if(raf)return;
   raf=requestAnimationFrame(renderNow);
 }
+
 window.addEventListener('load',()=>setTimeout(schedule,900),{once:true});
 window.addEventListener('yardivo:data-synced',schedule);
 window.addEventListener('yardivo:overview-refresh',schedule);
@@ -27069,7 +26577,7 @@ document.addEventListener('change',e=>{
   if(e.target?.id==='overviewSupplierSelect')schedule();
 },true);
 
-window.YardivoOverviewFullChart={render:schedule};
+window.YardivoOverviewFullChart={render:schedule,rows:mergedRows};
 })();
 </script>
 <script id="yardivo-overview-fullchart-master-bridge-v1-20260901">
@@ -27774,274 +27282,6 @@ window.YardivoOverviewManagerSummary={render};
 </script>
 
 
-<style id="yardivo-warroom-myyard-final-v1-20260901">
-/* MY YARD: 2D really shows the 2D yard; 3D really shows the canonical WebGL scene. */
-#myYard[data-yardivo-yard-mode="2d"] #yardivoMyYardWebGL{display:none!important}
-#myYard[data-yardivo-yard-mode="2d"] .myy-world{
-  display:block!important;
-  position:absolute!important;
-  inset:0!important;
-  z-index:6!important;
-}
-#myYard[data-yardivo-yard-mode="2d"] .myy-world.d2{
-  transform:none!important;
-}
-#myYard[data-yardivo-yard-mode="3d"] #yardivoMyYardWebGL{display:block!important}
-#myYard[data-yardivo-yard-mode="3d"] .myy-world{display:none!important}
-
-/* WAR ROOM: one large canonical My Yard screen. */
-#yardivoWarRoom .wr-bg,
-#yardivoWarRoom .wr-scan{display:none!important}
-#yardivoWarRoom .wr-shell{
-  grid-template-rows:64px minmax(0,1fr)!important;
-  padding:10px 12px 12px!important;
-  background:#050b11!important;
-}
-#yardivoWarRoom .wr-header{
-  grid-template-columns:auto 1fr auto!important;
-  min-height:54px!important;
-  padding:0 4px 9px!important;
-}
-#yardivoWarRoom .wr-brand .wr-logo3d{width:38px!important;height:38px!important}
-#yardivoWarRoom .wr-brand .wr-y{font-size:30px!important;animation:none!important}
-#yardivoWarRoom .wr-center{text-align:left!important;margin-left:18px!important}
-#yardivoWarRoom .wr-main{
-  display:block!important;
-  min-height:0!important;
-  padding:8px 0 0!important;
-}
-#yardivoWarRoom .wr-main>.wr-col{display:none!important}
-#yardivoWarRoom .wr-twin{
-  position:relative!important;
-  width:100%!important;
-  height:100%!important;
-  min-height:calc(100vh - 96px)!important;
-  border:1px solid #24445a!important;
-  border-radius:10px!important;
-  overflow:hidden!important;
-  background:#07131f!important;
-}
-#yardivoWarRoom .wr-twin-title{
-  position:absolute!important;
-  left:16px!important;
-  top:14px!important;
-  z-index:90!important;
-  padding:7px 10px!important;
-  border:1px solid #315a74!important;
-  border-radius:7px!important;
-  background:rgba(7,19,31,.88)!important;
-  color:#edf6ff!important;
-  font-size:8px!important;
-  font-weight:1000!important;
-}
-#yardivoWarRoom #wrYardCanvas{
-  position:absolute!important;
-  inset:0!important;
-  width:100%!important;
-  height:100%!important;
-  overflow:hidden!important;
-}
-#yardivoWarRoom #wrYardCanvas>*:not(#yardivoWarRoomMyYardMirror){
-  display:none!important;
-}
-#yardivoWarRoom #yardivoWarRoomMyYardMirror{
-  display:block!important;
-  position:absolute!important;
-  inset:0!important;
-  width:100%!important;
-  height:100%!important;
-  z-index:70!important;
-  visibility:visible!important;
-  opacity:1!important;
-  background:#07131f!important;
-}
-#yardivoWarRoom #yardivoWarRoomMyYardMirror canvas{
-  display:block!important;
-  width:100%!important;
-  height:100%!important;
-}
-#yardivoWarRoom .wrmirror-badge{display:none!important}
-#yardivoWarRoom .wr-footer{display:none!important}
-
-/* Central operational notification shown only while War Room is active. */
-#yardivoWarRoomNotice{
-  position:fixed;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%) scale(.96);
-  z-index:27000;
-  width:min(560px,82vw);
-  padding:18px 22px;
-  border:1px solid #3c6b88;
-  border-left:5px solid #2489eb;
-  border-radius:12px;
-  background:rgba(6,18,29,.96);
-  color:#edf6ff;
-  box-shadow:0 28px 90px rgba(0,0,0,.52);
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-  transition:opacity .16s ease,transform .16s ease,visibility .16s;
-  text-align:center;
-}
-#yardivoWarRoomNotice.show{
-  opacity:1;
-  visibility:visible;
-  transform:translate(-50%,-50%) scale(1);
-}
-#yardivoWarRoomNotice[data-kind="entry"]{border-left-color:#37d879}
-#yardivoWarRoomNotice[data-kind="change"]{border-left-color:#ffc04a}
-#yardivoWarRoomNotice small{
-  display:block;
-  font-size:8px;
-  font-weight:1000;
-  letter-spacing:1px;
-  color:#8eabba;
-}
-#yardivoWarRoomNotice strong{
-  display:block;
-  margin-top:7px;
-  font-size:22px;
-}
-#yardivoWarRoomNotice span{
-  display:block;
-  margin-top:6px;
-  font-size:10px;
-  color:#bdd0db;
-}
-</style>
-
-<script id="yardivo-warroom-myyard-final-v1-20260901-js">
-(function(){
-'use strict';
-
-const MODE_KEY='yardivo_myyard_view_mode_v2';
-let noticeTimer=0,lastSnapshot=new Map(),initialized=false;
-
-function currentMode(){
-  try{return localStorage.getItem(MODE_KEY)==='2d'?'2d':'3d'}catch(_){return'3d'}
-}
-function applyMode(mode){
-  mode=mode==='2d'?'2d':'3d';
-  try{localStorage.setItem(MODE_KEY,mode)}catch(_){}
-  const root=document.getElementById('myYard');if(!root)return;
-  root.dataset.yardivoYardMode=mode;
-  root.querySelectorAll('[data-myy]').forEach(b=>b.classList.toggle('active',b.dataset.myy===mode));
-  const world=root.querySelector('.myy-world');
-  if(world){
-    world.classList.toggle('d2',mode==='2d');
-    world.classList.toggle('d3',mode==='3d');
-  }
-  const help=root.querySelector('.myy-help');
-  if(help)help.style.display=mode==='3d'?'block':'none';
-  if(mode==='2d'){
-    try{window.YardivoMyYard?.render?.()}catch(_){}
-  }else{
-    try{window.YardivoMyYardWebGL?.boot?.()}catch(_){}
-    try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
-  }
-}
-document.addEventListener('click',e=>{
-  const b=e.target.closest?.('#myYard [data-myy]');
-  if(!b)return;
-  e.preventDefault();
-  e.stopImmediatePropagation();
-  applyMode(b.dataset.myy);
-},true);
-document.addEventListener('click',e=>{
-  if(e.target.closest?.('[data-view="myYard"],[data-home-target="myYard"]')){
-    setTimeout(()=>applyMode(currentMode()),100);
-  }
-},true);
-window.addEventListener('load',()=>setTimeout(()=>applyMode(currentMode()),1200),{once:true});
-
-/* War Room notification model */
-function roomActive(){
-  return !!document.getElementById('yardivoWarRoom')?.classList.contains('active');
-}
-function anns(){
-  try{return Array.isArray(announcements)?announcements:[]}catch(_){return[]}
-}
-function keyState(a){
-  return JSON.stringify([
-    a?.status||'',a?.date||'',a?.time||'',a?.warehouse||'',a?.dock||'',
-    a?.actualDate||'',a?.actualTime||'',a?.gateCheckedAt||'',a?.yardArrivalAt||'',
-    a?.dockArrivalAt||'',a?.receivedAt||'',a?.completedAt||'',a?.gateOutAt||'',
-    a?.rejectedAt||''
-  ]);
-}
-function operationalStatus(a){
-  try{return operationalPlanStatus(a)||a.status||'Najavljeno'}catch(_){return a?.status||'Najavljeno'}
-}
-function ensureNotice(){
-  let n=document.getElementById('yardivoWarRoomNotice');
-  if(n)return n;
-  n=document.createElement('div');n.id='yardivoWarRoomNotice';
-  n.innerHTML='<small>WAR ROOM · LIVE PROMJENA</small><strong></strong><span></span>';
-  document.body.appendChild(n);
-  return n;
-}
-function showNotice(kind,title,detail){
-  if(!roomActive())return;
-  const n=ensureNotice();
-  n.dataset.kind=kind||'change';
-  n.querySelector('strong').textContent=title||'PROMJENA';
-  n.querySelector('span').textContent=detail||'';
-  n.classList.remove('show');
-  requestAnimationFrame(()=>n.classList.add('show'));
-  clearTimeout(noticeTimer);
-  noticeTimer=setTimeout(()=>n.classList.remove('show'),3600);
-}
-function snapshot(notify){
-  const rows=anns(),next=new Map();
-  rows.forEach(a=>{
-    const id=String(a?.id??a?.announcement_id??'');
-    if(!id)return;
-    next.set(id,keyState(a));
-    if(notify&&initialized){
-      if(!lastSnapshot.has(id)){
-        showNotice('entry','NOVA NAJAVA U SUSTAVU',
-          `${a.supplier||'Dobavljač'} · ${a.date||'—'} ${a.time||''} · ${a.warehouse||'—'} · R${a.dock||'—'}`);
-      }else if(lastSnapshot.get(id)!==keyState(a)){
-        showNotice('change','PROMJENA NAJAVE',
-          `${a.supplier||'Dobavljač'} · ${operationalStatus(a)} · ${a.warehouse||'—'} · R${a.dock||'—'}`);
-      }
-    }
-  });
-  lastSnapshot=next;initialized=true;
-}
-snapshot(false);
-
-window.addEventListener('yardivo:data-synced',()=>{
-  snapshot(true);
-  if(roomActive()){
-    try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
-    try{window.YardivoWarRoomExactMirror?.boot?.()}catch(_){}
-  }
-});
-setInterval(()=>{
-  snapshot(true);
-  if(roomActive()){
-    try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
-  }
-},2000);
-
-/* Ensure opening War Room immediately mounts the canonical 3D My Yard mirror. */
-document.addEventListener('click',e=>{
-  if(!e.target.closest?.('#yardivoWarButton,[data-view="yardivoWarRoom"],[data-home-target="yardivoWarRoom"],[data-view="controltower"],[data-view="controlTower"]'))return;
-  setTimeout(async()=>{
-    try{await window.YardivoMyYardWebGL?.boot?.()}catch(_){}
-    try{await window.YardivoWarRoomExactMirror?.boot?.()}catch(_){}
-    snapshot(false);
-  },180);
-},true);
-
-window.YardivoWarRoomNotice={show:showNotice,refresh:()=>snapshot(true)};
-window.YardivoMyYardMode={set:applyMode,current:currentMode};
-})();
-</script>
-
-
 <style id="yardivo-light-total-white-strict-v1-20260901">
 /* STRICT LIGHT: no dark/navy structural surface is allowed to leak into the application. */
 html[data-yardivo-main-theme="light"],
@@ -28294,43 +27534,6 @@ document.addEventListener('click',e=>{
 },true);
 
 window.YardivoCanonicalLogout={logout};
-})();
-</script>
-
-
-<style id="yardivo-warroom-interactive-same-as-myyard-v1-20260901">
-#yardivoWarRoom #yardivoWarRoomMyYardMirror canvas{
-  pointer-events:auto!important;
-  cursor:grab!important;
-  touch-action:none!important;
-}
-#yardivoWarRoom #yardivoWarRoomMyYardMirror canvas:active{cursor:grabbing!important}
-#yardivoWarRoom .wr-twin-title{
-  display:flex!important;
-  align-items:center!important;
-  gap:12px!important;
-}
-#yardivoWarRoom .wr-twin-title::after{
-  content:"DRŽI LIJEVI KLIK I VUCI · CTRL + KOTAČIĆ = ZOOM"!important;
-  color:#8eabba!important;
-  font-size:7px!important;
-  font-weight:800!important;
-  letter-spacing:.3px!important;
-}
-</style>
-<script id="yardivo-warroom-interactive-same-as-myyard-v1-20260901-js">
-(function(){
-'use strict';
-function sync(){
-  try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
-  try{window.YardivoWarRoomExactMirror?.boot?.()}catch(_){}
-}
-document.addEventListener('click',e=>{
-  if(e.target.closest?.('#yardivoWarButton,[data-view="yardivoWarRoom"],[data-home-target="yardivoWarRoom"]')){
-    setTimeout(sync,120);
-  }
-},true);
-window.addEventListener('yardivo:data-synced',sync);
 })();
 </script>
 
@@ -28926,6 +28129,370 @@ window.YardivoMainTheme={apply,toggle,current:read};
 apply(read(),false);
 })();
 </script>
+
+
+<style id="yardivo-myyard-focus-live-v1-20260901">
+/* My Yard toolbar action */
+#myYard .myy-toolbar .myy-enlarge-btn{
+  margin-left:auto!important;
+  min-height:32px!important;
+  padding:0 12px!important;
+  border-radius:7px!important;
+  font-size:8px!important;
+  font-weight:1000!important;
+  letter-spacing:.35px!important;
+}
+
+/* Enlarged My Yard = ONLY the canonical 3D scene. */
+body.yardivo-myyard-focus{
+  overflow:hidden!important;
+}
+body.yardivo-myyard-focus #myYard{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100vh!important;
+  margin:0!important;
+  padding:0!important;
+  z-index:26000!important;
+  background:#07131f!important;
+}
+body.yardivo-myyard-focus #myYard .myy-shell{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  background:#07131f!important;
+}
+body.yardivo-myyard-focus #myYard .myy-toolbar{
+  display:none!important;
+}
+body.yardivo-myyard-focus #myYard .myy-stage{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:100vh!important;
+  border:0!important;
+  border-radius:0!important;
+  margin:0!important;
+  padding:0!important;
+  background:#07131f!important;
+}
+body.yardivo-myyard-focus #myYard .myy-world{
+  display:none!important;
+}
+body.yardivo-myyard-focus #yardivoMyYardWebGL{
+  display:block!important;
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  z-index:20!important;
+}
+body.yardivo-myyard-focus #yardivoMyYardWebGL canvas{
+  width:100%!important;
+  height:100%!important;
+}
+body.yardivo-myyard-focus #myYard .myy-help{
+  display:block!important;
+  position:fixed!important;
+  right:18px!important;
+  bottom:18px!important;
+  z-index:26040!important;
+}
+
+/* Focus controls */
+#yardivoMyYardFocusExit{
+  display:none;
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:26100;
+  min-height:40px;
+  padding:0 14px;
+  border:1px solid #4b6678;
+  border-radius:8px;
+  background:rgba(5,15,23,.90);
+  color:#edf6ff;
+  font:1000 9px Arial,sans-serif;
+  letter-spacing:.45px;
+  cursor:pointer;
+  box-shadow:0 10px 34px rgba(0,0,0,.32);
+}
+body.yardivo-myyard-focus #yardivoMyYardFocusExit{display:block}
+
+/* Live changes notification */
+#yardivoMyYardLiveNotice{
+  position:fixed;
+  left:50%;
+  top:24px;
+  transform:translate(-50%,-16px);
+  width:min(620px,calc(100vw - 150px));
+  z-index:26120;
+  padding:13px 16px;
+  border:1px solid #38637e;
+  border-left:5px solid #2489eb;
+  border-radius:10px;
+  background:rgba(5,17,27,.95);
+  color:#edf6ff;
+  box-shadow:0 18px 55px rgba(0,0,0,.42);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .16s ease,transform .16s ease,visibility .16s;
+  text-align:center;
+}
+#yardivoMyYardLiveNotice.show{
+  opacity:1;
+  visibility:visible;
+  transform:translate(-50%,0);
+}
+#yardivoMyYardLiveNotice[data-kind="new"]{border-left-color:#37d879}
+#yardivoMyYardLiveNotice[data-kind="change"]{border-left-color:#ffc04a}
+#yardivoMyYardLiveNotice[data-kind="remove"]{border-left-color:#ef6a73}
+#yardivoMyYardLiveNotice small{
+  display:block;
+  color:#8da9b9;
+  font-size:7px;
+  font-weight:1000;
+  letter-spacing:1px;
+}
+#yardivoMyYardLiveNotice strong{
+  display:block;
+  margin-top:4px;
+  font-size:16px;
+  line-height:1.25;
+}
+#yardivoMyYardLiveNotice span{
+  display:block;
+  margin-top:4px;
+  color:#bdd0db;
+  font-size:9px;
+}
+
+/* War Room is removed from the product UI even if an old script or cached DOM tries to recreate it. */
+#yardivoWarRoom,#yardivoWarButton,
+[data-view="yardivoWarRoom"],[data-home-target="yardivoWarRoom"]{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+</style>
+
+<script id="yardivo-myyard-focus-live-v1-20260901-js">
+(function(){
+'use strict';
+
+let snapshotMap=new Map(),snapshotReady=false,noticeTimer=0;
+
+function anns(){
+  try{return Array.isArray(announcements)?announcements:[]}catch(_){return[]}
+}
+function stableState(a){
+  /* Operationally meaningful fields. A change in any of these produces a My Yard notice. */
+  return JSON.stringify({
+    supplier:a?.supplier||'',
+    date:a?.date||'',time:a?.time||'',warehouse:a?.warehouse||'',dock:a?.dock||'',
+    status:a?.status||'',pallets:a?.pallets??'',sku:a?.sku??'',
+    orderNumber:a?.orderNumber||'',plannedPlate:a?.plannedPlate||'',arrivalPlate:a?.arrivalPlate||'',
+    plannedDriver:a?.plannedDriver||'',arrivalDriver:a?.arrivalDriver||'',
+    actualDate:a?.actualDate||'',actualTime:a?.actualTime||'',
+    gateCheckedAt:a?.gateCheckedAt||'',yardArrivalAt:a?.yardArrivalAt||'',
+    dockArrivalAt:a?.dockArrivalAt||'',unloadStartedAt:a?.unloadStartedAt||'',
+    receivedAt:a?.receivedAt||'',completedAt:a?.completedAt||'',gateOutAt:a?.gateOutAt||'',
+    rejectedAt:a?.rejectedAt||'',lateMinutes:a?.lateMinutes??'',arrivalType:a?.arrivalType||'',
+    responsible:a?.responsible||''
+  });
+}
+function titleOf(a){
+  return String(a?.supplier||'DOBAVLJAČ');
+}
+function detailOf(a){
+  const parts=[
+    a?.warehouse||'',
+    a?.dock?('R'+a.dock):'',
+    a?.date||'',
+    a?.time||'',
+    a?.status||''
+  ].filter(Boolean);
+  return parts.join(' · ');
+}
+function ensureNotice(){
+  let n=document.getElementById('yardivoMyYardLiveNotice');
+  if(n)return n;
+  n=document.createElement('div');
+  n.id='yardivoMyYardLiveNotice';
+  n.innerHTML='<small>MY YARD · LIVE PROMJENA</small><strong></strong><span></span>';
+  document.body.appendChild(n);
+  return n;
+}
+function notice(kind,title,detail){
+  if(!document.body.classList.contains('yardivo-myyard-focus'))return;
+  const n=ensureNotice();
+  n.dataset.kind=kind;
+  n.querySelector('strong').textContent=title||'PROMJENA';
+  n.querySelector('span').textContent=detail||'';
+  n.classList.remove('show');
+  requestAnimationFrame(()=>n.classList.add('show'));
+  clearTimeout(noticeTimer);
+  noticeTimer=setTimeout(()=>n.classList.remove('show'),3300);
+}
+function scan(notify){
+  const rows=anns(),next=new Map(),byId=new Map();
+  rows.forEach(a=>{
+    const id=String(a?.id??a?.announcement_id??'');
+    if(!id)return;
+    next.set(id,stableState(a));
+    byId.set(id,a);
+    if(notify&&snapshotReady){
+      if(!snapshotMap.has(id)){
+        notice('new','NOVA NAJAVA · '+titleOf(a),detailOf(a));
+      }else if(snapshotMap.get(id)!==next.get(id)){
+        notice('change','PROMJENA · '+titleOf(a),detailOf(a));
+      }
+    }
+  });
+  if(notify&&snapshotReady){
+    snapshotMap.forEach((_,id)=>{
+      if(!next.has(id)){
+        notice('remove','NAJAVA UKLONJENA','ID '+id);
+      }
+    });
+  }
+  snapshotMap=next;
+  snapshotReady=true;
+}
+function ensureControls(){
+  const root=document.getElementById('myYard');
+  if(!root)return;
+  const toolbar=root.querySelector('.myy-toolbar');
+  if(toolbar&&!toolbar.querySelector('.myy-enlarge-btn')){
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='myy-enlarge-btn';
+    b.textContent='⛶ POVEĆAJ PRIKAZ';
+    b.title='Prikaži samo My Yard 3D scenu';
+    toolbar.appendChild(b);
+  }
+  if(!document.getElementById('yardivoMyYardFocusExit')){
+    const x=document.createElement('button');
+    x.id='yardivoMyYardFocusExit';
+    x.type='button';
+    x.textContent='✕ ZATVORI POVEĆANI PRIKAZ';
+    document.body.appendChild(x);
+  }
+}
+async function enter(){
+  ensureControls();
+  try{window.YardivoMyYardMode?.set?.('3d')}catch(_){}
+  try{window.YardivoMyYardWebGL?.boot?.()}catch(_){}
+  document.body.classList.add('yardivo-myyard-focus');
+  document.getElementById('myYard')?.setAttribute('data-yardivo-yard-mode','3d');
+  snapshotReady=false;scan(false);
+  setTimeout(()=>{
+    try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+    try{
+      const e=window.__YARDIVO_MYYARD_ENGINE__;
+      const host=document.getElementById('yardivoMyYardWebGL');
+      if(e?.renderer&&host){
+        const w=Math.max(10,host.clientWidth),hh=Math.max(10,host.clientHeight);
+        e.renderer.setSize(w,hh,false);
+        e.camera.aspect=w/hh;e.camera.updateProjectionMatrix();
+      }
+    }catch(_){}
+  },80);
+}
+function exit(){
+  document.body.classList.remove('yardivo-myyard-focus');
+  document.getElementById('yardivoMyYardLiveNotice')?.classList.remove('show');
+  setTimeout(()=>{
+    try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+  },80);
+}
+function purgeWarRoom(){
+  document.getElementById('yardivoWarRoom')?.remove();
+  document.getElementById('yardivoWarButton')?.remove();
+  document.querySelectorAll('[data-view="yardivoWarRoom"],[data-home-target="yardivoWarRoom"]').forEach(x=>x.remove());
+}
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest?.('#myYard .myy-enlarge-btn');
+  if(b){e.preventDefault();e.stopPropagation();enter();return}
+  if(e.target.closest?.('#yardivoMyYardFocusExit')){e.preventDefault();exit();return}
+},true);
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.body.classList.contains('yardivo-myyard-focus'))exit();
+},true);
+
+window.addEventListener('yardivo:data-synced',()=>{
+  scan(true);
+  if(document.body.classList.contains('yardivo-myyard-focus')){
+    try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+  }
+});
+setInterval(()=>scan(true),2000);
+
+window.addEventListener('load',()=>setTimeout(()=>{ensureControls();purgeWarRoom();scan(false)},1100),{once:true});
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-view="myYard"],[data-home-target="myYard"]'))setTimeout(ensureControls,100);
+},true);
+
+window.YardivoMyYardFocus={enter,exit,refresh:()=>scan(true)};
+})();
+</script>
+
+
+<style id="yardivo-overview-all-suppliers-wheel-v2-20260901">
+#overview #overviewFullChartScroll,
+#overview .overview-full-chart-scroll{
+  cursor:ew-resize!important;
+  overscroll-behavior:contain!important;
+  scroll-behavior:auto!important;
+}
+#overview .overview-full-bar-item.no-info .overview-full-bar-track{
+  background:
+    linear-gradient(to top,rgba(135,150,160,.12),rgba(135,150,160,.025))!important;
+  border-style:dashed!important;
+  border-color:rgba(145,160,170,.42)!important;
+}
+#overview .overview-full-bar-item.no-info .overview-full-bar{
+  height:0!important;
+  min-height:0!important;
+  background:transparent!important;
+}
+#overview .overview-full-no-info-zero{
+  position:absolute;
+  left:50%;
+  bottom:3px;
+  transform:translateX(-50%);
+  color:var(--theme-muted,#778995);
+  font-size:7px;
+  font-weight:1000;
+  line-height:1;
+}
+#overview .overview-full-bar-item.no-info .overview-full-bar-value{
+  color:var(--theme-muted,#778995)!important;
+  font-size:7px!important;
+  white-space:nowrap!important;
+}
+#overview .overview-full-bar-item.has-info .overview-full-bar{
+  min-height:2px!important;
+}
+html[data-yardivo-main-theme="light"] #overview .overview-full-bar-item.no-info .overview-full-bar-track{
+  background:#f8fafb!important;
+  border-color:#cbd6dd!important;
+}
+html[data-yardivo-main-theme="light"] #overview .overview-full-no-info-zero,
+html[data-yardivo-main-theme="light"] #overview .overview-full-bar-item.no-info .overview-full-bar-value{
+  color:#6c7f8c!important;
+}
+</style>
 
 </body>
 </html>
