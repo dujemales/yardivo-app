@@ -5867,6 +5867,7 @@ class YardivoGuardedMutationObserver extends NativeMO{
 
 window.MutationObserver=YardivoGuardedMutationObserver;
 window.__YARDIVO_WELCOME_MO_GUARD__={
+  native:NativeMO,
   flush(){
     const pending=Array.from(guarded);
     guarded.clear();
@@ -24286,78 +24287,7 @@ window.YardivoThemeV2={setMain,setDark,main,dark,scene};
 </script>
 
 
-<style id="yardivo-login-theme-sync-v1-20260831">
-/* Login follows the currently selected application theme. */
-html[data-yardivo-main-theme="light"] #loginOverlay{
- background:linear-gradient(135deg,#edf2ef 0%,#ffffff 58%,#f3f6f4 100%)!important
-}
-html[data-yardivo-main-theme="light"] #loginOverlay .login-card{
- background:#fff!important;color:#18211c!important;border-color:#d8e1dc!important;
- box-shadow:0 24px 70px rgba(26,42,33,.13)!important
-}
-html[data-yardivo-main-theme="light"] #loginOverlay input,
-html[data-yardivo-main-theme="light"] #loginOverlay select{
- background:#fff!important;color:#18211c!important;border-color:#cbd7d0!important
-}
-
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] #loginOverlay{
- background:radial-gradient(circle at 70% 12%,#222a25 0%,#111412 45%,#090b0a 100%)!important
-}
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] #loginOverlay .login-card{
- background:#191d1a!important;color:#f0f3f1!important;border-color:#303733!important
-}
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] #loginOverlay input,
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] #loginOverlay select{
- background:#202522!important;color:#f0f3f1!important;border-color:#363e39!important
-}
-
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="blue"] #loginOverlay{
- background:radial-gradient(circle at 72% 10%,#17324a 0%,#0b1824 44%,#060e15 100%)!important
-}
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="blue"] #loginOverlay .login-card{
- background:#102233!important;color:#eef6fc!important;border-color:#284961!important
-}
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="blue"] #loginOverlay input,
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="blue"] #loginOverlay select{
- background:#162b3d!important;color:#eef6fc!important;border-color:#31556e!important
-}
-
-/* Original first YARDIVO blue login */
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] #loginOverlay{
- background:
-   radial-gradient(circle at 72% 12%,rgba(35,107,157,.28),transparent 32%),
-   linear-gradient(135deg,#04101b 0%,#07131f 52%,#0a2133 100%)!important
-}
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] #loginOverlay .login-card{
- background:linear-gradient(180deg,#0f2639,#0b1d2d)!important;
- color:#edf6ff!important;border-color:#234965!important;
- box-shadow:0 28px 80px rgba(0,0,0,.45),0 0 0 1px rgba(62,143,200,.08) inset!important
-}
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] #loginOverlay input,
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] #loginOverlay select{
- background:#122b40!important;color:#edf6ff!important;border-color:#2c506d!important
-}
-html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] #loginOverlay button{
- border-color:#2d668c!important
-}
-
-/* Welcome splash intentionally keeps its original fixed YARDIVO appearance. */
-
-/* Ensure the visible legacy settings card displays all 3 options cleanly. */
-#yardivoDarkStyleSettings .yardivo-dark-style-options{
- display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important
-}
-#yardivoDarkStyleSettings .yardivo-dark-style-option.original{
- border-color:#2d5878!important;
- background:linear-gradient(145deg,rgba(14,42,64,.9),rgba(8,27,43,.9))!important
-}
-body.light-mode #yardivoDarkStyleSettings .yardivo-dark-style-option.original{
- background:#f1f7fb!important;color:#183044!important;border-color:#b7ccda!important
-}
-@media(max-width:900px){
- #yardivoDarkStyleSettings .yardivo-dark-style-options{grid-template-columns:1fr!important}
-}
-</style>
+<style id="yardivo-login-theme-sync-v1-20260831-disabled">/* disabled: Login restored to original YARDIVO theme */</style>
 <script id="yardivo-theme-canonical-bridge-v1-20260831-js">
 (function(){
 'use strict';
@@ -24942,182 +24872,147 @@ html[data-yardivo-main-theme] body #heatmap{
 </style>
 
 
-<style id="yardivo-login-blue-interactive-final-v1-20260901">
-/* Login is always classic YARDIVO blue, independent of the selected app theme. */
-#loginOverlay{
-  background:
-    radial-gradient(circle at 72% 12%,rgba(35,107,157,.30),transparent 32%),
-    linear-gradient(135deg,#04101b 0%,#07131f 52%,#0a2133 100%)!important;
+
+<style id="yardivo-original-login-restored-v1-20260901">
+/* EXACT original YARDIVO login palette from the original application. */
+#loginOverlay.login-overlay{
+  position:fixed!important;
+  inset:0!important;
+  z-index:2147483645!important;
+  display:flex;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:20px!important;
+  background:radial-gradient(circle at 50% 20%,#12324e,#07111b 55%)!important;
+  backdrop-filter:none!important;
+  visibility:visible;
+  opacity:1;
 }
 #loginOverlay .login-card{
-  background:linear-gradient(180deg,#0f2639,#0b1d2d)!important;
-  color:#edf6ff!important;
-  border-color:#234965!important;
-  box-shadow:0 28px 80px rgba(0,0,0,.45),0 0 0 1px rgba(62,143,200,.08) inset!important;
+  width:min(430px,96vw)!important;
+  margin:auto!important;
+  padding:24px!important;
+  display:grid!important;
+  gap:12px!important;
+  background:#0d1b29!important;
+  color:#fff!important;
+  border:1px solid #26435a!important;
+  border-radius:12px!important;
+  box-shadow:0 30px 90px rgba(0,0,0,.55)!important;
+  transform:none!important;
+  filter:none!important;
 }
-#loginOverlay .login-card label{color:#9eb6c9!important}
-#loginOverlay input,
-#loginOverlay select,
-#loginOverlay textarea{
-  background:#102a3e!important;
-  color:#edf6ff!important;
-  border-color:#315772!important;
-  caret-color:#8fd2ff!important;
+#loginOverlay .login-logo-combo{margin-bottom:16px!important}
+#loginOverlay .login-card label{
+  display:grid!important;
+  gap:6px!important;
+  margin-top:11px!important;
+  color:#94a9b9!important;
+  font-size:10px!important;
+  font-weight:800!important;
 }
-#loginOverlay input:hover,
-#loginOverlay select:hover,
-#loginOverlay textarea:hover,
-#loginOverlay input:focus,
-#loginOverlay select:focus,
-#loginOverlay textarea:focus{
-  border-color:#4b9bd0!important;
+#loginOverlay .login-card input,
+#loginOverlay .login-card select{
+  width:100%!important;
+  min-height:0!important;
+  padding:11px!important;
+  background:#07131f!important;
+  color:#fff!important;
+  border:1px solid #28435a!important;
+  border-radius:6px!important;
   outline:none!important;
-  box-shadow:0 0 0 2px rgba(75,155,208,.16)!important;
+  box-shadow:none!important;
+  opacity:1!important;
+  filter:none!important;
 }
-#loginOverlay button{
-  border-color:#2d6285!important;
+#loginOverlay .login-card input:hover,
+#loginOverlay .login-card select:hover,
+#loginOverlay .login-card input:focus,
+#loginOverlay .login-card select:focus{
+  border-color:#2489eb!important;
+  outline:none!important;
+  box-shadow:0 0 0 2px rgba(36,137,235,.14)!important;
 }
-#loginOverlay button:hover,
-#loginOverlay button:focus-visible{
-  border-color:#59a7d8!important;
-  box-shadow:0 0 0 2px rgba(89,167,216,.15)!important;
+#loginOverlay .login-card button{
+  width:100%!important;
+  min-height:0!important;
+  margin-top:16px!important;
+  padding:12px!important;
+  border:1px solid #2489eb!important;
+  background:#126fc9!important;
+  color:#fff!important;
+  border-radius:6px!important;
+  font-weight:900!important;
+  box-shadow:none!important;
 }
-
-/* Login must always be fully interactive once Welcome is done. */
-html:not(.yardivo-booting) #loginOverlay,
-html.yardivo-login-ready #loginOverlay,
-html.yardivo-welcome-complete #loginOverlay{
+#loginOverlay .login-card button:hover,
+#loginOverlay .login-card button:focus-visible{
+  background:#167bdc!important;
+  border-color:#3b9bf4!important;
+  box-shadow:none!important;
+}
+#loginOverlay,
+#loginOverlay *,
+#loginForm,
+#loginUser,#loginPass,#loginRole,#rememberMe,#loginSubmitBtn,#loginChangePasswordBtn{
   pointer-events:auto!important;
 }
-html:not(.yardivo-booting) #loginOverlay .login-card,
-html:not(.yardivo-booting) #loginOverlay form,
-html:not(.yardivo-booting) #loginOverlay label,
-html:not(.yardivo-booting) #loginOverlay input,
-html:not(.yardivo-booting) #loginOverlay select,
-html:not(.yardivo-booting) #loginOverlay textarea,
-html:not(.yardivo-booting) #loginOverlay button,
-html.yardivo-welcome-complete #loginOverlay .login-card,
-html.yardivo-welcome-complete #loginOverlay form,
-html.yardivo-welcome-complete #loginOverlay label,
-html.yardivo-welcome-complete #loginOverlay input,
-html.yardivo-welcome-complete #loginOverlay select,
-html.yardivo-welcome-complete #loginOverlay textarea,
-html.yardivo-welcome-complete #loginOverlay button{
-  pointer-events:auto!important;
+#loginUser,#loginPass{
+  cursor:text!important;
+  user-select:text!important;
+  -webkit-user-select:text!important;
+  touch-action:manipulation!important;
 }
-#loginOverlay .login-card,
-#loginOverlay form{position:relative!important;z-index:2!important}
-#loginOverlay input,
-#loginOverlay select,
-#loginOverlay textarea,
-#loginOverlay button{
-  position:relative!important;
-  z-index:3!important;
-}
+#loginRole,#rememberMe,#loginSubmitBtn,#loginChangePasswordBtn{cursor:pointer!important}
 
-/* Once Welcome is hidden, it can never intercept a click. */
+/* Nothing from Welcome may sit over Login after hand-off. */
 html.yardivo-welcome-complete #yardivoWelcomeSplash,
 #yardivoWelcomeSplash.hide{
+  display:none!important;
+  visibility:hidden!important;
+  opacity:0!important;
   pointer-events:none!important;
 }
 </style>
 
-<script id="yardivo-login-blue-interactive-final-v1-20260901-js">
+<script id="yardivo-login-interaction-hardening-v1-20260901">
 (function(){
 'use strict';
 
-function unlockLogin(){
-  if(!document.documentElement.classList.contains('yardivo-welcome-complete')) return;
+function unlock(){
+  if(!document.documentElement.classList.contains('yardivo-welcome-complete'))return false;
 
   document.documentElement.classList.remove('yardivo-booting');
-  const o=document.getElementById('loginOverlay');
-  if(!o)return;
+  document.body.classList.remove('yardivo-welcome-active');
 
-  o.style.setProperty('display','flex','important');
-  o.style.setProperty('visibility','visible','important');
-  o.style.setProperty('opacity','1','important');
-  o.style.setProperty('pointer-events','auto','important');
-  o.removeAttribute('inert');
-  o.setAttribute('aria-hidden','false');
+  /* Restore the native observer constructor after startup. */
+  try{
+    const g=window.__YARDIVO_WELCOME_MO_GUARD__;
+    if(g?.native){
+      window.MutationObserver=g.native;
+    }
+  }catch(_){}
 
-  const form=document.getElementById('loginForm');
-  if(form){
-    form.removeAttribute('inert');
-    form.style.setProperty('pointer-events','auto','important');
+  const splash=document.getElementById('yardivoWelcomeSplash');
+  if(splash){
+    splash.classList.add('hide');
+    splash.style.setProperty('display','none','important');
+    splash.style.setProperty('pointer-events','none','important');
   }
 
-  ['loginUser','loginPass','loginRole'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el)return;
-    el.disabled=false;
-    el.removeAttribute('disabled');
-    el.removeAttribute('inert');
-    el.removeAttribute('aria-hidden');
-    el.style.setProperty('pointer-events','auto','important');
-    el.style.setProperty('user-select','text','important');
-  });
-}
-
-window.addEventListener('yardivo:welcome-complete',()=>{
-  requestAnimationFrame(()=>requestAnimationFrame(unlockLogin));
-});
-
-window.addEventListener('load',()=>{
-  setTimeout(unlockLogin,5800);
-  setTimeout(unlockLogin,6800);
-},{once:true});
-
-document.addEventListener('focusin',e=>{
-  if(e.target.closest?.('#loginOverlay')) unlockLogin();
-},true);
-
-window.YardivoLoginUnlock={unlock:unlockLogin};
-})();
-</script>
-
-
-<style id="yardivo-login-real-fields-final-v2-20260901">
-html.yardivo-welcome-complete #loginOverlay,
-html.yardivo-login-ready #loginOverlay{
-  pointer-events:auto!important;
-}
-html.yardivo-welcome-complete #loginForm,
-html.yardivo-welcome-complete #loginUser,
-html.yardivo-welcome-complete #loginPass,
-html.yardivo-welcome-complete #loginRole,
-html.yardivo-welcome-complete #rememberMe,
-html.yardivo-welcome-complete #loginSubmitBtn,
-html.yardivo-welcome-complete #loginChangePasswordBtn{
-  pointer-events:auto!important;
-}
-#loginUser,#loginPass,#loginRole{
-  cursor:text!important;
-  touch-action:manipulation!important;
-}
-#loginRole{cursor:pointer!important}
-</style>
-<script id="yardivo-login-real-fields-final-v2-20260901-js">
-(function(){
-'use strict';
-function enableRealLoginFields(){
-  if(!document.documentElement.classList.contains('yardivo-welcome-complete'))return;
   const overlay=document.getElementById('loginOverlay');
   const form=document.getElementById('loginForm');
+  if(!overlay||!form)return false;
 
-  document.documentElement.classList.remove('yardivo-booting');
-
-  if(overlay){
-    overlay.removeAttribute('inert');
-    overlay.setAttribute('aria-hidden','false');
-    overlay.style.setProperty('display','flex','important');
-    overlay.style.setProperty('visibility','visible','important');
-    overlay.style.setProperty('opacity','1','important');
-    overlay.style.setProperty('pointer-events','auto','important');
-  }
-  if(form){
-    form.removeAttribute('inert');
-    form.style.setProperty('pointer-events','auto','important');
-  }
+  [overlay,form].forEach(el=>{
+    el.removeAttribute('inert');
+    el.removeAttribute('aria-disabled');
+    el.style.setProperty('pointer-events','auto','important');
+  });
+  overlay.setAttribute('aria-hidden','false');
+  overlay.style.setProperty('display','flex','important');
+  overlay.style.setProperty('visibility','visible','important');
+  overlay.style.setProperty('opacity','1','important');
 
   ['loginUser','loginPass','loginRole','rememberMe','loginSubmitBtn','loginChangePasswordBtn'].forEach(id=>{
     const el=document.getElementById(id);
@@ -25125,23 +25020,39 @@ function enableRealLoginFields(){
     el.disabled=false;
     el.removeAttribute('disabled');
     el.removeAttribute('inert');
+    el.removeAttribute('aria-disabled');
     el.removeAttribute('aria-hidden');
     el.style.setProperty('pointer-events','auto','important');
   });
-
-  const u=document.getElementById('loginUser');
-  const p=document.getElementById('loginPass');
-  if(u)u.style.setProperty('user-select','text','important');
-  if(p)p.style.setProperty('user-select','text','important');
+  return true;
 }
+
+/* Extra hardening: even if a transparent legacy layer catches the pointer,
+   clicking inside username/password geometry focuses the intended real input. */
+document.addEventListener('pointerdown',function(e){
+  if(!document.documentElement.classList.contains('yardivo-welcome-complete'))return;
+  for(const id of ['loginUser','loginPass']){
+    const el=document.getElementById(id);
+    if(!el)continue;
+    const r=el.getBoundingClientRect();
+    if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom){
+      if(document.activeElement!==el){
+        try{el.focus({preventScroll:true})}catch(_){el.focus()}
+      }
+      return;
+    }
+  }
+},true);
+
 window.addEventListener('yardivo:welcome-complete',()=>{
-  requestAnimationFrame(()=>requestAnimationFrame(enableRealLoginFields));
+  requestAnimationFrame(()=>requestAnimationFrame(unlock));
 });
 window.addEventListener('load',()=>{
-  setTimeout(enableRealLoginFields,5900);
-  setTimeout(enableRealLoginFields,6800);
+  setTimeout(unlock,5800);
+  setTimeout(unlock,6800);
 },{once:true});
-window.YardivoRealLoginFields={enable:enableRealLoginFields};
+
+window.YardivoLoginInteraction={unlock};
 })();
 </script>
 
