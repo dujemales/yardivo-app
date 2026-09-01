@@ -26449,5 +26449,190 @@ window.YardivoAnnouncementMapSync={refresh:refreshMaps,sync:syncAndRefresh};
 }
 </style>
 
+
+<style id="yardivo-full-white-light-mode-v1-20260901">
+/* YARDIVO LIGHT MODE — authoritative full-white application skin.
+   Operational semantic colors (status/map content) remain meaningful, while
+   every structural surface is white instead of mixed blue/graphite. */
+html[data-yardivo-main-theme="light"],
+html[data-theme="light"],
+html.light-mode,
+body.light-mode{
+  color-scheme:light!important;
+  --bg:#ffffff!important;
+  --surface:#ffffff!important;
+  --surface2:#ffffff!important;
+  --panel:#ffffff!important;
+  --card:#ffffff!important;
+  --border:#d9e1e7!important;
+  --text:#13202a!important;
+  --muted:#667784!important;
+}
+
+/* Main application chrome */
+html[data-yardivo-main-theme="light"] body,
+html[data-theme="light"] body,
+body.light-mode,
+html[data-yardivo-main-theme="light"] .app-shell,
+html[data-theme="light"] .app-shell,
+body.light-mode .app-shell,
+html[data-yardivo-main-theme="light"] .main,
+html[data-theme="light"] .main,
+body.light-mode .main,
+html[data-yardivo-main-theme="light"] .main-content,
+html[data-theme="light"] .main-content,
+body.light-mode .main-content,
+html[data-yardivo-main-theme="light"] .view,
+html[data-theme="light"] .view,
+body.light-mode .view{
+  background:#fff!important;
+  color:#13202a!important;
+}
+
+/* Navigation / top bars / panels / cards / dialogs */
+html[data-yardivo-main-theme="light"] :is(.sidebar,.topbar,.panel,.card,.home-card,.control-card,.settings-card,.settings-section,.overview-card,.overview-panel,.kpi-card,.ops-kpi,.performance-kpi,.week-map-day,.daily-map-shell,.modal-card,.dialog-card,.login-card),
+html[data-theme="light"] :is(.sidebar,.topbar,.panel,.card,.home-card,.control-card,.settings-card,.settings-section,.overview-card,.overview-panel,.kpi-card,.ops-kpi,.performance-kpi,.week-map-day,.daily-map-shell,.modal-card,.dialog-card),
+body.light-mode :is(.sidebar,.topbar,.panel,.card,.home-card,.control-card,.settings-card,.settings-section,.overview-card,.overview-panel,.kpi-card,.ops-kpi,.performance-kpi,.week-map-day,.daily-map-shell,.modal-card,.dialog-card){
+  background:#fff!important;
+  color:#13202a!important;
+  border-color:#d9e1e7!important;
+  box-shadow:none!important;
+}
+
+/* Generic structural blocks that previously stayed navy. */
+html[data-yardivo-main-theme="light"] :is(.panel-head,.section-head,.card-head,.week-map-day-head,.week-map-day-totals,.arrival-summary,.data-wrap,.pro-planner-wrap,.incident-form,.gate-body,.yard-current-row),
+html[data-theme="light"] :is(.panel-head,.section-head,.card-head,.week-map-day-head,.week-map-day-totals,.arrival-summary,.data-wrap,.pro-planner-wrap,.incident-form,.gate-body,.yard-current-row),
+body.light-mode :is(.panel-head,.section-head,.card-head,.week-map-day-head,.week-map-day-totals,.arrival-summary,.data-wrap,.pro-planner-wrap,.incident-form,.gate-body,.yard-current-row){
+  background:#fff!important;
+  color:#13202a!important;
+  border-color:#d9e1e7!important;
+}
+
+/* Tables */
+html[data-yardivo-main-theme="light"] :is(table,.data-table,.oper-table) :is(th,td),
+html[data-theme="light"] :is(table,.data-table,.oper-table) :is(th,td),
+body.light-mode :is(table,.data-table,.oper-table) :is(th,td){
+  background:#fff!important;
+  color:#13202a!important;
+  border-color:#dfe6eb!important;
+}
+html[data-yardivo-main-theme="light"] :is(table,.data-table,.oper-table) th,
+html[data-theme="light"] :is(table,.data-table,.oper-table) th,
+body.light-mode :is(table,.data-table,.oper-table) th{
+  color:#536673!important;
+}
+
+/* Inputs */
+html[data-yardivo-main-theme="light"] :is(input,select,textarea),
+html[data-theme="light"] :is(input,select,textarea),
+body.light-mode :is(input,select,textarea){
+  background:#fff!important;
+  color:#13202a!important;
+  border-color:#cbd6dd!important;
+}
+html[data-yardivo-main-theme="light"] :is(input,select,textarea)::placeholder,
+html[data-theme="light"] :is(input,select,textarea)::placeholder,
+body.light-mode :is(input,select,textarea)::placeholder{color:#8b9aa4!important}
+
+/* Text that inherited dark-theme white. */
+html[data-yardivo-main-theme="light"] :is(h1,h2,h3,h4,.page-title,.panel-title,.card-title,.yard-current-row strong),
+html[data-theme="light"] :is(h1,h2,h3,h4,.page-title,.panel-title,.card-title,.yard-current-row strong),
+body.light-mode :is(h1,h2,h3,h4,.page-title,.panel-title,.card-title,.yard-current-row strong){
+  color:#13202a!important;
+}
+html[data-yardivo-main-theme="light"] :is(small,.muted,.subtitle,.meta),
+html[data-theme="light"] :is(small,.muted,.subtitle,.meta),
+body.light-mode :is(small,.muted,.subtitle,.meta){
+  color:#667784!important;
+}
+
+/* Sidebar stays white as requested; active item uses a pale neutral/blue tint only. */
+html[data-yardivo-main-theme="light"] .nav-btn,
+html[data-theme="light"] .nav-btn,
+body.light-mode .nav-btn{
+  background:#fff!important;
+  color:#344955!important;
+  border-color:transparent!important;
+}
+html[data-yardivo-main-theme="light"] .nav-btn:hover,
+html[data-theme="light"] .nav-btn:hover,
+body.light-mode .nav-btn:hover{
+  background:#f5f8fa!important;
+}
+html[data-yardivo-main-theme="light"] .nav-btn.active,
+html[data-theme="light"] .nav-btn.active,
+body.light-mode .nav-btn.active{
+  background:#eef5f9!important;
+  color:#174f70!important;
+  border-color:#d3e3ec!important;
+}
+
+/* Announcement schedule + Daily/Weekly maps: white canvas/grid.
+   Booking/status colors are intentionally NOT overridden. */
+html[data-yardivo-main-theme="light"] :is(#announcementSchedule,.schedule-grid,#dailyMapBoard,.daily-map-vertical-grid,#weeklyMapBoard,#yardivoExpandedSchedule .yesm-body,#yardivoExpandedSchedule .yesm-map-host),
+html[data-theme="light"] :is(#announcementSchedule,.schedule-grid,#dailyMapBoard,.daily-map-vertical-grid,#weeklyMapBoard,#yardivoExpandedSchedule .yesm-body,#yardivoExpandedSchedule .yesm-map-host),
+body.light-mode :is(#announcementSchedule,.schedule-grid,#dailyMapBoard,.daily-map-vertical-grid,#weeklyMapBoard,#yardivoExpandedSchedule .yesm-body,#yardivoExpandedSchedule .yesm-map-host){
+  background:#fff!important;
+  color:#13202a!important;
+  border-color:#d7e0e6!important;
+}
+html[data-yardivo-main-theme="light"] :is(.schedule-grid .head,.schedule-grid .ramp,.daily-map-vertical-grid .dmv-corner,.daily-map-vertical-grid .dmv-ramp-head,.daily-map-vertical-grid .dmv-time,.daily-map-vertical-grid .dmv-cell,.yesm-v-head,.yesm-v-time,.yesm-v-cell,.freecell),
+html[data-theme="light"] :is(.schedule-grid .head,.schedule-grid .ramp,.daily-map-vertical-grid .dmv-corner,.daily-map-vertical-grid .dmv-ramp-head,.daily-map-vertical-grid .dmv-time,.daily-map-vertical-grid .dmv-cell,.yesm-v-head,.yesm-v-time,.yesm-v-cell,.freecell),
+body.light-mode :is(.schedule-grid .head,.schedule-grid .ramp,.daily-map-vertical-grid .dmv-corner,.daily-map-vertical-grid .dmv-ramp-head,.daily-map-vertical-grid .dmv-time,.daily-map-vertical-grid .dmv-cell,.yesm-v-head,.yesm-v-time,.yesm-v-cell,.freecell){
+  background:#fff!important;
+  color:#40545f!important;
+  border-color:#dce4e9!important;
+}
+
+/* Overview surfaces also stay pure white. Keep bar/status colors themselves. */
+html[data-yardivo-main-theme="light"] :is(#overviewSupplier3D,#overviewSupplier3D .ov3d-stage,#overviewSupplier3D .ov3d-world,#overviewSupplierChart),
+html[data-theme="light"] :is(#overviewSupplier3D,#overviewSupplier3D .ov3d-stage,#overviewSupplier3D .ov3d-world,#overviewSupplierChart),
+body.light-mode :is(#overviewSupplier3D,#overviewSupplier3D .ov3d-stage,#overviewSupplier3D .ov3d-world,#overviewSupplierChart){
+  background:#fff!important;
+  color:#13202a!important;
+}
+
+/* Expanded map shell */
+html[data-yardivo-main-theme="light"] #yardivoExpandedSchedule,
+html[data-theme="light"] #yardivoExpandedSchedule,
+body.light-mode #yardivoExpandedSchedule{
+  background:#fff!important;
+  color:#13202a!important;
+}
+html[data-yardivo-main-theme="light"] #yardivoExpandedSchedule .yesm-toolbar,
+html[data-theme="light"] #yardivoExpandedSchedule .yesm-toolbar,
+body.light-mode #yardivoExpandedSchedule .yesm-toolbar{
+  background:#fff!important;
+  color:#13202a!important;
+  border-color:#d9e1e7!important;
+}
+
+/* Do not alter Welcome or original YARDIVO login appearance. */
+#yardivoWelcomeSplash{color-scheme:dark}
+</style>
+<script id="yardivo-full-white-light-mode-v1-20260901-js">
+(function(){
+'use strict';
+function normalize(){
+  const html=document.documentElement,body=document.body;if(!body)return;
+  const ds=html.dataset.yardivoMainTheme||html.dataset.theme||'';
+  const light=ds==='light'||html.classList.contains('light-mode')||body.classList.contains('light-mode');
+  if(light){
+    html.dataset.yardivoMainTheme='light';
+    html.dataset.theme='light';
+    html.classList.add('light-mode');
+    html.classList.remove('dark-mode');
+    body.classList.add('light-mode');
+    body.classList.remove('dark-mode');
+  }
+}
+window.addEventListener('yardivo:theme-change',normalize);
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-theme],[data-yardivo-theme],#themeToggle,#themeSwitch'))setTimeout(normalize,0);
+},true);
+window.addEventListener('load',normalize,{once:true});
+})();
+</script>
+
 </body>
 </html>
