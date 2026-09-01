@@ -11548,7 +11548,7 @@ function allowedViewsForRole(role){
   const map={
     admin:[],
     inventory:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','announcements','weeklyDeliveries','overview','suppliers','calendar','heatmap','controltower','controlTower','plannerPro','incidents','incidentArchive','reports','settings','unannounced','epal','orderSearch'],
-    reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','docks','operations','incidents','incidentArchive','plannerPro','controltower','controlTower','settings','unannounced','epal','orderSearch'],
+    reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','controltower','controlTower','settings','unannounced','epal','orderSearch','liveYard'],
     gate:['homeMenu','checkin','unannounced','myYard','docks'],
     management:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','overview','reports','calendar','heatmap','controltower','controlTower','suppliers','incidents','incidentArchive','settings']
   };
@@ -12377,7 +12377,7 @@ const ROLE_LABEL={admin:'Admin',inventory:'Upravljanje zalihama',reception:'Prij
 const ROLE_VIEWS={
  admin:['homeMenu','dashboard','receiving','weeklyMap','dailyMap','settings','checkin','myYard','docks','trucks','suppliers','announcements','weeklyDeliveries','overview','incidents','incidentArchive','shipments','operations','reports','plannerPro','controltower','calendar','heatmap'],
  inventory:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','announcements','weeklyDeliveries','overview','suppliers','calendar','heatmap','controltower','controlTower','plannerPro','incidents','incidentArchive','reports','settings','unannounced','epal','orderSearch'],
- reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','plannerPro','controltower','controlTower','settings','unannounced','epal','orderSearch'],
+ reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','controltower','controlTower','settings','unannounced','epal','orderSearch','liveYard'],
  gate:['homeMenu','checkin','unannounced','myYard','docks'],
  management:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','overview','reports','calendar','heatmap','controltower','suppliers','incidents','incidentArchive','settings']
 };
@@ -12876,11 +12876,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   // Exact requested permissions.
   const ACCESS={
     admin:'ALL',
-    reception:new Set([
-      'homeMenu','dashboard','docks','yard','trucks','receiving',
-      'dailyMap','weeklyMap','incidents','suppliers','incidentArchive',
-      'notifications','settings'
-    ]),
+    reception:new Set(['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','controltower','controlTower','settings','unannounced','epal','orderSearch','liveYard']),
     inventory:new Set([
       'homeMenu','dashboard','yard','docks','announcements',
       'dailyMap','weeklyMap','suppliers','overview','incidents',
@@ -13226,7 +13222,7 @@ if(select){
 'use strict';
 const KEY='yardivo_yms_announcements_v1', LEG='studenac_yms_announcements';
 const HOME={
- reception:new Set(['dashboard','docks','yard','trucks','receiving','dailyMap','weeklyMap','incidents','suppliers','incidentArchive','notifications','settings']),
+ reception:new Set(['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','controltower','controlTower','settings','unannounced','epal','orderSearch','liveYard']),
  inventory:new Set(['dashboard','yard','docks','announcements','dailyMap','weeklyMap','suppliers','overview','incidents','incidentArchive','notifications','settings']),
  gate:new Set(['homeMenu','checkin','unannounced','myYard','docks'])
 };
@@ -20287,7 +20283,7 @@ window.YardivoQAWorkflow={approveUnannounced:approve,rejectUnannounced:reject,en
 const ROLE={
  admin:['homeMenu','dashboard','receiving','weeklyMap','dailyMap','settings','checkin','myYard','docks','trucks','suppliers','announcements','weeklyDeliveries','overview','incidents','incidentArchive','shipments','operations','reports','plannerPro','controltower','controlTower','calendar','heatmap','unannounced','epal','orderSearch','liveYard','yardivoWarRoom'],
  inventory:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','announcements','weeklyDeliveries','overview','suppliers','calendar','heatmap','controltower','controlTower','plannerPro','incidents','incidentArchive','reports','settings','unannounced','epal','orderSearch','liveYard'],
- reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','plannerPro','controltower','controlTower','settings','unannounced','epal','orderSearch','liveYard'],
+ reception:['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','controltower','controlTower','settings','unannounced','epal','orderSearch','liveYard'],
  gate:['homeMenu','checkin','unannounced','myYard','docks'],
  management:['homeMenu','dashboard','weeklyMap','dailyMap','myYard','overview','reports','calendar','heatmap','controltower','controlTower','suppliers','incidents','incidentArchive','settings']
 };
@@ -30461,6 +30457,129 @@ document.addEventListener('click',e=>{
 
 window.YardivoGateCanonical={apply:syncGate,open:enterGateView};
 window.YardivoServerProfiles={render:renderProfiles,create:createProfile};
+})();
+</script>
+
+
+<style id="yardivo-role-stability-final-v4-20260901">
+/* Canonical stable role visibility. My Yard is available to every application role. */
+body[data-yardivo-role="admin"] [data-view="myYard"],
+body[data-yardivo-role="inventory"] [data-view="myYard"],
+body[data-yardivo-role="reception"] [data-view="myYard"],
+body[data-yardivo-role="gate"] [data-view="myYard"]{
+  visibility:visible!important;
+}
+body[data-yardivo-role="admin"] [data-home-target="myYard"],
+body[data-yardivo-role="inventory"] [data-home-target="myYard"],
+body[data-yardivo-role="reception"] [data-home-target="myYard"],
+body[data-yardivo-role="gate"] [data-home-target="myYard"]{
+  visibility:visible!important;
+}
+
+/* Reception exact menu — prevents old role sheets from briefly repainting stale cards. */
+body[data-yardivo-role="reception"] [data-view="homeMenu"],
+body[data-yardivo-role="reception"] [data-view="dashboard"],
+body[data-yardivo-role="reception"] [data-view="receiving"],
+body[data-yardivo-role="reception"] [data-view="dailyMap"],
+body[data-yardivo-role="reception"] [data-view="weeklyMap"],
+body[data-yardivo-role="reception"] [data-view="suppliers"],
+body[data-yardivo-role="reception"] [data-view="checkin"],
+body[data-yardivo-role="reception"] [data-view="myYard"],
+body[data-yardivo-role="reception"] [data-view="docks"],
+body[data-yardivo-role="reception"] [data-view="operations"],
+body[data-yardivo-role="reception"] [data-view="incidents"],
+body[data-yardivo-role="reception"] [data-view="incidentArchive"],
+body[data-yardivo-role="reception"] [data-view="controltower"],
+body[data-yardivo-role="reception"] [data-view="controlTower"],
+body[data-yardivo-role="reception"] [data-view="settings"],
+body[data-yardivo-role="reception"] [data-view="unannounced"],
+body[data-yardivo-role="reception"] [data-view="epal"],
+body[data-yardivo-role="reception"] [data-view="orderSearch"],
+body[data-yardivo-role="reception"] [data-view="liveYard"]{
+  visibility:visible!important;
+}
+</style>
+
+<script id="yardivo-role-stability-final-v4-20260901-js">
+(function(){
+'use strict';
+const MATRIX={
+ admin:'ALL',
+ inventory:new Set(['homeMenu','dashboard','weeklyMap','dailyMap','myYard','announcements','yardivoMyAnnouncements','overview','suppliers','calendar','heatmap','controltower','controlTower','incidents','incidentArchive','reports','settings','unannounced','epal','orderSearch','liveYard']),
+ reception:new Set(['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','controltower','controlTower','settings','unannounced','epal','orderSearch','liveYard']),
+ gate:new Set(['homeMenu','checkin','unannounced','myYard','docks'])
+};
+function norm(r){
+ r=String(r||'').toLowerCase().trim();
+ if(r==='porta'||r==='portir')return'gate';
+ if(r==='prijam')return'reception';
+ if(r==='zalihe'||r.includes('zalih'))return'inventory';
+ return r;
+}
+function role(){try{return norm(window.currentSession?.role||currentSession?.role)}catch(_){return''}}
+function allowed(v){const r=role();return r==='admin'||!!MATRIX[r]?.has(v)}
+function apply(){
+ const r=role();if(!r)return;
+ document.body.dataset.yardivoRole=r;
+ document.documentElement.dataset.yardivoRole=r;
+
+ document.querySelectorAll('[data-view]').forEach(el=>{
+   const ok=allowed(el.dataset.view);
+   el.classList.toggle('role-hidden',!ok);
+   el.style.setProperty('display',ok?'':'none',ok?'':'important');
+   if(ok){el.style.removeProperty('visibility');el.removeAttribute('hidden');el.removeAttribute('aria-disabled')}
+ });
+ document.querySelectorAll('[data-home-target]').forEach(el=>{
+   const ok=allowed(el.dataset.homeTarget);
+   el.classList.toggle('role-hidden',!ok);
+   el.style.setProperty('display',ok?'':'none',ok?'':'important');
+   if(ok){el.style.removeProperty('visibility');el.removeAttribute('hidden');el.removeAttribute('aria-disabled')}
+ });
+
+ /* My Yard is explicitly universal for all four production roles. */
+ if(['admin','inventory','reception','gate'].includes(r)){
+   document.querySelectorAll('[data-view="myYard"],[data-home-target="myYard"]').forEach(el=>{
+     el.classList.remove('role-hidden');el.removeAttribute('hidden');el.removeAttribute('aria-disabled');
+     el.style.removeProperty('display');el.style.removeProperty('visibility');
+   });
+ }
+}
+function open(view){
+ if(!allowed(view))return false;
+ apply();
+ const v=document.getElementById(view);
+ if(!v)return false;
+ document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+ v.classList.add('active');
+ document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
+ if(view==='myYard')setTimeout(()=>{
+   try{window.YardivoMyYardWebGL?.boot?.()}catch(_){}
+   try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+   try{window.YardivoMyYardMode?.set?.(window.YardivoMyYardMode.current?.()||'3d')}catch(_){}
+ },30);
+ if(view==='unannounced')setTimeout(()=>{
+   try{window.YardivoUnannouncedGateV2?.populateForm?.()}catch(_){}
+   try{window.YardivoUnannouncedSection?.render?.()}catch(_){}
+ },20);
+ return true;
+}
+
+/* Final click owner for allowed role navigation. Direct activation avoids chains of stale wrappers. */
+document.addEventListener('click',e=>{
+ const el=e.target.closest?.('[data-view],[data-home-target]');
+ if(!el||!role())return;
+ const view=el.dataset.view||el.dataset.homeTarget||'';
+ if(!allowed(view))return;
+ e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+ open(view);
+},true);
+
+window.addEventListener('yardivo:login',()=>setTimeout(apply,30));
+window.addEventListener('yardivo:data-synced',apply);
+window.addEventListener('load',()=>setTimeout(apply,900),{once:true});
+
+/* No periodic visibility timer here: role UI is event-driven to eliminate blinking. */
+window.YardivoRoleStableFinal={apply,open,allowed,matrix:MATRIX};
 })();
 </script>
 
