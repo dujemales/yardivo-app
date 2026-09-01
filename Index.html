@@ -20388,8 +20388,22 @@ async function render(){
   try{
     const r=await invoke('list');const a=r.users||[];
     host.innerHTML='<div class="master-user-row"><strong>Korisnik</strong><strong>Rola</strong><strong>Lokacija</strong><strong>Status</strong><strong>Akcije</strong></div>'+
-    a.map(u=>`<div class="master-user-row"><div><strong>${esc(u.username)}</strong></div><div>${esc(u.app_role)}</div><div>${esc(u.location)}</div><div>${u.active?'AKTIVAN':'DEAKTIVIRAN'}</div><div><button class="action" data-srv-toggle="${u.auth_user_id}" data-active="${u.active}">${u.active?'DEAKT.':'AKTIV.'}</button> ${u.username==='dujemales'?'':`<button class="action danger" data-srv-del="${u.auth_user_id}">OBRIŠI</button>`}</div></div>`).join('');
+    a.map(u=>`<div class="master-user-row"><div><strong>${esc(u.username)}</strong></div><div>${esc(u.app_role)}</div><div>${esc(u.location)}</div><div>${u.active?'AKTIVAN':'DEAKTIVIRAN'}</div><div><button class="action" data-srv-toggle="${u.auth_user_id}" data-active="${u.active}">${u.active?'DEAKT.':'AKTIV.'}</button> <button class="action" data-srv-password="${u.auth_user_id}" data-srv-user="${esc(u.username)}">PROMIJENI ŠIFRU</button> ${u.username==='dujemales'?'':`<button class="action danger" data-srv-del="${u.auth_user_id}">OBRIŠI</button>`}</div></div>`).join('');
     host.querySelectorAll('[data-srv-toggle]').forEach(b=>b.onclick=async()=>{try{await invoke('update',{auth_user_id:b.dataset.srvToggle,active:b.dataset.active!=='true'});await render()}catch(e){alert(e.message)}});
+    host.querySelectorAll('[data-srv-password]').forEach(b=>b.onclick=async()=>{
+      const username=b.dataset.srvUser||'korisnik';
+      const next=window.prompt(`NOVA ŠIFRA · ${username}\nUpiši novu šifru (najmanje 6 znakova).`);
+      if(next===null)return;
+      if(String(next).length<6){alert('Šifra mora imati najmanje 6 znakova.');return}
+      const again=window.prompt(`POTVRDA ŠIFRE · ${username}\nPonovno upiši novu šifru.`);
+      if(again===null)return;
+      if(next!==again){alert('Šifre se ne podudaraju.');return}
+      if(!confirm(`Promijeniti šifru za korisnika "${username}"?`))return;
+      b.disabled=true;
+      try{await invoke('password',{auth_user_id:b.dataset.srvPassword,password:next});alert(`Šifra za korisnika "${username}" je uspješno promijenjena.`)}
+      catch(e){alert('Promjena šifre nije uspjela: '+(e?.message||e))}
+      finally{b.disabled=false}
+    });
     host.querySelectorAll('[data-srv-del]').forEach(b=>b.onclick=async()=>{if(confirm('Trajno obrisati korisnika?'))try{await invoke('delete',{auth_user_id:b.dataset.srvDel});await render()}catch(e){alert(e.message)}});
   }catch(e){host.innerHTML=`<div class="master-note warn">Greška: ${esc(e.message)}</div>`}
 }
@@ -30401,6 +30415,7 @@ async function renderProfiles(){
         <div>${u.active?'AKTIVAN':'DEAKTIVIRAN'}</div>
         <div>
           <button class="action" data-profile-toggle="${esc(u.auth_user_id)}" data-active="${u.active?'1':'0'}">${u.active?'DEAKT.':'AKTIV.'}</button>
+          <button class="action" data-profile-password="${esc(u.auth_user_id)}" data-profile-user="${esc(u.username)}">PROMIJENI ŠIFRU</button>
           ${u.username==='dujemales'?'':` <button class="action danger" data-profile-delete="${esc(u.auth_user_id)}">OBRIŠI</button>`}
         </div>
       </div>`).join('');
@@ -30411,6 +30426,28 @@ async function renderProfiles(){
           await invokeUsers('update',{auth_user_id:btn.dataset.profileToggle,active:btn.dataset.active!=='1'});
           await renderProfiles();
         }catch(e){alert(e.message)}
+      };
+    });
+    host.querySelectorAll('[data-profile-password]').forEach(btn=>{
+      btn.onclick=async()=>{
+        const username=btn.dataset.profileUser||'korisnik';
+        const next=window.prompt(`NOVA ŠIFRA · ${username}\nUpiši novu šifru (najmanje 6 znakova).`);
+        if(next===null)return;
+        if(String(next).length<6){alert('Šifra mora imati najmanje 6 znakova.');return}
+        const again=window.prompt(`POTVRDA ŠIFRE · ${username}\nPonovno upiši novu šifru.`);
+        if(again===null)return;
+        if(next!==again){alert('Šifre se ne podudaraju.');return}
+        if(!confirm(`Promijeniti šifru za korisnika "${username}"?`))return;
+        btn.disabled=true;
+        try{
+          await invokeUsers('password',{auth_user_id:btn.dataset.profilePassword,password:next});
+          try{showYmsToast?.('success','ŠIFRA PROMIJENJENA',`Nova šifra je spremljena za ${username}.`)}catch(_){}
+          alert(`Šifra za korisnika "${username}" je uspješno promijenjena.`);
+        }catch(e){
+          alert('Promjena šifre nije uspjela: '+(e?.message||e));
+        }finally{
+          btn.disabled=false;
+        }
       };
     });
     host.querySelectorAll('[data-profile-delete]').forEach(btn=>{
@@ -31005,5 +31042,22 @@ document.addEventListener('click',e=>{
 window.YardivoPasswordChange={change};
 })();
 </script>
+
+<style id="yardivo-admin-account-password-style-v1-20260901">
+#masterUserList .master-user-row>div:last-child{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  align-items:center;
+}
+#masterUserList [data-profile-password],
+#masterUserList [data-srv-password]{
+  border-color:#2f6ea3!important;
+  background:#0d2b45!important;
+  color:#bfe0ff!important;
+  white-space:nowrap;
+}
+</style>
+
 </body>
 </html>
