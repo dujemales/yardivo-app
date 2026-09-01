@@ -6032,7 +6032,7 @@ html[data-theme="light"] #yardivoBrandFooter strong{color:#244257!important}
 <span aria-hidden="true" class="theme-track-icons"><span>🌙</span><span>☀️</span></span>
 <span aria-hidden="true" class="theme-thumb">🌙</span>
 </button>
-<script id="yardivo-theme-switch-v3">
+<script id="yardivo-theme-switch-v3" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
 const KEY='yardivo_theme_v3';
@@ -20803,7 +20803,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 window.addEventListener('yardivo:login',()=>{document.body.classList.add('yardivo-role-switching');atomicEnter()});
 })();
 </script>
-<script id="yardivo-myyard-interaction-stability-v1">
+<script id="yardivo-myyard-interaction-stability-v1" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
 function bind(){
@@ -23187,7 +23187,11 @@ function buildEngine(T,host){
    if((e.buttons&1)!==1){stop(e);return}
    const dx=e.clientX-px,dy=e.clientY-py;
    if(Math.abs(dx)+Math.abs(dy)>3)moved=true;
-   yaw-=dx*.0075;pitch=Math.max(.28,Math.min(1.18,pitch+dy*.005));
+   /* Horizontal rotation is intentionally UNBOUNDED: My Yard can orbit full 360°
+      repeatedly in either direction. Pitch alone is limited so the camera cannot flip. */
+   yaw-=dx*.009;
+   if(Math.abs(yaw)>Math.PI*200)yaw%=Math.PI*2;
+   pitch=Math.max(.28,Math.min(1.18,pitch+dy*.005));
    px=e.clientX;py=e.clientY;cameraApply()
  });
  renderer.domElement.addEventListener('pointerup',stop);
@@ -27238,7 +27242,7 @@ html[data-yardivo-main-theme="light"] body.light-mode :is(
   /* semantic components retain their own explicit colors */
 }
 </style>
-<script id="yardivo-theme-isolation-final-v1-20260901">
+<script id="yardivo-theme-isolation-final-v1-20260901" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
 const MAIN='yardivo_main_theme_v2';
@@ -28327,6 +28331,599 @@ document.addEventListener('click',e=>{
   }
 },true);
 window.addEventListener('yardivo:data-synced',sync);
+})();
+</script>
+
+
+<style id="yardivo-myyard-360-orbit-final-v1-20260901">
+#myYard[data-yardivo-yard-mode="3d"] #yardivoMyYardWebGL{
+  pointer-events:auto!important;
+  touch-action:none!important;
+}
+#myYard[data-yardivo-yard-mode="3d"] #yardivoMyYardWebGL canvas{
+  pointer-events:auto!important;
+  touch-action:none!important;
+  cursor:grab!important;
+  user-select:none!important;
+}
+#myYard[data-yardivo-yard-mode="3d"] #yardivoMyYardWebGL canvas:active{
+  cursor:grabbing!important;
+}
+</style>
+<script id="yardivo-myyard-360-orbit-final-v1-20260901-js">
+(function(){
+'use strict';
+
+/* Stop obsolete parent-level drag handlers from competing with the canonical WebGL canvas.
+   The WebGL v3 engine remains the single owner of 3D orbit. */
+function protect(){
+  const host=document.getElementById('yardivoMyYardWebGL');
+  const canvas=host?.querySelector('canvas');
+  if(!canvas)return;
+  if(canvas.dataset.yardivoOrbitProtected==='1')return;
+  canvas.dataset.yardivoOrbitProtected='1';
+
+  /* Do not stop propagation here: the canonical engine listeners are on this exact canvas.
+     We only prevent native browser drag/select behavior. */
+  canvas.addEventListener('dragstart',e=>e.preventDefault());
+  canvas.addEventListener('contextmenu',e=>e.preventDefault());
+}
+window.addEventListener('load',()=>setTimeout(protect,1200),{once:true});
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-view="myYard"],[data-home-target="myYard"],#myYard [data-myy="3d"]')){
+    setTimeout(protect,120);
+  }
+},true);
+window.addEventListener('yardivo:data-synced',protect);
+window.YardivoMyYard360={protect};
+})();
+</script>
+
+
+<style id="yardivo-light-absolute-white-v4-20260901">
+/* LIGHT MODE — absolute white structural palette.
+   This final layer intentionally overrides old inline navy/graphite backgrounds. */
+html[data-yardivo-main-theme="light"] body.light-mode{
+  --bg:#fff!important;--panel:#fff!important;--panel2:#fff!important;
+  --card:#fff!important;--border:#cbd7df!important;
+  --text:#102b3c!important;--muted:#607787!important;
+  --theme-bg:#fff!important;--theme-bg-2:#fff!important;
+  --theme-panel:#fff!important;--theme-panel-2:#fff!important;
+  --theme-card:#fff!important;--theme-input:#fff!important;
+  --theme-border:#cbd7df!important;--theme-border-soft:#dfe7ec!important;
+  --theme-text:#102b3c!important;--theme-muted:#607787!important;
+  background:#fff!important;color:#102b3c!important;
+}
+
+/* Every application structural container becomes white. */
+html[data-yardivo-main-theme="light"] body.light-mode :is(
+.app-shell,.sidebar,.sidebar-head,.sidebar-header,.sidebar-footer,.topbar,.app-header,
+.main,.main-content,.content,.view,.view.active,
+.panel,.panel-head,.panel-body,.card,.home-menu,.home-menu-shell,.home-menu-grid,.home-menu-card,.home-card,
+.toolbar,.controls,.filter,.filter-box,.data-wrap,.table-wrap,.table-responsive,
+.settings-grid,.settings-card,.settings-section,.settings-group,
+.daily-map,.daily-map-board,.daily-map-toolbar,.daily-map-grid,.daily-map-shell,
+.weekly-map,.week-map,.week-map-day,.week-map-item,.week-day,.week-day-head,.week-summary,.week-delivery,
+.schedule-wrap,.schedule-grid,.schedule-table,.schedule-cell,.schedule-row,
+.capacity-panel,.capacity-grid,.capacity-card,.ramp-capacity,.ramp-card,.dock-card,
+.overview-hero,.overview-panel,.overview-card,.overview-kpi,.overview-executive,.overview-exec-kpi,
+.overview-focus-card,.overview-operational-kpis,.overview-detail-drilldown,.overview-best-below-chart,
+.supplier-card,.supplier-history-card,.announcement-card,.incident-card,.truck-history-card,
+.receiving-card,.gate-card,.order-card,.epal-card,.unannounced-card,.operation-card,.planner-card,
+.report-card,.calendar-card,.heat-card,.tower-card,.terminal,.terminal-panel,
+.user-card,.role-card,.permission-card,.admin-card,.permission-item,.permission-row,
+.master-note,.master-settings-body,.master-perms,.holiday-admin,.holiday-row,
+fieldset,legend
+){
+  background-color:#fff!important;
+  background-image:none!important;
+  color:#102b3c!important;
+  border-color:#cbd7df!important;
+  box-shadow:none!important;
+}
+
+/* Old components with inline dark backgrounds: force white unless they are semantic statuses. */
+html[data-yardivo-main-theme="light"] body.light-mode [style*="background:#07131f"],
+html[data-yardivo-main-theme="light"] body.light-mode [style*="background: #07131f"],
+html[data-yardivo-main-theme="light"] body.light-mode [style*="background:#0d1b29"],
+html[data-yardivo-main-theme="light"] body.light-mode [style*="background: #0d1b29"],
+html[data-yardivo-main-theme="light"] body.light-mode [style*="background:#091827"],
+html[data-yardivo-main-theme="light"] body.light-mode [style*="background: #091827"],
+html[data-yardivo-main-theme="light"] body.light-mode [style*="background:#06121d"],
+html[data-yardivo-main-theme="light"] body.light-mode [style*="background: #06121d"],
+html[data-yardivo-main-theme="light"] body.light-mode [style*="background:#050b11"],
+html[data-yardivo-main-theme="light"] body.light-mode [style*="background: #050b11"]{
+  background:#fff!important;color:#102b3c!important;border-color:#cbd7df!important;
+}
+
+/* Sidebar in screenshot must be white, with strong readable labels. */
+html[data-yardivo-main-theme="light"] body.light-mode .sidebar{
+  background:#fff!important;border-right:1px solid #c9d5dd!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode .nav-btn{
+  background:#fff!important;color:#17394e!important;border:1px solid #d5e0e6!important;
+  box-shadow:none!important;font-weight:800!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode .nav-btn:hover{
+  background:#f5f9fc!important;color:#0c2c41!important;border-color:#b9cad5!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode .nav-btn.active{
+  background:#edf6fc!important;color:#075e9f!important;border-color:#9fc8e4!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode .sidebar-footer{
+  background:#fff!important;color:#526b7a!important;border-top:1px solid #d7e1e7!important;
+}
+
+/* Top bar from screenshot: absolutely no navy strip. */
+html[data-yardivo-main-theme="light"] body.light-mode :is(.topbar,.top-bar,.app-header,.header-bar){
+  background:#fff!important;color:#102b3c!important;border-color:#cbd7df!important;
+  box-shadow:0 1px 0 #dce5ea!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode :is(.topbar h1,.topbar h2,.topbar strong,.topbar b,.topbar span,.topbar small){
+  color:#17394e!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode :is(.location-badge,#globalWarehouseInfo,#currentUserChip,.user-chip,.notif-bell){
+  background:#fff!important;color:#17394e!important;border-color:#c5d3dc!important;box-shadow:none!important;
+}
+
+/* Main map/table/capacity region. */
+html[data-yardivo-main-theme="light"] body.light-mode :is(
+#dailyMap,#weeklyMap,#dashboard,#overview,#suppliers,#reports,#settings,#announcements,
+#receiving,#checkin,#unannounced,#epal,#incidents,#incidentArchive,#operations,#docks,
+#orderSearch,#yardivoMyAnnouncements
+){
+  background:#fff!important;color:#102b3c!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode :is(table,thead,tbody,tfoot,tr,th,td){
+  background:#fff!important;color:#102b3c!important;border-color:#d5e0e6!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode th{
+  background:#f7fafc!important;color:#17394e!important;font-weight:900!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode :is(input,select,textarea){
+  background:#fff!important;color:#102b3c!important;border-color:#bdccd6!important;
+}
+
+/* Cards like RAMPA 1/2/3: white body, clear dark typography. */
+html[data-yardivo-main-theme="light"] body.light-mode :is(
+.ramp-card,.dock-card,[class*="ramp-card"],[class*="capacity-card"],[class*="ramp-capacity"]
+){
+  background:#fff!important;color:#102b3c!important;border-color:#c7d5de!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode :is(
+.ramp-card,.dock-card,[class*="ramp-card"],[class*="capacity-card"],[class*="ramp-capacity"]
+) :is(h2,h3,h4,strong,b,small,span,label){
+  color:#17394e!important;
+}
+
+/* Preserve meaning, but remove the dark/navy rectangular delivery card seen in screenshot. */
+html[data-yardivo-main-theme="light"] body.light-mode :is(
+.delivery-card,.delivery-item,.appointment-card,.supplier-slot,.ramp-delivery,.capacity-delivery,
+[class*="delivery-item"],[class*="appointment-card"],[class*="supplier-slot"]
+){
+  background:#f8fbfd!important;color:#17394e!important;border-color:#c7d7e1!important;
+}
+
+/* Buttons are white in Light mode except intentional primary/status actions. */
+html[data-yardivo-main-theme="light"] body.light-mode :is(.action,.secondary,button):not(
+.primary,.danger,.delete-all-btn,#logoutBtn,.status-badge,.badge,.chip
+){
+  background:#fff!important;color:#17394e!important;border-color:#c4d2db!important;
+  box-shadow:none!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode #logoutBtn,
+html[data-yardivo-main-theme="light"] body.light-mode #homeLogoutBtn{
+  background:#fff5f5!important;color:#a32832!important;border-color:#dda3a8!important;
+}
+
+/* Footer must not form a dark horizontal bar. */
+html[data-yardivo-main-theme="light"] body.light-mode :is(
+footer,.footer,.app-footer,[class*="app-footer"]
+){
+  background:#fff!important;color:#506978!important;border-color:#d7e1e7!important;
+}
+
+/* Operational status colors may stay colored, but text must remain readable. */
+html[data-yardivo-main-theme="light"] body.light-mode :is(
+.status-badge,.badge,.chip,.status-pill,.notice-pill,.delay-chip,.incident-chip,.live,
+.driver-data-ok,.identity-chip,.missing-driver-data,.identity-missing
+){
+  box-shadow:none!important;
+}
+</style>
+
+<script id="yardivo-light-absolute-white-v4-20260901-js">
+(function(){
+'use strict';
+function enforce(){
+  const html=document.documentElement,body=document.body;
+  const light=html.dataset.yardivoMainTheme==='light'||body.classList.contains('light-mode');
+  if(!light)return;
+  html.dataset.yardivoMainTheme='light';
+  body.classList.add('light-mode');
+
+  /* Remove old optional light palette class which painted sections green/dark. */
+  body.classList.remove('yardivo-light-green');
+
+  /* Explicitly clear legacy inline dark backgrounds on the large structural nodes
+     visible in Daily Map / capacity screens. */
+  document.querySelectorAll(
+    '.sidebar,.topbar,.top-bar,.app-header,.main,.main-content,.view.active,.panel,.panel-head,.panel-body,'+
+    '.daily-map-board,.daily-map-toolbar,.capacity-panel,.capacity-grid,.ramp-card,.dock-card,.data-wrap,.table-wrap'
+  ).forEach(el=>{
+    const bg=(el.style.background||el.style.backgroundColor||'').toLowerCase();
+    if(/#07131f|#0d1b29|#091827|#06121d|#050b11|rgb\(7,\s*19,\s*31\)|rgb\(13,\s*27,\s*41\)/.test(bg)){
+      el.style.setProperty('background','#fff','important');
+      el.style.setProperty('color','#102b3c','important');
+    }
+  });
+}
+window.addEventListener('load',()=>setTimeout(enforce,500),{once:true});
+window.addEventListener('yardivo:login',()=>setTimeout(enforce,100));
+window.addEventListener('yardivo:data-synced',enforce);
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('#yardivoThemeSwitch,[data-view],[data-home-target]'))setTimeout(enforce,80);
+},true);
+window.YardivoAbsoluteWhite={apply:enforce};
+})();
+</script>
+
+
+<style id="yardivo-light-ux-canonical-v5-20260901">
+/* ============================================================
+   YARDIVO LIGHT UX — canonical final owner
+   White structural UI, strong readable typography, no navy leaks.
+   ============================================================ */
+html[data-yardivo-main-theme="light"],
+html[data-yardivo-main-theme="light"] body{
+  color-scheme:light!important;
+}
+html[data-yardivo-main-theme="light"] body{
+  --yv-bg:#ffffff;
+  --yv-surface:#ffffff;
+  --yv-surface-soft:#f8fafc;
+  --yv-surface-hover:#f3f7fa;
+  --yv-line:#d6e0e7;
+  --yv-line-strong:#bdccd6;
+  --yv-text:#132f42;
+  --yv-text-2:#425d6e;
+  --yv-muted:#6d8290;
+  --yv-accent:#176fa6;
+  --yv-accent-soft:#edf6fb;
+
+  --theme-bg:#fff!important;
+  --theme-bg-2:#fff!important;
+  --theme-panel:#fff!important;
+  --theme-panel-2:#fff!important;
+  --theme-card:#fff!important;
+  --theme-border:var(--yv-line)!important;
+  --theme-border-soft:#e3eaee!important;
+  --theme-text:var(--yv-text)!important;
+  --theme-muted:var(--yv-muted)!important;
+  --theme-input:#fff!important;
+  --theme-hover:var(--yv-surface-hover)!important;
+  --theme-shadow:rgba(23,50,68,.07)!important;
+
+  background:#fff!important;
+  color:var(--yv-text)!important;
+}
+
+/* App chrome */
+html[data-yardivo-main-theme="light"] body :is(
+.app-shell,.sidebar,.sidebar-head,.sidebar-header,.sidebar-footer,
+.topbar,.top-bar,.app-header,.header-bar,.warehouse-bar,
+.main,.main-content,.content,.view,.view.active
+){
+  background:#fff!important;
+  background-image:none!important;
+  color:var(--yv-text)!important;
+  border-color:var(--yv-line)!important;
+  box-shadow:none!important;
+}
+html[data-yardivo-main-theme="light"] body .sidebar{
+  border-right:1px solid var(--yv-line)!important;
+}
+html[data-yardivo-main-theme="light"] body :is(.topbar,.top-bar,.app-header,.header-bar){
+  border-bottom:1px solid var(--yv-line)!important;
+}
+
+/* Navigation */
+html[data-yardivo-main-theme="light"] body .nav-btn{
+  background:#fff!important;
+  color:#24475d!important;
+  border:1px solid #dde5ea!important;
+  box-shadow:none!important;
+  font-weight:850!important;
+}
+html[data-yardivo-main-theme="light"] body .nav-btn:hover{
+  background:var(--yv-surface-hover)!important;
+  color:#12384f!important;
+  border-color:#c9d7df!important;
+}
+html[data-yardivo-main-theme="light"] body .nav-btn.active{
+  background:var(--yv-accent-soft)!important;
+  color:#0e6599!important;
+  border-color:#a9cfe4!important;
+  box-shadow:inset 3px 0 0 #2588bf!important;
+}
+
+/* Panels, cards and management surfaces */
+html[data-yardivo-main-theme="light"] body :is(
+.panel,.panel-head,.panel-body,.card,.home-menu-card,.home-card,
+.settings-card,.settings-section,.settings-group,.data-wrap,.table-wrap,.table-responsive,
+.toolbar,.controls,.filter,.filter-box,.master-note,.holiday-admin,.holiday-row,
+.overview-hero,.overview-panel,.overview-card,.overview-kpi,.overview-executive,
+.overview-exec-kpi,.overview-focus-card,.overview-operational-kpis,.overview-detail-drilldown,
+.overview-best-below-chart,.performance-kpi,.dash-clean-kpi,.supplier-history-card,
+.truck-history-card,.supplier-card,.announcement-card,.incident-card,.dock-card,.ramp-card,
+.receiving-card,.gate-card,.order-card,.epal-card,.unannounced-card,.operation-card,
+.planner-card,.report-card,.calendar-card,.heat-card,.tower-card,.terminal,.terminal-panel,
+.user-card,.role-card,.permission-card,.admin-card,.permission-item,.permission-row,
+.week-day,.week-day-head,.week-summary,.week-summary>div,.week-delivery,.week-map-day,.week-map-item
+){
+  background:#fff!important;
+  background-image:none!important;
+  color:var(--yv-text)!important;
+  border-color:var(--yv-line)!important;
+  box-shadow:none!important;
+}
+html[data-yardivo-main-theme="light"] body .panel-head{
+  background:#fafcfd!important;
+}
+
+/* Typography */
+html[data-yardivo-main-theme="light"] body :is(
+h1,h2,h3,h4,h5,strong,b,.section-title,.panel-head h2,.panel-head h3
+){
+  color:var(--yv-text)!important;
+}
+html[data-yardivo-main-theme="light"] body :is(
+small,.meta,.subtitle,.muted,.panel-head small,.ann-help
+){
+  color:var(--yv-muted)!important;
+}
+
+/* Tables */
+html[data-yardivo-main-theme="light"] body :is(table,thead,tbody,tfoot,tr,td){
+  background:#fff!important;
+  color:var(--yv-text)!important;
+  border-color:#dce5ea!important;
+}
+html[data-yardivo-main-theme="light"] body th{
+  background:#f8fafc!important;
+  color:#24475d!important;
+  border-color:#d8e2e8!important;
+  font-weight:900!important;
+}
+html[data-yardivo-main-theme="light"] body tbody tr:hover td{
+  background:#f8fbfd!important;
+}
+
+/* Forms */
+html[data-yardivo-main-theme="light"] body :is(input,select,textarea){
+  background:#fff!important;
+  color:#17384d!important;
+  border-color:var(--yv-line-strong)!important;
+  box-shadow:none!important;
+}
+html[data-yardivo-main-theme="light"] body :is(input,select,textarea):focus{
+  border-color:#6eaccf!important;
+  box-shadow:0 0 0 3px rgba(41,134,187,.10)!important;
+  outline:none!important;
+}
+html[data-yardivo-main-theme="light"] body :is(input,textarea)::placeholder{
+  color:#82939e!important;
+}
+
+/* Daily / weekly map structural surfaces */
+html[data-yardivo-main-theme="light"] body :is(
+#dailyMap,#weeklyMap,.daily-map,.daily-map-board,.daily-map-toolbar,
+.week-map,.week-map-board,.schedule-wrap,.schedule-grid,.schedule-table,.map-grid,
+.capacity-panel,.capacity-grid
+){
+  background:#fff!important;
+  background-image:none!important;
+  color:var(--yv-text)!important;
+  border-color:var(--yv-line)!important;
+}
+
+/* Ramp capacity / supplier slots: no dark rectangles in light mode. */
+html[data-yardivo-main-theme="light"] body :is(
+[class*="ramp-card"],[class*="capacity-card"],[class*="capacity-panel"],
+.delivery-card,.delivery-item,.appointment-card,.supplier-slot,.ramp-delivery,.capacity-delivery,
+[class*="delivery-item"],[class*="appointment-card"],[class*="supplier-slot"]
+){
+  background:#fff!important;
+  background-image:none!important;
+  color:var(--yv-text)!important;
+  border-color:#cfdce4!important;
+  box-shadow:none!important;
+}
+html[data-yardivo-main-theme="light"] body :is(
+[class*="ramp-card"],[class*="capacity-card"],.delivery-card,.delivery-item,.appointment-card,.supplier-slot
+) :is(h2,h3,h4,strong,b,span,small){
+  color:#1b4056!important;
+}
+
+/* Standard neutral buttons. Semantic/primary buttons retain their meaning. */
+html[data-yardivo-main-theme="light"] body :is(button,.secondary,.action):not(
+.primary,.danger,.delete-all-btn,#logoutBtn,#homeLogoutBtn,
+.status-badge,.status-pill,.badge,.chip
+){
+  background:#fff!important;
+  color:#24475d!important;
+  border-color:#c9d6de!important;
+  box-shadow:none!important;
+}
+html[data-yardivo-main-theme="light"] body :is(button,.secondary,.action):not(
+.primary,.danger,.delete-all-btn,#logoutBtn,#homeLogoutBtn
+):hover{
+  background:#f5f9fb!important;
+  border-color:#adbfca!important;
+}
+
+/* Logout stays visually clear. */
+html[data-yardivo-main-theme="light"] body #logoutBtn,
+html[data-yardivo-main-theme="light"] body #homeLogoutBtn{
+  background:#fff5f5!important;
+  color:#a52c35!important;
+  border-color:#e0a8ad!important;
+}
+
+/* Footer / status footer */
+html[data-yardivo-main-theme="light"] body :is(footer,.footer,.app-footer,#yardivoBrandFooter){
+  background:#fff!important;
+  color:#607988!important;
+  border-color:var(--yv-line)!important;
+}
+
+/* Remove legacy light variants. */
+html[data-yardivo-main-theme="light"] body.yardivo-light-green{
+  background:#fff!important;
+}
+
+/* THEME SWITCH — small, isolated, clickable ONLY on itself. */
+#yardivoThemeSwitch{
+  position:fixed!important;
+  top:14px!important;
+  right:18px!important;
+  width:72px!important;
+  height:36px!important;
+  min-width:72px!important;
+  min-height:36px!important;
+  max-width:72px!important;
+  max-height:36px!important;
+  padding:3px!important;
+  margin:0!important;
+  border-radius:999px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  z-index:10050!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+#yardivoThemeSwitch::before,
+#yardivoThemeSwitch::after{pointer-events:none!important}
+#yardivoThemeSwitch *{pointer-events:none!important}
+
+html[data-yardivo-main-theme="light"] #yardivoThemeSwitch{
+  background:#eef3f6!important;
+  border:1px solid #b8c7d0!important;
+  box-shadow:0 3px 10px rgba(25,52,70,.10)!important;
+}
+html[data-yardivo-main-theme="dark"] #yardivoThemeSwitch{
+  border:1px solid #36536a!important;
+}
+html[data-yardivo-main-theme="light"] #yardivoThemeSwitch .theme-thumb{
+  background:#fff!important;
+  color:#c88900!important;
+  box-shadow:0 2px 6px rgba(25,52,70,.16)!important;
+  transform:translateX(36px)!important;
+}
+html[data-yardivo-main-theme="dark"] #yardivoThemeSwitch .theme-thumb{
+  transform:translateX(0)!important;
+}
+</style>
+
+<script id="yardivo-theme-canonical-single-owner-v5-20260901">
+(function(){
+'use strict';
+
+const MAIN='yardivo_main_theme_v2';
+let locked=false;
+
+function read(){
+  try{
+    const v=localStorage.getItem(MAIN);
+    if(v==='light'||v==='dark')return v;
+  }catch(_){}
+  return document.body?.classList.contains('light-mode')?'light':'dark';
+}
+function paintSwitch(theme){
+  const sw=document.getElementById('yardivoThemeSwitch');
+  if(!sw)return;
+  const thumb=sw.querySelector('.theme-thumb');
+  if(thumb)thumb.textContent=theme==='light'?'☀️':'🌙';
+  sw.dataset.theme=theme;
+  sw.setAttribute('aria-label',theme==='light'?'Light mode — prebaci na Dark':'Dark mode — prebaci na Light');
+  sw.title=theme==='light'?'Light mode':'Dark mode';
+}
+function apply(theme,save=true){
+  theme=theme==='light'?'light':'dark';
+  const html=document.documentElement,body=document.body;
+  if(!body)return;
+
+  if(save){
+    try{
+      localStorage.setItem(MAIN,theme);
+      localStorage.setItem('yardivo_theme_v3',theme);
+      localStorage.setItem('yardivo_theme_v2',theme);
+      localStorage.setItem('yardivo_theme',theme);
+      localStorage.setItem('theme',theme);
+    }catch(_){}
+  }
+
+  html.dataset.yardivoMainTheme=theme;
+  html.dataset.theme=theme;
+  html.dataset.yardivoTheme=theme;
+  html.classList.toggle('light-mode',theme==='light');
+  html.classList.toggle('dark-mode',theme==='dark');
+  body.classList.toggle('light-mode',theme==='light');
+  body.classList.toggle('dark-mode',theme==='dark');
+  body.classList.remove('yardivo-light-green');
+
+  paintSwitch(theme);
+
+  /* Keep only dark appearance controller synchronized; it must never toggle main theme. */
+  try{window.YardivoSimpleTheme?.apply?.()}catch(_){}
+  try{window.YardivoDarkPaletteIsolation?.apply?.()}catch(_){}
+  if(theme==='light'){
+    try{window.YardivoAbsoluteWhite?.apply?.()}catch(_){}
+  }
+}
+function toggle(){
+  if(locked)return;
+  locked=true;
+  apply(read()==='light'?'dark':'light',true);
+  setTimeout(()=>locked=false,180);
+}
+
+/* Exact event ownership:
+   only the actual #yardivoThemeSwitch element can toggle the theme.
+   No text scan, no closest() over unrelated controls, no global DOM observer. */
+document.addEventListener('pointerup',e=>{
+  const sw=document.getElementById('yardivoThemeSwitch');
+  if(!sw || e.target!==sw)return;
+  if(e.button!==0 && e.pointerType!=='touch')return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+  toggle();
+},true);
+
+/* Suppress the synthetic click that follows pointerup so legacy click handlers cannot run. */
+document.addEventListener('click',e=>{
+  const sw=document.getElementById('yardivoThemeSwitch');
+  if(!sw || e.target!==sw)return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+},true);
+
+document.addEventListener('keydown',e=>{
+  const sw=document.getElementById('yardivoThemeSwitch');
+  if(!sw || e.target!==sw || (e.key!=='Enter'&&e.key!==' '))return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+  toggle();
+},true);
+
+window.addEventListener('load',()=>apply(read(),false),{once:true});
+window.addEventListener('yardivo:login',()=>setTimeout(()=>apply(read(),false),60));
+
+window.YardivoMainTheme={apply,toggle,current:read};
+apply(read(),false);
 })();
 </script>
 
