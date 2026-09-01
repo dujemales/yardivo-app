@@ -43,14 +43,13 @@ Designed & Developed by Duje Maleš
   }catch(_){}
 })();
 </script>
-
 <style id="yardivo-first-paint-bootstrap-style-v1">
 html.yardivo-booting #loginOverlay,
 html.yardivo-booting #loginScreen,
 html.yardivo-booting .login-screen,
 html.yardivo-booting .login-overlay{visibility:hidden!important;opacity:0!important;pointer-events:none!important}
 </style>
-<meta name="yardivo-build" content="PROD-PROFESSIONAL-UX-V2-2026-08-31">
+<meta content="PROD-PROFESSIONAL-UX-V2-2026-08-31" name="yardivo-build"/>
 <script id="yardivo-rbac-session-migration">
 (function(){
   try{
@@ -65,7 +64,7 @@ html.yardivo-booting .login-overlay{visibility:hidden!important;opacity:0!import
 })();
 </script>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>YARDIVO - YARD MANAGEMENT SYSTEM</title>
 <style>
 :root{--bg:#07111d;--bg2:#091827;--panel:#0b1623;--panel2:#0d1b2a;--line:#1c2c3c;--line2:#233749;--text:#f7f9fc;--muted:#8fa2b7;--blue:#1f7cf5;--blue2:#0d5bc6;--green:#31d16b;--red:#ff424c;--orange:#ff922b;--purple:#9e61ff;--yellow:#ffc02e}
@@ -4373,7 +4372,6 @@ html[data-theme="light"] body.light-mode [class*="status"] *{
 
 /* Login / welcome remain intentionally styled by their dedicated theme CSS */
 </style>
-
 <style id="yardivo-xlsx-export-style">
 .yardivo-export-btn{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:0 12px;border-radius:6px;border:1px solid #2f7a54;background:#123524;color:#9ce6b8;font-size:8px;font-weight:1000;letter-spacing:.35px;cursor:pointer}
 .yardivo-export-btn:hover{background:#17492f;border-color:#4aa16f;color:#d8ffe5}
@@ -5452,7 +5450,6 @@ html[data-theme="light"] .yam-busy{background:#fde7ea;color:#94404b;border-color
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="YARDIVO" name="apple-mobile-web-app-title"/>
-
 <style id="yardivo-theme-final-v233">
 html[data-theme="dark"][data-theme-preset="greeny"] body,html[data-theme="dark"][data-theme-preset="greeny"] main,html[data-theme="dark"][data-theme-preset="greeny"] .app-shell,html[data-theme="dark"][data-theme-preset="greeny"] .view{background:#111513!important;color:#e8efeb!important}
 html[data-theme="dark"][data-theme-preset="greeny"] header,html[data-theme="dark"][data-theme-preset="greeny"] .topbar,html[data-theme="dark"][data-theme-preset="greeny"] .sidebar,html[data-theme="dark"][data-theme-preset="greeny"] nav{background:#171c19!important;border-color:#33443a!important}
@@ -5818,7 +5815,6 @@ html:not(.yardivo-role-admin) #qrMobileSettingsPanel{display:none!important}
 #yardivoAnnouncementInfoModal .yai-status{display:inline-flex;padding:5px 8px;border-radius:99px;border:1px solid #3c694d;background:#10261a;color:#69dc93}
 @media(max-width:620px){#yardivoAnnouncementInfoModal .yai-grid{grid-template-columns:1fr}#yardivoAnnouncementInfoModal .yai-card{width:100%}}
 </style>
-
 <script id="yardivo-smart-prepaint-state">
 (function(){
   try{
@@ -5842,8 +5838,6 @@ html.yardivo-smart-off #yardivoAutoReplanAlertStack{
   pointer-events:none!important;
 }
 </style>
-
-
 <script id="yardivo-welcome-observer-guard-v1-20260901">
 (function(){
 'use strict';
@@ -5924,8 +5918,7 @@ html.yardivo-welcome-complete #yardivoWelcomeBar{
   width:100%!important;
 }
 </style>
-
-</head>
+</meta></head>
 <body>
 <button aria-label="Uključi full screen" id="yardivoFullscreenBtn" title="Full screen" type="button"><span class="fs-icon">⛶</span><span class="fs-label">FULL SCREEN</span></button>
 <div aria-label="YARDIVO copyright" id="yardivoBrandFooter"><span><strong>YARDIVO™</strong> · Yard Management System · Designed &amp; Created by Duje Maleš · © 2026</span></div>
@@ -6420,7 +6413,7 @@ var currentSession=null;
 </label>
 <label class="remember-me-row"><input id="rememberMe" type="checkbox"/><span>Zapamti me na ovom uređaju</span></label>
 <button id="loginSubmitBtn" type="button">PRIJAVA</button>
-<button id="loginChangePasswordBtn" type="button" class="login-change-password-btn">PROMIJENI LOZINKU</button>
+<button class="login-change-password-btn" id="loginChangePasswordBtn" type="button">PROMIJENI LOZINKU</button>
 <div class="login-note" id="loginError">PRIJAVA — upiši korisničko ime, lozinku i odaberi rolu koju ti je dodijelio Admin.</div>
 </form>
 </div>
@@ -7126,79 +7119,81 @@ AUTOMATSKA PREPORUKA</small>
 <section class="view" id="overview">
 <div class="overview-hero">
 <div>
-<h1>OVERVIEW · ANALITIKA DOBAVLJAČA</h1>
-<p>Usporedba pouzdanosti dobavljača i detaljna analiza odabranog partnera.</p>
+<h1>OVERVIEW · UPRAVLJAČKI PREGLED DOBAVLJAČA</h1>
+<p>Jedan pogled na pouzdanost, rizike i operativnu kvalitetu svih dobavljača.</p>
 </div>
 <label class="overview-supplier-select">DOBAVLJAČ
             <select id="overviewSupplierSelect">
 <option value="">Odaberi dobavljača...</option>
 </select>
 </label>
+</div><section class="overview-executive" id="overviewExecutive">
+<div class="overview-exec-head">
+<div>
+<small>UPRAVLJAČKI SAŽETAK</small>
+<h2>STANJE DOBAVLJAČA</h2>
 </div>
-
-<div class="supplier-ranking-grid">
-<section class="panel supplier-ranking-panel">
-<div class="panel-head"><div><h2>TOP 10 NAJBOLJIH</h2><small>Najviša ukupna ocjena pouzdanosti</small></div><span class="rank-badge good">BEST</span></div>
-<div class="ranking-bars" id="overviewBest10"></div>
-</section>
-<section class="panel supplier-ranking-panel">
-<div class="panel-head"><div><h2>TOP 10 NAJGORIH</h2><small>Dobavljači s najnižom ocjenom pouzdanosti</small></div><span class="rank-badge bad">WATCH</span></div>
-<div class="ranking-bars" id="overviewWorst10"></div>
-</section>
+<div class="overview-exec-health" id="ovExecHealth">—</div>
 </div>
-<section class="panel overview-supplier-detail" id="overviewSupplierDetail">
-<div class="overview-empty">Odaberi dobavljača iz dropdowna za detaljnu analizu.</div>
-</section>
-<div class="performance-kpis">
+<div class="overview-exec-kpis">
+<div class="overview-exec-kpi"><small>PROSJEČNA POUZDANOST</small><strong id="ovExecReliability">—</strong><span>evaluirani dobavljači</span></div>
+<div class="overview-exec-kpi"><small>VISOKA POUZDANOST</small><strong id="ovExecStrong">0</strong><span>dobavljači ≥ 80%</span></div>
+<div class="overview-exec-kpi"><small>POTREBNA PAŽNJA</small><strong id="ovExecRisk">0</strong><span>dobavljači &lt; 60%</span></div>
+<div class="overview-exec-kpi"><small>UKUPNA TOČNOST</small><strong id="ovExecPunctuality">—</strong><span>stvarni dolasci na vrijeme</span></div>
+<div class="overview-exec-kpi"><small>NO-SHOW</small><strong id="ovExecNoShow">0</strong><span>dospjele isporuke</span></div>
+<div class="overview-exec-kpi"><small>INCIDENTI</small><strong id="ovExecIncidents">0</strong><span>aktivna povijest dobavljača</span></div>
+</div>
+<div class="overview-manager-focus">
+<article class="overview-focus-card" id="ovFocusBest"><small>NAJBOLJI DOBAVLJAČ</small><strong>—</strong><span>—</span></article>
+<article class="overview-focus-card attention" id="ovFocusAttention"><small>PRIORITET ZA RAZGOVOR</small><strong>—</strong><span>—</span></article>
+<article class="overview-focus-card" id="ovFocusData"><small>POKRIVENOST PODATAKA</small><strong>—</strong><span>—</span></article>
+</div>
+</section><section class="overview-operational-kpis"><div class="overview-subhead"><div><small>OPERATIVNA SLIKA</small><h2>ISPORUKE I ODSTUPANJA</h2></div></div><div class="performance-kpis">
 <div class="performance-kpi"><small>UKUPNO EVIDENTIRANIH DOLAZAKA</small><strong id="ovTotal">0</strong><span>s evidentiranim stvarnim dolaskom</span></div>
 <div class="performance-kpi"><small>DOLASCI NA VRIJEME</small><strong id="ovOnTime">0%</strong><span>do 15 min tolerancije</span></div>
 <div class="performance-kpi"><small>PROSJEČNO KAŠNJENJE</small><strong id="ovAvgDelay">0 min</strong><span>samo zakašnjeli dolasci</span></div>
 <div class="performance-kpi"><small>UKUPNO INCIDENATA</small><strong id="ovIncidents">0</strong><span>evidentirani problemi isporuke</span></div><div class="performance-kpi"><small>PROMJENE NAJAVA</small><strong id="ovChanges">0</strong><span>evidentirane izmjene termina</span></div><div class="performance-kpi"><small>PROSJEČAN ISTOVAR</small><strong id="ovAvgUnload">0 min</strong><span>stvarna vremena istovara</span></div><div class="performance-kpi"><small>ISKORIŠTENOST RAMPI</small><strong id="ovDockUtil">0%</strong><span>prema rezerviranim minutama</span></div>
-</div>
+</div></section>
 
 <section class="panel overview-full-supplier-chart" id="overviewFullSupplierChartPanel">
-  <div class="panel-head">
-    <div>
-      <h2>POUZDANOST SVIH DOBAVLJAČA</h2>
-      <small id="overviewFullChartSubtitle">Svaki dobavljač · pouzdanost 0–100% · od crvenog prema zelenom</small>
-    </div>
-    <div class="overview-full-chart-actions">
-      <div class="overview-full-chart-mode" role="group" aria-label="Način prikaza grafa">
-        <button type="button" data-overview-chart-mode="2d">2D</button>
-        <button type="button" data-overview-chart-mode="3d">3D</button>
-      </div>
-      <div class="overview-full-chart-legend" aria-label="Legenda pouzdanosti">
-        <span><i style="--c:hsl(0 76% 44%)"></i>LOŠIJE</span>
-        <span><i style="--c:hsl(60 76% 44%)"></i>SREDNJE</span>
-        <span><i style="--c:hsl(120 76% 39%)"></i>BOLJE</span>
-      </div>
-    </div>
-  </div>
-  <div class="overview-full-chart-scroll" id="overviewFullChartScroll">
-    <div class="overview-full-chart-axis">
-      <span style="bottom:100%">100</span>
-      <span style="bottom:75%">75</span>
-      <span style="bottom:50%">50</span>
-      <span style="bottom:25%">25</span>
-      <span style="bottom:0%">0</span>
-    </div>
-    <div class="overview-full-chart-gridlines"></div>
-    <div class="overview-full-chart-bars" id="overviewFullSupplierBars">
-      <div class="overview-empty">Učitavanje dobavljača...</div>
-    </div>
-  </div>
+<div class="panel-head">
+<div>
+<h2>POUZDANOST SVIH DOBAVLJAČA</h2>
+<small id="overviewFullChartSubtitle">Svaki dobavljač u sustavu · veća pouzdanost = viši stupac · 0–100%</small>
+</div>
+<div class="overview-full-chart-actions">
+<div aria-label="Legenda pouzdanosti" class="overview-full-chart-legend">
+<span><i style="--c:hsl(0 76% 44%)"></i>LOŠIJE</span>
+<span><i style="--c:hsl(60 76% 44%)"></i>SREDNJE</span>
+<span><i style="--c:hsl(120 76% 39%)"></i>BOLJE</span>
+</div>
+</div>
+</div>
+<div class="overview-full-chart-scroll" id="overviewFullChartScroll">
+<div class="overview-full-chart-axis">
+<span style="bottom:100%">100</span>
+<span style="bottom:75%">75</span>
+<span style="bottom:50%">50</span>
+<span style="bottom:25%">25</span>
+<span style="bottom:0%">0</span>
+</div>
+<div class="overview-full-chart-gridlines"></div>
+<div class="overview-full-chart-bars" id="overviewFullSupplierBars">
+<div class="overview-empty">Učitavanje dobavljača...</div>
+</div>
+</div>
+</section><section class="overview-best-below-chart panel supplier-ranking-panel">
+<div class="panel-head"><div><h2>TOP 10 NAJBOLJIH</h2><small>Najviša ukupna ocjena pouzdanosti</small></div><span class="rank-badge good">BEST</span></div>
+<div class="ranking-bars" id="overviewBest10"></div>
 </section>
-
-<div class="overview-layout">
+<div class="overview-layout overview-layout-single">
 <section class="panel">
-<div class="panel-head"><div><h2>SVI DOBAVLJAČI</h2><small id="overviewSupplierCount">0 dobavljača · kompletna lista</small></div><input id="overviewSearch" placeholder="Pretraži dobavljača..."/></div>
+<div class="panel-head"><div><h2>DOBAVLJAČI · RANG I KPI</h2><small id="overviewSupplierCount">0 dobavljača · kompletna lista</small></div><input id="overviewSearch" placeholder="Pretraži dobavljača..."/></div>
 <div class="data-wrap"><table class="data-table"><thead><tr><th>DOBAVLJAČ</th><th>DOLASCI</th><th>NA VRIJEME</th><th>KAŠNJENJA</th><th>PROSJ. KAŠNJENJE</th><th>INCIDENTI</th><th>OCJENA</th></tr></thead><tbody id="supplierPerformance"></tbody></table></div>
 </section>
-<section class="panel">
-<div class="panel-head"><div><h2>TOP DOBAVLJAČI</h2><small>Postotak urednih dolazaka</small></div></div>
-<div class="mini-bars" id="supplierBars"></div>
+</div><section class="panel overview-detail-drilldown overview-supplier-detail" id="overviewSupplierDetail">
+<div class="overview-empty">Odaberi dobavljača iz dropdowna za detaljnu analizu.</div>
 </section>
-</div>
 <section class="panel" style="margin-top:12px">
 <div class="panel-head"><div><h2>EVIDENCIJA KAŠNJENJA</h2><small>Planirani i stvarni dolazak ostaju trajno zabilježeni</small></div></div>
 <div class="data-wrap"><table class="data-table"><thead><tr><th>SKLADIŠTE</th><th>DOBAVLJAČ</th><th>PLANIRANO</th><th>STVARNI DOLAZAK</th><th>ODSTUPANJE</th><th>RAMPA</th><th>PALETE</th><th>SKU</th></tr></thead><tbody id="delayHistory"></tbody></table></div>
@@ -17088,7 +17083,6 @@ body{padding-bottom:24px!important}
   #yardivoBrandFooter{font-size:7px;letter-spacing:.2px}
 }
 </style>
-
 <script id="yardivo-xlsx-export-v1">
 (function(){
 'use strict';
@@ -19236,7 +19230,6 @@ setInterval(()=>{if(canUse())ensureTools()},1800);
 window.YardivoAvailabilityMap={open,close,render,exportPdf};
 })();
 </script>
-
 <script data-disabled-by="yardivo-v30" id="yardivo-real-webgl-yard-v1" type="text/plain">
 (function(){
 'use strict';
@@ -20218,8 +20211,8 @@ function ensure(){
  apply();
 }
 function stateOf(a,selected){
- const s=String(a.status||'').toLowerCase(),today=isoToday();
- if(selected!==today)return'incoming';
+ const s=String(a.status||'').toLowerCase();
+ /* 2D uses the same authoritative operational status as 3D for every date. */
  if(a.rejectedAt||s.includes('odbij'))return'rejected';
  if(a.gateOutAt||a.completedAt||a.receivedAt||s.includes('zaprim')||s.includes('završ')||s.includes('izašao'))return'done';
  if(a.dockArrivalAt||s.includes('rampi'))return'dock';
@@ -20495,7 +20488,6 @@ window.addEventListener('load',()=>setTimeout(apply,100));document.addEventListe
  setTimeout(enforcePorta,50);
 })();
 </script>
-
 <script id="yardivo-final-rbac-integrity-guard">
 (function(){
 'use strict';
@@ -20524,7 +20516,6 @@ document.addEventListener('click',()=>setTimeout(enforce,0),true);
 setInterval(enforce,2500);
 })();
 </script>
-
 <script id="yardivo-server-user-admin">
 (function(){
 'use strict';
@@ -20572,7 +20563,6 @@ mo.observe(document.documentElement,{childList:true,subtree:true});
 window.YardivoUserAdmin={render,create};
 })();
 </script>
-
 <script id="yardivo-final-settings-rbac-20260831">
 (function(){
 'use strict';
@@ -20624,8 +20614,6 @@ document.addEventListener('click',()=>setTimeout(enforce,0),true);
 setInterval(enforce,1500);
 })();
 </script>
-
-
 <style id="yardivo-qa-no-flash-and-myyard-v1">
 /* Never reveal the application while role visibility is being resolved. */
 body.yardivo-role-switching .app-shell{visibility:hidden!important}
@@ -20833,8 +20821,6 @@ document.addEventListener('click',e=>{if(e.target.closest('[data-view="myYard"],
 window.addEventListener('load',()=>setTimeout(bind,300));
 })();
 </script>
-
-
 <style id="yardivo-final-login-interaction-fix-20260831">
 html,body{overscroll-behavior:auto!important}
 #loginOverlay{
@@ -20905,8 +20891,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 window.addEventListener('load',stableApply);
 })();
 </script>
-
-
 <script id="yardivo-final-login-stability-20260831">
 (function(){
 'use strict';
@@ -20952,7 +20936,6 @@ window.addEventListener('load',()=>setTimeout(stabilize,80));
 window.addEventListener('yardivo:login',()=>setTimeout(stabilize,0));
 })();
 </script>
-
 <script id="yardivo-welcome-before-login-lock-20260831">
 (function(){
 'use strict';
@@ -20973,7 +20956,6 @@ setTimeout(lock,250);
 setTimeout(lock,1000);
 })();
 </script>
-
 <style id="yardivo-final-theme-logout-layout-20260831">
 /* Only one theme control is allowed: the moon/sun switch. */
 #yardivoThemePresetBox,
@@ -21075,8 +21057,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 window.addEventListener('load',cleanup);
 })();
 </script>
-
-
 <style id="yardivo-final-my-announcements-rbac-20260831">
 /* MOJE NAJAVE is strictly inventory-only. */
 html:not([data-yardivo-role="inventory"]) [data-view="yardivoMyAnnouncements"],
@@ -21127,8 +21107,6 @@ document.addEventListener('click',e=>{
 },true);
 })();
 </script>
-
-
 <style id="yardivo-global-font-scale-20260831">
 :root{--yardivo-ui-scale:1}
 /* Global accessibility text scaling: applies to the whole application,
@@ -21181,8 +21159,6 @@ apply();
 window.addEventListener('load',apply);
 })();
 </script>
-
-
 <style id="yardivo-login-change-password-style-20260831">
 #loginChangePasswordBtn{
   width:100%;margin-top:8px;padding:10px 12px;border-radius:7px;
@@ -21203,32 +21179,32 @@ window.addEventListener('load',apply);
 #yardivoChangePasswordDialog .ycp-msg.ok{display:block;color:#91efb0;border-color:#286a43;background:#10251a}
 </style>
 <dialog id="yardivoChangePasswordDialog">
-  <form class="ycp-form" method="dialog" onsubmit="return false">
-    <div class="ycp-head">
-      <div>
-        <h2>PROMIJENI LOZINKU</h2>
-        <small>Potvrdi trenutnu lozinku i postavi novu.</small>
-      </div>
-      <button type="button" class="icon-btn" id="ycpClose" aria-label="Zatvori">×</button>
-    </div>
-    <label>Korisničko ime
-      <input id="ycpUser" autocomplete="username" placeholder="Korisničko ime"/>
-    </label>
-    <label>Trenutna lozinka
-      <input id="ycpCurrent" type="password" autocomplete="current-password" placeholder="••••••••"/>
-    </label>
-    <label>Nova lozinka
-      <input id="ycpNew" type="password" autocomplete="new-password" placeholder="Najmanje 10 znakova"/>
-    </label>
-    <label>Ponovi novu lozinku
-      <input id="ycpConfirm" type="password" autocomplete="new-password" placeholder="Ponovi novu lozinku"/>
-    </label>
-    <div id="ycpMsg" class="ycp-msg"></div>
-    <div class="ycp-actions">
-      <button type="button" class="secondary" id="ycpCancel">ODUSTANI</button>
-      <button type="button" class="primary" id="ycpSave">SPREMI NOVU LOZINKU</button>
-    </div>
-  </form>
+<form class="ycp-form" method="dialog" onsubmit="return false">
+<div class="ycp-head">
+<div>
+<h2>PROMIJENI LOZINKU</h2>
+<small>Potvrdi trenutnu lozinku i postavi novu.</small>
+</div>
+<button aria-label="Zatvori" class="icon-btn" id="ycpClose" type="button">×</button>
+</div>
+<label>Korisničko ime
+      <input autocomplete="username" id="ycpUser" placeholder="Korisničko ime"/>
+</label>
+<label>Trenutna lozinka
+      <input autocomplete="current-password" id="ycpCurrent" placeholder="••••••••" type="password"/>
+</label>
+<label>Nova lozinka
+      <input autocomplete="new-password" id="ycpNew" placeholder="Najmanje 10 znakova" type="password"/>
+</label>
+<label>Ponovi novu lozinku
+      <input autocomplete="new-password" id="ycpConfirm" placeholder="Ponovi novu lozinku" type="password"/>
+</label>
+<div class="ycp-msg" id="ycpMsg"></div>
+<div class="ycp-actions">
+<button class="secondary" id="ycpCancel" type="button">ODUSTANI</button>
+<button class="primary" id="ycpSave" type="button">SPREMI NOVU LOZINKU</button>
+</div>
+</form>
 </dialog>
 <script id="yardivo-login-change-password-20260831">
 (function(){
@@ -21317,8 +21293,6 @@ document.addEventListener('click',e=>{
 $('yardivoChangePasswordDialog')?.addEventListener('cancel',e=>{e.preventDefault();close()});
 })();
 </script>
-
-
 <style id="yardivo-full-light-mode-20260831">
 /* ===== YARDIVO FULL LIGHT MODE — FINAL OVERRIDE =====
    No dark/blue application surfaces may bleed through in light mode.
@@ -21622,8 +21596,6 @@ document.addEventListener('change',e=>{
 new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:['class']});
 })();
 </script>
-
-
 <style id="yardivo-dark-accent-choice-style-20260831">
 /* Dark appearance selector in Settings: Admin / Inventory / Reception only. */
 #yardivoDarkStyleSettings{
@@ -21853,7 +21825,6 @@ body:not(.light-mode).yardivo-dark-graphite #settings{
   background:#101214!important;
 }
 </style>
-
 <script id="yardivo-dark-accent-choice-20260831">
 (function(){
 'use strict';
@@ -21977,8 +21948,6 @@ new MutationObserver(()=>{
 }).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
-
-
 <style id="yardivo-light-legacy-surface-sweep-20260831">
 /* Final light-mode sweep for legacy/dynamically-rendered YARDIVO widgets.
    These classes were not covered by the earlier generic panel/card overrides. */
@@ -22143,7 +22112,6 @@ html[data-theme="light"] body .notice-result.good{
   border-color:#a9d5b7!important;
 }
 </style>
-
 <script id="yardivo-light-theme-class-bridge-20260831">
 (function(){
 'use strict';
@@ -22161,8 +22129,6 @@ new MutationObserver(bridge).observe(document.documentElement,{attributes:true,a
 new MutationObserver(bridge).observe(document.body,{attributes:true,attributeFilter:['class']});
 })();
 </script>
-
-
 <style id="yardivo-light-green-choice-style-20260831">
 /* ===== LIGHT MODE STYLE CHOICE: CLASSIC WHITE / GREEN-WHITE ===== */
 #yardivoLightStyleSettings{
@@ -22420,7 +22386,6 @@ body.light-mode.yardivo-light-green #yardivoLightStyleSettings{
   border-color:#cfe1d3!important;
 }
 </style>
-
 <script id="yardivo-light-green-choice-20260831">
 (function(){
 'use strict';
@@ -22542,8 +22507,6 @@ new MutationObserver(()=>{
 }).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
-
-
 <style id="yardivo-green-white-polish-20260831">
 /* GREEN / WHITE LIGHT — polished clean logistics look:
    white workspace + green structure + soft status chips; no dark navy/brown pills. */
@@ -22780,8 +22743,6 @@ body.light-mode.yardivo-light-green .nav-badge{
   border:none!important;
 }
 </style>
-
-
 <style id="yardivo-overview-3d-carousel-style-20260831">
 /* ===== OVERVIEW 3D SUPPLIER BAR CAROUSEL ===== */
 #overviewSupplier3D{
@@ -22937,7 +22898,6 @@ body.light-mode.yardivo-light-green #overviewSupplier3D .ov3d-score{
   #overviewSupplier3D .ov3d-world,#overviewSupplier3D .ov3d-bar3{transition:none!important}
 }
 </style>
-
 <script id="yardivo-overview-3d-carousel-20260831">
 (function(){
 'use strict';
@@ -23055,9 +23015,6 @@ setInterval(()=>{
 },5000);
 })();
 </script>
-
-
-
 <style id="yardivo-myyard-webgl-v3-style">
 #myYard .myy-stage{position:relative!important;overflow:hidden!important;background:#09100c!important}
 #myYard .myy-world{display:none!important}
@@ -23257,8 +23214,6 @@ setInterval(()=>{if(document.getElementById('myYard')?.classList.contains('activ
 window.YardivoMyYardWebGL={boot,refresh:()=>engine?.sync()};
 })();
 </script>
-
-
 <style id="yardivo-hide-smart-allocation-card-20260831">
 /* User-requested cleanup: remove the blue Smart Allocation/brain card above recommendation. */
 #smartAllocationCard,
@@ -23285,8 +23240,6 @@ window.YardivoMyYardWebGL={boot,refresh:()=>engine?.sync()};
  new MutationObserver(()=>clean()).observe(document.documentElement,{childList:true,subtree:true});
 })();
 </script>
-
-
 <style id="yardivo-warroom-webgl-sync-v1-20260831">
 #yardivoWarRoom #wrYardCanvas{position:relative!important;overflow:hidden!important;background:#09100c!important;min-height:560px}
 #yardivoWarRoom #wrYardCanvas>*:not(#yardivoWarRoomWebGL){display:none!important}
@@ -23493,8 +23446,6 @@ setInterval(()=>{const r=document.getElementById('yardivoWarRoom');if(r?.classLi
 window.YardivoWarRoomWebGL={boot,refresh:()=>engine?.sync()};
 })();
 </script>
-
-
 <style id="yardivo-myyard-webgl-lighten-v1-20260831">
 /* Brighten My Yard only; keep War Room darker for control-room contrast. */
 #yardivoMyYardWebGL{background:#cfdad3!important}
@@ -23538,8 +23489,6 @@ window.addEventListener('load',()=>setTimeout(patch,1200));
 /* disabled by yardivo-myyard-flicker-fix-v1: competing periodic lighting writer */
 })();
 </script>
-
-
 <style id="yardivo-professional-redesign-v1-20260831">
 :root{
  --yv-bg:#f3f6f4;--yv-surface:#fff;--yv-surface2:#f8faf9;--yv-line:#dce5df;
@@ -23659,8 +23608,6 @@ tbody tr:hover td{background:color-mix(in srgb,var(--yv-brand) 4%,var(--yv-surfa
  window.addEventListener('load',polish);
 })();
 </script>
-
-
 <style id="yardivo-professional-redesign-v2-20260831">
 /* YARDIVO Professional UX v2 — premium logistics control-system refinement */
 :root{
@@ -23819,8 +23766,6 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{
  new MutationObserver(enhance).observe(document.documentElement,{childList:true,subtree:true});
 })();
 </script>
-
-
 <style id="yardivo-warroom-exact-myyard-mirror-v1-20260831">
 /* WAR ROOM = exact visual mirror of MY YARD */
 #yardivoWarRoom #wrYardCanvas{position:relative!important;overflow:hidden!important;min-height:560px}
@@ -23853,7 +23798,7 @@ async function boot(){
    const T=window.__YARDIVO_THREE_MODULE__;
    if(!e||!T)return;
 
-   mirrorScene=e.scene; mirrorCamera=e.camera;
+   mirrorScene=e.scene; if(!mirrorCamera)mirrorCamera=e.camera.clone();
    if(mirrorRenderer && mirrorRenderer.domElement.parentElement!==host) host.appendChild(mirrorRenderer.domElement);
    if(!mirrorRenderer){
      mirrorRenderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
@@ -23864,23 +23809,9 @@ async function boot(){
      mirrorRenderer.toneMappingExposure=e.renderer?.toneMappingExposure||1.22;
      host.appendChild(mirrorRenderer.domElement);
 
-     let drag=false,moved=false,px=0,py=0;
      const c=mirrorRenderer.domElement;
-     c.addEventListener('pointerdown',ev=>{if(ev.button!==0)return;drag=true;moved=false;px=ev.clientX;py=ev.clientY;c.setPointerCapture?.(ev.pointerId)});
-     c.addEventListener('pointermove',ev=>{
-       if(!drag)return;const dx=ev.clientX-px,dy=ev.clientY-py;if(Math.abs(dx)+Math.abs(dy)>3)moved=true;
-       // manipulate the canonical My Yard camera, so both views remain literally identical
-       const cam=mirrorCamera, target=new T.Vector3(0,0,-2),off=cam.position.clone().sub(target);
-       let sph=new T.Spherical().setFromVector3(off);sph.theta-=dx*.0075;sph.phi=Math.max(.30,Math.min(1.28,sph.phi+dy*.005));
-       cam.position.copy(new T.Vector3().setFromSpherical(sph).add(target));cam.lookAt(target);px=ev.clientX;py=ev.clientY;
-     });
-     const stop=ev=>{drag=false;try{c.releasePointerCapture?.(ev.pointerId)}catch(_){}};
-     c.addEventListener('pointerup',stop);c.addEventListener('pointercancel',stop);
-     c.addEventListener('wheel',ev=>{
-       if(!ev.ctrlKey)return;ev.preventDefault();const target=new T.Vector3(0,0,-2),off=mirrorCamera.position.clone().sub(target);
-       const factor=ev.deltaY>0?1.06:.94;const len=Math.max(35,Math.min(125,off.length()*factor));
-       mirrorCamera.position.copy(off.normalize().multiplyScalar(len).add(target));mirrorCamera.lookAt(target);
-     },{passive:false});
+     /* War Room is a presentation mirror: camera navigation stays owned by My Yard. */
+     c.style.pointerEvents='none';
 
      ro=new ResizeObserver(()=>{
        const w=Math.max(10,host.clientWidth),hh=Math.max(10,host.clientHeight);
@@ -23889,7 +23820,20 @@ async function boot(){
    }
    window.YardivoMyYardWebGL?.refresh?.();
    if(!raf){
-     const draw=()=>{raf=requestAnimationFrame(draw);if(mirrorRenderer&&mirrorScene&&mirrorCamera)mirrorRenderer.render(mirrorScene,mirrorCamera)};
+     const draw=()=>{
+       raf=requestAnimationFrame(draw);
+       const canonical=window.__YARDIVO_MYYARD_ENGINE__;
+       if(mirrorRenderer&&mirrorScene&&mirrorCamera&&canonical?.camera){
+         const src=canonical.camera;
+         mirrorCamera.position.copy(src.position);
+         mirrorCamera.quaternion.copy(src.quaternion);
+         mirrorCamera.fov=src.fov;
+         mirrorCamera.near=src.near;mirrorCamera.far=src.far;
+         mirrorCamera.updateProjectionMatrix();
+         mirrorRenderer.toneMappingExposure=canonical.renderer?.toneMappingExposure||mirrorRenderer.toneMappingExposure;
+         mirrorRenderer.render(mirrorScene,mirrorCamera);
+       }
+     };
      draw();
    }
  }catch(err){console.error('YARDIVO exact War Room mirror',err)}
@@ -23902,8 +23846,6 @@ setInterval(()=>{const r=document.getElementById('yardivoWarRoom');if(r?.classLi
 window.YardivoWarRoomExactMirror={boot};
 })();
 </script>
-
-
 <style id="yardivo-ux-original-option-v1-20260831">
 /* UX appearance selector */
 #yardivoUxStyleSetting{margin-top:14px;padding-top:14px;border-top:1px solid var(--yv-line,#dce5df)}
@@ -23951,8 +23893,6 @@ new MutationObserver(()=>{if(document.getElementById('settings'))inject()}).obse
 window.YardivoUxStyle={apply,mode};
 })();
 </script>
-
-
 <style id="yardivo-professional-graphite-green-maps-v1-20260831">
 /* Professional UX = graphite/black-grey chrome + green operational maps.
    Original YARDIVO mode is unaffected because these rules are scoped to professional UX. */
@@ -24043,8 +23983,6 @@ html:not([data-yardivo-ux="original"]) #yardivoWarRoomMyYardMirror .wrmirror-bad
  /* disabled by yardivo-myyard-flicker-fix-v1: competing periodic lighting writer */
 })();
 </script>
-
-
 <style id="yardivo-overview-2d3d-fix-v1-20260831">
 #overviewSupplier3D .ov3d-mode{display:inline-flex;gap:3px;padding:3px;border:1px solid var(--yv-line,#34463c);border-radius:8px;background:rgba(0,0,0,.12)}
 #overviewSupplier3D .ov3d-mode button{min-width:42px!important}
@@ -24056,7 +23994,7 @@ html:not([data-yardivo-ux="original"]) #yardivoWarRoomMyYardMirror .wrmirror-bad
 #overviewSupplier3D[data-mode="2d"] .ov3d-side,#overviewSupplier3D[data-mode="2d"] .ov3d-top{display:none!important}
 #overviewSupplier3D[data-mode="2d"] .ov3d-front{transform:none!important;inset:0!important;width:100%!important;height:100%!important}
 </style>
-<script id="yardivo-overview-2d3d-fix-v2-20260901-js">
+<script id="yardivo-overview-2d3d-fix-v2-20260901-js" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
 
@@ -24206,7 +24144,6 @@ window.YardivoOverviewChart23D={
 };
 })();
 </script>
-
 <script id="yardivo-xlsx-export-complete-fix-v1-20260831">
 (function(){
 'use strict';
@@ -24265,8 +24202,6 @@ setInterval(hook,3000);
 window.YardivoOverviewFullXlsx={export:exportOverview};
 })();
 </script>
-
-
 <style id="yardivo-dark-original-third-option-v1-20260831">
 #yardivoOriginalDarkOption{margin-top:10px}
 #yardivoOriginalDarkOption .ydo-label{font-size:8px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--yv-muted,#9aa49e);margin-bottom:7px}
@@ -24307,7 +24242,6 @@ html[data-yardivo-dark-look="original"] body:not(.light-mode) select,
 html[data-yardivo-dark-look="original"] body:not(.light-mode) textarea{background:#192a38!important;color:#eef5fb!important;border-color:#345268!important}
 </style>
 <script id="yardivo-dark-original-third-option-v1-20260831-js" type="application/x-yardivo-disabled">/* superseded by YARDIVO Theme System v2 */</script>
-
 <style id="yardivo-myyard-flicker-fix-v1-20260831">
 /* One stable visual owner for My Yard. JS no longer alternates scene brightness. */
 #myYard .myy-stage,#yardivoMyYardWebGL{background:#263c31!important}
@@ -24398,7 +24332,6 @@ setInterval(()=>{
 window.YardivoWarRoomBlankRepair={repair,watch};
 })();
 </script>
-
 <style id="yardivo-theme-switch-clean-v2-20260831">
 html[data-yardivo-main-theme="light"] body,body.light-mode{
   --yv-bg:#f6f8f7!important;--yv-surface:#fff!important;--yv-surface2:#fff!important;
@@ -24496,7 +24429,6 @@ html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body tex
 #yardivoThemeSettingsV2 button.active{border-color:#4088ba!important;box-shadow:0 0 0 2px rgba(64,136,186,.15)!important}
 #yardivoThemeSettingsV2 .yt-note{margin-top:7px;font-size:9px;opacity:.68}
 </style>
-
 <script id="yardivo-theme-switch-clean-v2-20260831-js" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
@@ -24541,8 +24473,6 @@ new MutationObserver(()=>{hook();settings()}).observe(document.documentElement,{
 window.YardivoThemeV2={setMain,setDark,main,dark,scene};
 })();
 </script>
-
-
 <style id="yardivo-login-theme-sync-v1-20260831-disabled">/* disabled: Login restored to original YARDIVO theme */</style>
 <script id="yardivo-theme-canonical-bridge-v1-20260831-js">
 (function(){
@@ -24603,8 +24533,6 @@ window.YardivoCanonicalTheme={apply,currentMain,currentDark};
 apply();
 })();
 </script>
-
-
 <style id="yardivo-no-dashboard-flash-after-welcome-v1-20260831">
 /* During Welcome/Login flow the application itself must never be visible underneath. */
 html.yardivo-booting body .app-shell,
@@ -24643,7 +24571,6 @@ html.yardivo-login-ready #loginOverlay{
   opacity:1!important;
 }
 </style>
-
 <script id="yardivo-no-dashboard-flash-after-welcome-v2-20260901-js">
 (function(){
 'use strict';
@@ -24683,8 +24610,6 @@ window.YardivoStartupHandoffFix={
 };
 })();
 </script>
-
-
 <style id="yardivo-theme-simplified-final-v1-20260831">
 /* ==========================================================
    YARDIVO FINAL THEME MODEL
@@ -24910,7 +24835,6 @@ html[data-yardivo-main-theme] body [class*="warehouse-map"]{
   #yardivoDarkStyleSettings .yardivo-dark-style-options{grid-template-columns:1fr!important}
 }
 </style>
-
 <script id="yardivo-theme-simplified-final-v1-20260831-js">
 (function(){
 'use strict';
@@ -25028,8 +24952,6 @@ window.YardivoSimpleTheme={apply,setDark,getMain,getDark};
 apply();
 })();
 </script>
-
-
 <style id="yardivo-hover-color-final-v1-20260831">
 /* Final interaction rule:
    LIGHT = blue hover/focus outline
@@ -25094,9 +25016,6 @@ html[data-yardivo-main-theme] body #heatmap{
   border-color:#28516c!important;
 }
 </style>
-
-
-
 <style id="yardivo-original-login-restored-v1-20260901">
 /* EXACT original YARDIVO login palette from the original application. */
 #loginOverlay.login-overlay{
@@ -25198,8 +25117,6 @@ html.yardivo-welcome-complete #yardivoWelcomeSplash,
   pointer-events:none!important;
 }
 </style>
-
-
 <style id="yardivo-login-safe-isolation-v2-20260901">
 /* Login owns the top interaction layer after Welcome. */
 html.yardivo-welcome-complete,
@@ -25234,7 +25151,6 @@ html.yardivo-welcome-complete #loginChangePasswordBtn{
   cursor:pointer!important;
 }
 </style>
-
 <script id="yardivo-login-safe-isolation-v2-20260901-js">
 (function(){
 'use strict';
@@ -25366,8 +25282,6 @@ window.addEventListener('load',()=>{
 window.YardivoLoginSafeIsolation={forceInteractive};
 })();
 </script>
-
-
 <style id="yardivo-login-unconditional-finalizer-v3-20260901-style">
 /* Final guard: if Login is on screen, the boot class can never make it non-interactive. */
 html.yardivo-login-ready #loginOverlay,
@@ -25385,7 +25299,6 @@ html.yardivo-welcome-complete #loginPass{
   cursor:text!important;
 }
 </style>
-
 <script id="yardivo-login-unconditional-finalizer-v3-20260901">
 (function(){
 'use strict';
@@ -25477,8 +25390,6 @@ window.addEventListener('yardivo:welcome-complete',()=>{
 window.YardivoLoginFinalizer={finalize:finalizeLogin};
 })();
 </script>
-
-
 <script id="yardivo-canonical-login-router-v1-20260901">
 (function(){
 'use strict';
@@ -25690,8 +25601,6 @@ document.addEventListener('submit',function(e){
 window.YardivoCanonicalLogin={login:canonicalLogin,direct:directSupabaseLogin};
 })();
 </script>
-
-
 <style id="yardivo-post-auth-transition-fix-v1-20260901">
 /* Once authentication succeeds, Login must lose against the application state,
    even though startup CSS uses !important to keep Login visible before auth. */
@@ -25718,7 +25627,6 @@ html.yardivo-app-authenticated body .view.active{
   pointer-events:auto!important;
 }
 </style>
-
 <script id="yardivo-post-auth-transition-fix-v1-20260901-js">
 (function(){
 'use strict';
@@ -25793,8 +25701,6 @@ function openAuthenticatedApp(){
 window.YardivoPostAuthTransition={open:openAuthenticatedApp};
 })();
 </script>
-
-
 <style id="yardivo-original-dark-authentic-v1-20260901">
 /* ==============================================================
    AUTHENTIC ORIGINAL YARDIVO DARK
@@ -25912,7 +25818,6 @@ html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body #he
   border-color:#28516c!important;
 }
 </style>
-
 <script id="yardivo-original-dark-authentic-v1-20260901-js">
 (function(){
 'use strict';
@@ -25993,14 +25898,10 @@ window.YardivoAuthenticOriginalTheme={apply:applyAuthenticOriginal};
 setTimeout(applyAuthenticOriginal,0);
 })();
 </script>
-
-
 <style id="yardivo-dark-options-dedupe-v1-20260901">
 #yardivoDarkStyleSettings .yardivo-dark-style-option[data-dark-style="blue"],
 #yardivoThemeSettingsV2 [data-dark-look="blue"]{display:none!important}
 </style>
-
-
 <style id="yardivo-overview-all-suppliers-chart-v1-20260901">
 #overviewSupplier3D .ov3d-stage{
   overflow-x:auto!important;
@@ -26041,8 +25942,6 @@ setTimeout(applyAuthenticOriginal,0);
 }
 </style>
 <script id="yardivo-overview-all-suppliers-refresh-v1-20260901-disabled" type="application/x-yardivo-disabled"></script>
-
-
 <script id="yardivo-operational-sync-v1-20260901">
 (function(){
 'use strict';
@@ -26243,8 +26142,6 @@ window.YardivoOperationalSync={
 };
 })();
 </script>
-
-
 <style id="yardivo-overview-stable-bars-v2-20260901">
 #overviewSupplier3D .ov3d-stage{
   min-height:390px!important;
@@ -26396,8 +26293,6 @@ window.YardivoOperationalSync={
   animation:none!important;
 }
 </style>
-
-
 <script id="yardivo-announcement-map-canonical-sync-v1-20260901">
 (function(){
 'use strict';
@@ -26458,8 +26353,6 @@ document.addEventListener('click',e=>{
 window.YardivoAnnouncementMapSync={refresh:refreshMaps,sync:syncAndRefresh};
 })();
 </script>
-
-
 <style id="yardivo-expanded-map-consistency-v1-20260901">
 #yardivoExpandedSchedule .yesm-horizontal-grid{
   width:max-content!important;
@@ -26482,8 +26375,6 @@ window.YardivoAnnouncementMapSync={refresh:refreshMaps,sync:syncAndRefresh};
   font-weight:900!important;
 }
 </style>
-
-
 <style id="yardivo-full-white-light-mode-v1-20260901">
 /* YARDIVO LIGHT MODE — authoritative full-white application skin.
    Operational semantic colors (status/map content) remain meaningful, while
@@ -26667,8 +26558,6 @@ document.addEventListener('click',e=>{
 window.addEventListener('load',normalize,{once:true});
 })();
 </script>
-
-
 <style id="yardivo-light-mode-zero-navy-v2-20260901">
 /* FINAL LIGHT-MODE CLEANUP — no structural navy remains anywhere in the app. */
 html[data-yardivo-main-theme="light"] body,
@@ -26816,8 +26705,6 @@ body.light-mode #settings input[type="checkbox"]{
 /* Keep operational semantic/status fills untouched. Do not flatten:
    booked/status badges, incidents, success/warning/error, graph bars. */
 </style>
-
-
 <style id="yardivo-overview-fullwidth-chart-v1-20260901">
 #overview .overview-full-supplier-chart{
   width:100%!important;
@@ -26973,11 +26860,9 @@ html[data-yardivo-main-theme="light"] #overview .overview-full-chart-scroll{
   #overview .overview-full-bar-name{width:68px!important}
 }
 </style>
-
 <script id="yardivo-overview-fullwidth-chart-v1-20260901-js">
 (function(){
 'use strict';
-const MODE_KEY='yardivo_overview_full_chart_mode_v2';
 let raf=0;
 
 function esc(v){
@@ -26995,51 +26880,41 @@ function rows(){
     const x=window.YardivoOverviewMaster?.currentStats?.();
     return Array.isArray(x)?x:[];
   }catch(e){
-    console.warn('Overview chart stats',e);
+    console.warn('Overview supplier graph stats',e);
     return [];
   }
-}
-function currentMode(){
-  try{return localStorage.getItem(MODE_KEY)==='3d'?'3d':'2d'}catch(_){return'2d'}
-}
-function setMode(mode){
-  mode=mode==='3d'?'3d':'2d';
-  try{localStorage.setItem(MODE_KEY,mode)}catch(_){}
-  const panel=document.getElementById('overviewFullSupplierChartPanel');
-  if(panel)panel.dataset.chartMode=mode;
-  document.querySelectorAll('[data-overview-chart-mode]').forEach(b=>{
-    b.classList.toggle('active',b.dataset.overviewChartMode===mode);
-  });
-  /* IMPORTANT: chart mode is isolated from YARDIVO Light/Dark theme.
-     No theme storage keys, body classes or HTML theme datasets are touched here. */
 }
 function renderNow(){
   raf=0;
   const host=document.getElementById('overviewFullSupplierBars');
-  const panel=document.getElementById('overviewFullSupplierChartPanel');
-  if(!host||!panel)return;
-
-  setMode(currentMode());
+  if(!host)return;
 
   const sel=document.getElementById('overviewSupplierSelect');
   const selected=sel?.value||'';
+
+  /* Every supplier in the current Overview master scope is shown.
+     Weakest on the left, strongest on the right. */
   const data=rows().filter(Boolean).sort((a,b)=>{
-    const ar=a.reliability==null?101:Number(a.reliability);
-    const br=b.reliability==null?101:Number(b.reliability);
+    const ar=a.reliability==null?-1:Number(a.reliability);
+    const br=b.reliability==null?-1:Number(b.reliability);
     return ar-br || a.name.localeCompare(b.name,'hr');
   });
 
   const subtitle=document.getElementById('overviewFullChartSubtitle');
-  if(subtitle)subtitle.textContent=`${data.length} dobavljača · svaki stupac = jedan dobavljač · pouzdanost 0–100%`;
+  if(subtitle){
+    const rated=data.filter(x=>x.reliability!=null).length;
+    subtitle.textContent=`${data.length} dobavljača · ${rated} s izračunatom pouzdanošću · svaki stupac = jedan dobavljač`;
+  }
 
   if(!data.length){
     host.innerHTML='<div class="overview-empty">Nema dobavljača za prikaz.</div>';
     return;
   }
 
-  host.style.minWidth=Math.max(1180,data.length*96)+'px';
+  host.style.minWidth=Math.max(1200,data.length*92)+'px';
   host.innerHTML=data.map(x=>{
-    const r=x.reliability==null?0:Math.max(0,Math.min(100,Number(x.reliability)));
+    const raw=x.reliability==null?0:Number(x.reliability);
+    const r=Math.max(0,Math.min(100,Number.isFinite(raw)?raw:0));
     const c=color(x.reliability);
     const pct=x.reliability==null?'—':`${Math.round(r)}%`;
     const score=x.score10==null?'—':`${x.score10}/10`;
@@ -27048,10 +26923,7 @@ function renderNow(){
       title="${esc(x.name)} · ${pct} · ${score} · ${x.evaluated||0} obrađeno">
       <div class="overview-full-bar-value" style="color:${c}">${pct}</div>
       <div class="overview-full-bar-track">
-        <div class="overview-full-bar" style="height:${x.reliability==null?2:r}%;--bar:${c};background:${c}">
-          <span class="overview-full-bar-side"></span>
-          <span class="overview-full-bar-top"></span>
-        </div>
+        <div class="overview-full-bar" style="height:${x.reliability==null?1:Math.max(2,r)}%;--bar:${c};background:${c}"></div>
       </div>
       <div class="overview-full-bar-score">${score}</div>
       <div class="overview-full-bar-name">${esc(x.name)}</div>
@@ -27073,30 +26945,19 @@ function schedule(){
   if(raf)return;
   raf=requestAnimationFrame(renderNow);
 }
-
-document.addEventListener('click',e=>{
-  const b=e.target.closest?.('[data-overview-chart-mode]');
-  if(!b)return;
-  e.preventDefault();
-  e.stopPropagation();
-  setMode(b.dataset.overviewChartMode);
-},true);
-
-window.addEventListener('load',()=>setTimeout(schedule,1000),{once:true});
+window.addEventListener('load',()=>setTimeout(schedule,900),{once:true});
 window.addEventListener('yardivo:data-synced',schedule);
 window.addEventListener('yardivo:overview-refresh',schedule);
 document.addEventListener('click',e=>{
-  if(e.target.closest?.('[data-view="overview"],[data-home-target="overview"]'))setTimeout(schedule,100);
+  if(e.target.closest?.('[data-view="overview"],[data-home-target="overview"]'))setTimeout(schedule,80);
 },true);
 document.addEventListener('change',e=>{
   if(e.target?.id==='overviewSupplierSelect')schedule();
 },true);
 
-window.YardivoOverviewFullChart={render:schedule,setMode,currentMode};
+window.YardivoOverviewFullChart={render:schedule};
 })();
 </script>
-
-
 <script id="yardivo-overview-fullchart-master-bridge-v1-20260901">
 (function(){
 'use strict';
@@ -27107,8 +26968,6 @@ document.addEventListener('click',e=>{
 },true);
 })();
 </script>
-
-
 <style id="yardivo-overview-wide-stable-2d3d-v2-20260901">
 #overviewFullSupplierChartPanel{
   width:100%!important;
@@ -27199,8 +27058,6 @@ document.addEventListener('click',e=>{
   clip-path:polygon(0 5px,8px 0,100% 0,calc(100% - 8px) 5px)!important;
 }
 </style>
-
-
 <style id="yardivo-light-mode-pure-white-final-v3-20260901">
 html[data-yardivo-main-theme="light"] body.light-mode,
 html[data-yardivo-main-theme="light"] body.light-mode .app-shell,
@@ -27271,8 +27128,6 @@ html[data-yardivo-main-theme="light"] body.light-mode :is(
   /* semantic components retain their own explicit colors */
 }
 </style>
-
-
 <script id="yardivo-theme-isolation-final-v1-20260901">
 (function(){
 'use strict';
@@ -27307,6 +27162,931 @@ document.addEventListener('click',e=>{
 },true);
 window.YardivoThemeIsolation={apply,current:read};
 window.addEventListener('load',()=>apply(read()),{once:true});
+})();
+</script>
+<style id="yardivo-dark-palette-total-isolation-v1-20260901">
+/* DARK ORIGINAL PLAVI: every structural surface belongs to the original blue family. */
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] body,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] .app-shell,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] .main,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] .main-content,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] .view{
+  background:#07131f!important;background-image:none!important;color:#edf6ff!important;
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] :is(
+.sidebar,.sidebar-head,.sidebar-header,.sidebar-logo,.brand,.brand-box,
+.topbar,.top-bar,.app-header,.header-bar,.warehouse-bar,
+.panel,.card,.home-menu-card,.home-card,.control-card,.settings-card,.settings-section,
+.overview-card,.overview-panel,.kpi-card,.ops-kpi,.performance-kpi,
+.modal-card,.dialog-card,.data-wrap,.toolbar,.controls,.filter,.filter-box,
+.terminal,.terminal-panel,.supplier-card,.announcement-card,.incident-card,.dock-card,
+.ramp-card,.yard-card,.truck-card,.report-card,.calendar-card,.heat-card,.tower-card,
+.receiving-card,.gate-card,.order-card,.epal-card,.unannounced-card,.operation-card,
+.planner-card,.overview-kpi,.ranking-row,.user-card,.role-card,.permission-card,.admin-card
+){
+  background:#0d1b29!important;background-image:none!important;
+  color:#edf6ff!important;border-color:#26435a!important;
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] :is(.sidebar,.topbar,.top-bar,.app-header){
+  background:#091827!important;
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] :is(input,select,textarea){
+  background:#07131f!important;color:#fff!important;border-color:#28435a!important;
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] :is(table,thead,tbody,tr,th,td){
+  background:#0d1b29!important;color:#edf6ff!important;border-color:#26435a!important;
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] .nav-btn{
+  background:transparent!important;color:#d8e8f4!important;border-color:transparent!important;
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] .nav-btn:hover{
+  background:#102b42!important;border-color:#214d70!important;
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="original"] .nav-btn.active{
+  background:#126fc9!important;color:#fff!important;border-color:#2489eb!important;
+}
+
+/* DARK GREY: every structural surface is graphite/black — no original blue panels. */
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] body,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] .app-shell,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] .main,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] .main-content,
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] .view{
+  background:#090b0d!important;background-image:none!important;color:#f1f4f5!important;
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] :is(
+.sidebar,.sidebar-head,.sidebar-header,.sidebar-logo,.brand,.brand-box,
+.topbar,.top-bar,.app-header,.header-bar,.warehouse-bar,
+.panel,.card,.home-menu-card,.home-card,.control-card,.settings-card,.settings-section,
+.overview-card,.overview-panel,.kpi-card,.ops-kpi,.performance-kpi,
+.modal-card,.dialog-card,.data-wrap,.toolbar,.controls,.filter,.filter-box,
+.terminal,.terminal-panel,.supplier-card,.announcement-card,.incident-card,.dock-card,
+.ramp-card,.yard-card,.truck-card,.report-card,.calendar-card,.heat-card,.tower-card,
+.receiving-card,.gate-card,.order-card,.epal-card,.unannounced-card,.operation-card,
+.planner-card,.overview-kpi,.ranking-row,.user-card,.role-card,.permission-card,.admin-card
+){
+  background:#111417!important;background-image:none!important;
+  color:#f1f4f5!important;border-color:#30363b!important;
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] :is(.sidebar,.topbar,.top-bar,.app-header){
+  background:#0b0e10!important;
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] :is(input,select,textarea){
+  background:#0a0d0f!important;color:#f5f7f8!important;border-color:#363c41!important;
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] :is(table,thead,tbody,tr,th,td){
+  background:#111417!important;color:#f1f4f5!important;border-color:#30363b!important;
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] .nav-btn{
+  background:transparent!important;color:#d9dddf!important;border-color:transparent!important;
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] .nav-btn:hover{
+  background:#1b2023!important;border-color:#363d42!important;
+}
+html[data-yardivo-main-theme="dark"][data-yardivo-dark-look="graphite"] .nav-btn.active{
+  background:#242a2e!important;color:#fff!important;border-color:#50585e!important;
+}
+</style>
+<script id="yardivo-dark-palette-total-isolation-v1-20260901-js">
+(function(){
+'use strict';
+const MAIN='yardivo_main_theme_v2', DARK='yardivo_dark_look_v2';
+function norm(v){return v==='graphite'?'graphite':'original'}
+function apply(){
+  const html=document.documentElement,body=document.body;if(!body)return;
+  let main='dark',look='original';
+  try{
+    const m=localStorage.getItem(MAIN); main=m==='light'?'light':'dark';
+    look=norm(localStorage.getItem(DARK)||localStorage.getItem('yardivo_dark_style'));
+    localStorage.setItem(DARK,look);localStorage.setItem('yardivo_dark_style',look);
+  }catch(_){}
+  html.dataset.yardivoMainTheme=main;
+  html.dataset.theme=main;
+  html.dataset.yardivoDarkLook=look;
+  body.classList.toggle('dark-mode',main==='dark');
+  body.classList.toggle('light-mode',main==='light');
+}
+document.addEventListener('click',e=>{
+  const x=e.target.closest?.('.yardivo-dark-style-option[data-dark-style],#yardivoThemeSettingsV2 [data-dark-look]');
+  if(!x)return;
+  const v=x.dataset.darkStyle||x.dataset.darkLook;
+  if(v!=='original'&&v!=='graphite')return;
+  try{
+    localStorage.setItem(DARK,norm(v));
+    localStorage.setItem('yardivo_dark_style',norm(v));
+  }catch(_){}
+  setTimeout(apply,0);
+},true);
+document.addEventListener('change',e=>{
+  const x=e.target.closest?.('input[name="yardivoDarkStyle"]');
+  if(!x)return;
+  try{
+    localStorage.setItem(DARK,norm(x.value));
+    localStorage.setItem('yardivo_dark_style',norm(x.value));
+  }catch(_){}
+  setTimeout(apply,0);
+},true);
+window.addEventListener('load',()=>setTimeout(apply,250),{once:true});
+window.addEventListener('yardivo:login',()=>setTimeout(apply,50));
+window.YardivoDarkPaletteIsolation={apply};
+})();
+</script>
+<style id="yardivo-overview-serious-2d-wide-v1-20260901">
+#overview .overview-layout-single{
+  display:block!important;
+  grid-template-columns:none!important;
+}
+#overview .overview-layout-single > .panel{
+  width:100%!important;
+  max-width:none!important;
+}
+
+#overviewFullSupplierChartPanel{
+  width:100%!important;
+  max-width:none!important;
+  margin:16px 0 14px!important;
+}
+#overviewFullSupplierChartPanel .panel-head{
+  padding:16px 18px!important;
+}
+#overviewFullSupplierChartPanel .overview-full-chart-actions{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:14px!important;
+}
+#overviewFullSupplierChartPanel .overview-full-chart-scroll{
+  position:relative!important;
+  width:100%!important;
+  min-height:560px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  padding:26px 20px 20px 56px!important;
+  box-sizing:border-box!important;
+}
+#overviewFullSupplierChartPanel .overview-full-chart-axis{
+  top:34px!important;
+  bottom:100px!important;
+}
+#overviewFullSupplierChartPanel .overview-full-chart-gridlines{
+  left:56px!important;
+  right:20px!important;
+  top:34px!important;
+  bottom:100px!important;
+}
+#overviewFullSupplierChartPanel .overview-full-chart-bars{
+  position:relative!important;
+  display:flex!important;
+  align-items:flex-end!important;
+  justify-content:flex-start!important;
+  gap:14px!important;
+  width:max-content!important;
+  min-width:1200px!important;
+  height:470px!important;
+  padding:8px 14px 0!important;
+  box-sizing:border-box!important;
+}
+#overviewFullSupplierChartPanel .overview-full-bar-item{
+  flex:0 0 76px!important;
+  width:76px!important;
+  height:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  cursor:pointer!important;
+}
+#overviewFullSupplierChartPanel .overview-full-bar-value{
+  width:100%!important;
+  height:24px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  font-size:10px!important;
+  font-weight:1000!important;
+}
+#overviewFullSupplierChartPanel .overview-full-bar-track{
+  position:relative!important;
+  width:46px!important;
+  height:340px!important;
+  display:flex!important;
+  align-items:flex-end!important;
+  background:rgba(127,145,156,.05)!important;
+  border:1px solid rgba(127,145,156,.22)!important;
+  border-radius:5px 5px 2px 2px!important;
+  overflow:hidden!important;
+}
+#overviewFullSupplierChartPanel .overview-full-bar{
+  width:100%!important;
+  min-height:2px!important;
+  border-radius:4px 4px 0 0!important;
+  transition:none!important;
+  animation:none!important;
+  transform:none!important;
+  box-shadow:none!important;
+}
+#overviewFullSupplierChartPanel .overview-full-bar-side,
+#overviewFullSupplierChartPanel .overview-full-bar-top{
+  display:none!important;
+}
+#overviewFullSupplierChartPanel .overview-full-bar-score{
+  margin-top:6px!important;
+  min-width:46px!important;
+  padding:3px 5px!important;
+  text-align:center!important;
+  font-size:8px!important;
+  font-weight:1000!important;
+}
+#overviewFullSupplierChartPanel .overview-full-bar-name{
+  width:76px!important;
+  height:46px!important;
+  margin-top:5px!important;
+  text-align:center!important;
+  overflow:hidden!important;
+  display:-webkit-box!important;
+  -webkit-line-clamp:3!important;
+  -webkit-box-orient:vertical!important;
+  line-height:1.2!important;
+  font-size:7px!important;
+  font-weight:900!important;
+}
+#overviewFullSupplierChartPanel .overview-full-bar-item:hover .overview-full-bar-track,
+#overviewFullSupplierChartPanel .overview-full-bar-item.selected .overview-full-bar-track{
+  outline:2px solid #2489eb!important;
+  outline-offset:2px!important;
+}
+
+/* TOP 10 best is intentionally BELOW the graph, full width. */
+#overview .overview-best-below-chart{
+  width:100%!important;
+  max-width:none!important;
+  margin:0 0 14px!important;
+}
+#overview .overview-best-below-chart .ranking-bars{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px 14px!important;
+}
+@media(max-width:900px){
+  #overview .overview-best-below-chart .ranking-bars{grid-template-columns:1fr!important}
+}
+
+/* Explicitly hide any stray legacy 2D/3D control or obsolete 3D host. */
+#overview [data-overview-chart-mode],
+#overview .overview-full-chart-mode,
+#overview #overviewSupplier3D,
+#overview .ov3d-mode{
+  display:none!important;
+}
+</style>
+
+<style id="yardivo-overview-manager-layout-v1-20260901">
+#overview{
+  max-width:none!important;
+}
+#overview .overview-hero{
+  margin-bottom:14px!important;
+}
+#overview .overview-executive{
+  width:100%!important;
+  border:1px solid var(--theme-border,#26435a)!important;
+  border-radius:12px!important;
+  background:var(--theme-panel,#0d1b29)!important;
+  padding:16px!important;
+  margin-bottom:14px!important;
+}
+#overview .overview-exec-head{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:14px!important;
+  margin-bottom:12px!important;
+}
+#overview .overview-exec-head small,
+#overview .overview-subhead small{
+  display:block!important;
+  font-size:8px!important;
+  font-weight:1000!important;
+  letter-spacing:.8px!important;
+  color:var(--theme-muted,#8aa0af)!important;
+}
+#overview .overview-exec-head h2,
+#overview .overview-subhead h2{
+  margin:3px 0 0!important;
+  font-size:15px!important;
+}
+#overview .overview-exec-health{
+  min-width:130px!important;
+  padding:8px 12px!important;
+  text-align:center!important;
+  border:1px solid var(--theme-border,#26435a)!important;
+  border-radius:999px!important;
+  font-size:9px!important;
+  font-weight:1000!important;
+}
+#overview .overview-exec-health[data-tone="good"]{color:#37d879!important;border-color:#2c8b56!important}
+#overview .overview-exec-health[data-tone="mid"]{color:#ffc04a!important;border-color:#9a7424!important}
+#overview .overview-exec-health[data-tone="bad"]{color:#ff676f!important;border-color:#9b3840!important}
+#overview .overview-exec-kpis{
+  display:grid!important;
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  gap:9px!important;
+}
+#overview .overview-exec-kpi{
+  min-height:92px!important;
+  padding:12px!important;
+  border:1px solid var(--theme-border-soft,#1f394b)!important;
+  border-radius:9px!important;
+  background:var(--theme-card,#0a1824)!important;
+}
+#overview .overview-exec-kpi small{display:block!important;font-size:7px!important;font-weight:1000!important;color:var(--theme-muted,#8197a7)!important}
+#overview .overview-exec-kpi strong{display:block!important;margin-top:7px!important;font-size:23px!important}
+#overview .overview-exec-kpi span{display:block!important;margin-top:4px!important;font-size:7px!important;color:var(--theme-muted,#8197a7)!important}
+#overview .overview-manager-focus{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:9px!important;
+  margin-top:10px!important;
+}
+#overview .overview-focus-card{
+  padding:12px 13px!important;
+  border:1px solid var(--theme-border-soft,#1f394b)!important;
+  border-left:3px solid #2489eb!important;
+  border-radius:9px!important;
+  background:var(--theme-card,#0a1824)!important;
+}
+#overview .overview-focus-card[data-tone="good"]{border-left-color:#34bd70!important}
+#overview .overview-focus-card[data-tone="mid"]{border-left-color:#e7a72f!important}
+#overview .overview-focus-card[data-tone="bad"]{border-left-color:#e05059!important}
+#overview .overview-focus-card small{display:block!important;font-size:7px!important;font-weight:1000!important;color:var(--theme-muted,#8197a7)!important}
+#overview .overview-focus-card strong{display:block!important;margin-top:6px!important;font-size:13px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#overview .overview-focus-card span{display:block!important;margin-top:4px!important;font-size:8px!important;color:var(--theme-muted,#8197a7)!important;line-height:1.4!important}
+#overview .overview-operational-kpis{
+  width:100%!important;
+  margin-bottom:14px!important;
+}
+#overview .overview-subhead{
+  margin-bottom:7px!important;
+}
+#overview .performance-kpis{
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  gap:8px!important;
+}
+#overview .performance-kpi{
+  min-height:96px!important;
+}
+#overviewFullSupplierChartPanel{
+  margin-top:4px!important;
+}
+#overview .overview-detail-drilldown{
+  margin-top:14px!important;
+}
+#overview .overview-detail-drilldown:has(.overview-empty){
+  min-height:auto!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode #overview .overview-executive,
+html[data-yardivo-main-theme="light"] body.light-mode #overview .overview-exec-kpi,
+html[data-yardivo-main-theme="light"] body.light-mode #overview .overview-focus-card,
+html[data-yardivo-main-theme="light"] body.light-mode #overview .overview-operational-kpis{
+  background:#fff!important;
+  color:#13202a!important;
+  border-color:#d7e0e6!important;
+}
+@media(max-width:1200px){
+  #overview .overview-exec-kpis{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  #overview .performance-kpis{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
+@media(max-width:760px){
+  #overview .overview-exec-kpis,
+  #overview .overview-manager-focus,
+  #overview .performance-kpis{grid-template-columns:1fr 1fr!important}
+}
+</style>
+
+
+<script id="yardivo-overview-manager-summary-v1-20260901">
+(function(){
+'use strict';
+
+function stats(){
+  try{
+    const x=window.YardivoOverviewMaster?.currentStats?.();
+    return Array.isArray(x)?x:[];
+  }catch(_){return[]}
+}
+function text(id,v){
+  const el=document.getElementById(id);if(el)el.textContent=v;
+}
+function focus(id,name,line,tone){
+  const el=document.getElementById(id);if(!el)return;
+  const s=el.querySelector('strong'),d=el.querySelector('span');
+  if(s)s.textContent=name||'—';
+  if(d)d.textContent=line||'—';
+  el.dataset.tone=tone||'';
+}
+function render(){
+  const rows=stats().filter(Boolean);
+  const rated=rows.filter(x=>x.reliability!=null&&x.evaluated>0);
+  const totalEval=rated.reduce((s,x)=>s+Number(x.evaluated||0),0);
+  const totalArr=rated.reduce((s,x)=>s+Number(x.arrived||0),0);
+  const totalOn=rated.reduce((s,x)=>s+Number(x.on||0),0);
+  const totalNoShow=rated.reduce((s,x)=>s+Number(x.noShow||0),0);
+  const totalInc=rated.reduce((s,x)=>s+Number(x.incidents||0),0);
+  const avg=rated.length?Math.round(rated.reduce((s,x)=>s+Number(x.reliability||0),0)/rated.length):null;
+  const punctuality=totalArr?Math.round(totalOn/totalArr*100):null;
+  const strong=rated.filter(x=>x.reliability>=80).length;
+  const risk=rated.filter(x=>x.reliability<60).length;
+
+  text('ovExecReliability',avg==null?'—':avg+'%');
+  text('ovExecStrong',strong);
+  text('ovExecRisk',risk);
+  text('ovExecPunctuality',punctuality==null?'—':punctuality+'%');
+  text('ovExecNoShow',totalNoShow);
+  text('ovExecIncidents',totalInc);
+
+  let health='NEMA PODATAKA';
+  let tone='neutral';
+  if(avg!=null){
+    if(avg>=85){health='STABILNO';tone='good'}
+    else if(avg>=70){health='POD KONTROLOM';tone='mid'}
+    else{health='POTREBNA AKCIJA';tone='bad'}
+  }
+  const healthEl=document.getElementById('ovExecHealth');
+  if(healthEl){healthEl.textContent=health;healthEl.dataset.tone=tone}
+
+  const best=[...rated].sort((a,b)=>b.reliability-a.reliability||b.evaluated-a.evaluated)[0];
+  const attention=[...rated].sort((a,b)=>{
+    const ar=(a.reliability??101),br=(b.reliability??101);
+    if(ar!==br)return ar-br;
+    const ap=(a.noShow||0)*4+(a.incidents||0)*3+(a.late||0);
+    const bp=(b.noShow||0)*4+(b.incidents||0)*3+(b.late||0);
+    return bp-ap;
+  })[0];
+
+  focus(
+    'ovFocusBest',
+    best?.name||'—',
+    best?`${best.reliability}% pouzdanost · ${best.score10}/10 · ${best.on}/${best.arrived} na vrijeme`:'Nema evaluiranih dobavljača',
+    'good'
+  );
+  focus(
+    'ovFocusAttention',
+    attention?.name||'—',
+    attention?`${attention.reliability}% pouzdanost · ${attention.late} kašnjenja · ${attention.incidents} inc. · ${attention.noShow} no-show`:'Nema evaluiranih dobavljača',
+    attention&&attention.reliability<60?'bad':'mid'
+  );
+  const coverage=rows.length?Math.round(rated.length/rows.length*100):0;
+  focus(
+    'ovFocusData',
+    rows.length?`${rated.length}/${rows.length} dobavljača`:'—',
+    `${coverage}% ima dovoljno podataka za ocjenu · ${totalEval} evaluiranih isporuka`,
+    coverage>=80?'good':coverage>=50?'mid':'bad'
+  );
+}
+
+function schedule(){setTimeout(render,0)}
+window.addEventListener('load',()=>setTimeout(render,1000),{once:true});
+window.addEventListener('yardivo:data-synced',schedule);
+window.addEventListener('yardivo:overview-refresh',schedule);
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-view="overview"],[data-home-target="overview"]'))setTimeout(render,120);
+},true);
+document.addEventListener('change',e=>{
+  if(e.target?.id==='overviewSupplierSelect')schedule();
+},true);
+
+window.YardivoOverviewManagerSummary={render};
+})();
+</script>
+
+
+<style id="yardivo-warroom-myyard-final-v1-20260901">
+/* MY YARD: 2D really shows the 2D yard; 3D really shows the canonical WebGL scene. */
+#myYard[data-yardivo-yard-mode="2d"] #yardivoMyYardWebGL{display:none!important}
+#myYard[data-yardivo-yard-mode="2d"] .myy-world{
+  display:block!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:6!important;
+}
+#myYard[data-yardivo-yard-mode="2d"] .myy-world.d2{
+  transform:none!important;
+}
+#myYard[data-yardivo-yard-mode="3d"] #yardivoMyYardWebGL{display:block!important}
+#myYard[data-yardivo-yard-mode="3d"] .myy-world{display:none!important}
+
+/* WAR ROOM: one large canonical My Yard screen. */
+#yardivoWarRoom .wr-bg,
+#yardivoWarRoom .wr-scan{display:none!important}
+#yardivoWarRoom .wr-shell{
+  grid-template-rows:64px minmax(0,1fr)!important;
+  padding:10px 12px 12px!important;
+  background:#050b11!important;
+}
+#yardivoWarRoom .wr-header{
+  grid-template-columns:auto 1fr auto!important;
+  min-height:54px!important;
+  padding:0 4px 9px!important;
+}
+#yardivoWarRoom .wr-brand .wr-logo3d{width:38px!important;height:38px!important}
+#yardivoWarRoom .wr-brand .wr-y{font-size:30px!important;animation:none!important}
+#yardivoWarRoom .wr-center{text-align:left!important;margin-left:18px!important}
+#yardivoWarRoom .wr-main{
+  display:block!important;
+  min-height:0!important;
+  padding:8px 0 0!important;
+}
+#yardivoWarRoom .wr-main>.wr-col{display:none!important}
+#yardivoWarRoom .wr-twin{
+  position:relative!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:calc(100vh - 96px)!important;
+  border:1px solid #24445a!important;
+  border-radius:10px!important;
+  overflow:hidden!important;
+  background:#07131f!important;
+}
+#yardivoWarRoom .wr-twin-title{
+  position:absolute!important;
+  left:16px!important;
+  top:14px!important;
+  z-index:90!important;
+  padding:7px 10px!important;
+  border:1px solid #315a74!important;
+  border-radius:7px!important;
+  background:rgba(7,19,31,.88)!important;
+  color:#edf6ff!important;
+  font-size:8px!important;
+  font-weight:1000!important;
+}
+#yardivoWarRoom #wrYardCanvas{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  overflow:hidden!important;
+}
+#yardivoWarRoom #wrYardCanvas>*:not(#yardivoWarRoomMyYardMirror){
+  display:none!important;
+}
+#yardivoWarRoom #yardivoWarRoomMyYardMirror{
+  display:block!important;
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  z-index:70!important;
+  visibility:visible!important;
+  opacity:1!important;
+  background:#07131f!important;
+}
+#yardivoWarRoom #yardivoWarRoomMyYardMirror canvas{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+}
+#yardivoWarRoom .wrmirror-badge{display:none!important}
+#yardivoWarRoom .wr-footer{display:none!important}
+
+/* Central operational notification shown only while War Room is active. */
+#yardivoWarRoomNotice{
+  position:fixed;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%) scale(.96);
+  z-index:27000;
+  width:min(560px,82vw);
+  padding:18px 22px;
+  border:1px solid #3c6b88;
+  border-left:5px solid #2489eb;
+  border-radius:12px;
+  background:rgba(6,18,29,.96);
+  color:#edf6ff;
+  box-shadow:0 28px 90px rgba(0,0,0,.52);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .16s ease,transform .16s ease,visibility .16s;
+  text-align:center;
+}
+#yardivoWarRoomNotice.show{
+  opacity:1;
+  visibility:visible;
+  transform:translate(-50%,-50%) scale(1);
+}
+#yardivoWarRoomNotice[data-kind="entry"]{border-left-color:#37d879}
+#yardivoWarRoomNotice[data-kind="change"]{border-left-color:#ffc04a}
+#yardivoWarRoomNotice small{
+  display:block;
+  font-size:8px;
+  font-weight:1000;
+  letter-spacing:1px;
+  color:#8eabba;
+}
+#yardivoWarRoomNotice strong{
+  display:block;
+  margin-top:7px;
+  font-size:22px;
+}
+#yardivoWarRoomNotice span{
+  display:block;
+  margin-top:6px;
+  font-size:10px;
+  color:#bdd0db;
+}
+</style>
+
+<script id="yardivo-warroom-myyard-final-v1-20260901-js">
+(function(){
+'use strict';
+
+const MODE_KEY='yardivo_myyard_view_mode_v2';
+let noticeTimer=0,lastSnapshot=new Map(),initialized=false;
+
+function currentMode(){
+  try{return localStorage.getItem(MODE_KEY)==='2d'?'2d':'3d'}catch(_){return'3d'}
+}
+function applyMode(mode){
+  mode=mode==='2d'?'2d':'3d';
+  try{localStorage.setItem(MODE_KEY,mode)}catch(_){}
+  const root=document.getElementById('myYard');if(!root)return;
+  root.dataset.yardivoYardMode=mode;
+  root.querySelectorAll('[data-myy]').forEach(b=>b.classList.toggle('active',b.dataset.myy===mode));
+  const world=root.querySelector('.myy-world');
+  if(world){
+    world.classList.toggle('d2',mode==='2d');
+    world.classList.toggle('d3',mode==='3d');
+  }
+  const help=root.querySelector('.myy-help');
+  if(help)help.style.display=mode==='3d'?'block':'none';
+  if(mode==='2d'){
+    try{window.YardivoMyYard?.render?.()}catch(_){}
+  }else{
+    try{window.YardivoMyYardWebGL?.boot?.()}catch(_){}
+    try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+  }
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest?.('#myYard [data-myy]');
+  if(!b)return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  applyMode(b.dataset.myy);
+},true);
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-view="myYard"],[data-home-target="myYard"]')){
+    setTimeout(()=>applyMode(currentMode()),100);
+  }
+},true);
+window.addEventListener('load',()=>setTimeout(()=>applyMode(currentMode()),1200),{once:true});
+
+/* War Room notification model */
+function roomActive(){
+  return !!document.getElementById('yardivoWarRoom')?.classList.contains('active');
+}
+function anns(){
+  try{return Array.isArray(announcements)?announcements:[]}catch(_){return[]}
+}
+function keyState(a){
+  return JSON.stringify([
+    a?.status||'',a?.date||'',a?.time||'',a?.warehouse||'',a?.dock||'',
+    a?.actualDate||'',a?.actualTime||'',a?.gateCheckedAt||'',a?.yardArrivalAt||'',
+    a?.dockArrivalAt||'',a?.receivedAt||'',a?.completedAt||'',a?.gateOutAt||'',
+    a?.rejectedAt||''
+  ]);
+}
+function operationalStatus(a){
+  try{return operationalPlanStatus(a)||a.status||'Najavljeno'}catch(_){return a?.status||'Najavljeno'}
+}
+function ensureNotice(){
+  let n=document.getElementById('yardivoWarRoomNotice');
+  if(n)return n;
+  n=document.createElement('div');n.id='yardivoWarRoomNotice';
+  n.innerHTML='<small>WAR ROOM · LIVE PROMJENA</small><strong></strong><span></span>';
+  document.body.appendChild(n);
+  return n;
+}
+function showNotice(kind,title,detail){
+  if(!roomActive())return;
+  const n=ensureNotice();
+  n.dataset.kind=kind||'change';
+  n.querySelector('strong').textContent=title||'PROMJENA';
+  n.querySelector('span').textContent=detail||'';
+  n.classList.remove('show');
+  requestAnimationFrame(()=>n.classList.add('show'));
+  clearTimeout(noticeTimer);
+  noticeTimer=setTimeout(()=>n.classList.remove('show'),3600);
+}
+function snapshot(notify){
+  const rows=anns(),next=new Map();
+  rows.forEach(a=>{
+    const id=String(a?.id??a?.announcement_id??'');
+    if(!id)return;
+    next.set(id,keyState(a));
+    if(notify&&initialized){
+      if(!lastSnapshot.has(id)){
+        showNotice('entry','NOVA NAJAVA U SUSTAVU',
+          `${a.supplier||'Dobavljač'} · ${a.date||'—'} ${a.time||''} · ${a.warehouse||'—'} · R${a.dock||'—'}`);
+      }else if(lastSnapshot.get(id)!==keyState(a)){
+        showNotice('change','PROMJENA NAJAVE',
+          `${a.supplier||'Dobavljač'} · ${operationalStatus(a)} · ${a.warehouse||'—'} · R${a.dock||'—'}`);
+      }
+    }
+  });
+  lastSnapshot=next;initialized=true;
+}
+snapshot(false);
+
+window.addEventListener('yardivo:data-synced',()=>{
+  snapshot(true);
+  if(roomActive()){
+    try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+    try{window.YardivoWarRoomExactMirror?.boot?.()}catch(_){}
+  }
+});
+setInterval(()=>{
+  snapshot(true);
+  if(roomActive()){
+    try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+  }
+},2000);
+
+/* Ensure opening War Room immediately mounts the canonical 3D My Yard mirror. */
+document.addEventListener('click',e=>{
+  if(!e.target.closest?.('#yardivoWarButton,[data-view="yardivoWarRoom"],[data-home-target="yardivoWarRoom"],[data-view="controltower"],[data-view="controlTower"]'))return;
+  setTimeout(async()=>{
+    try{await window.YardivoMyYardWebGL?.boot?.()}catch(_){}
+    try{await window.YardivoWarRoomExactMirror?.boot?.()}catch(_){}
+    snapshot(false);
+  },180);
+},true);
+
+window.YardivoWarRoomNotice={show:showNotice,refresh:()=>snapshot(true)};
+window.YardivoMyYardMode={set:applyMode,current:currentMode};
+})();
+</script>
+
+
+<style id="yardivo-light-total-white-strict-v1-20260901">
+/* STRICT LIGHT: no dark/navy structural surface is allowed to leak into the application. */
+html[data-yardivo-main-theme="light"],
+html[data-yardivo-main-theme="light"] body,
+body.light-mode{
+  --theme-bg:#ffffff!important;
+  --theme-bg-2:#ffffff!important;
+  --theme-panel:#ffffff!important;
+  --theme-panel-2:#ffffff!important;
+  --theme-card:#ffffff!important;
+  --theme-input:#ffffff!important;
+  --theme-hover:#f5f7f9!important;
+  --theme-border:#d7dee3!important;
+  --theme-border-soft:#e4e9ed!important;
+  --theme-text:#16212a!important;
+  --theme-muted:#667783!important;
+  --theme-shadow:rgba(24,39,50,.08)!important;
+  background:#ffffff!important;
+  color:#16212a!important;
+  color-scheme:light!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode :is(
+.app,.app-shell,.main,.main-content,.content,.view,.sidebar,.sidebar-head,.sidebar-header,
+.sidebar-logo,.brand,.brand-box,.topbar,.top-bar,.app-header,.header-bar,.warehouse-bar,
+.home-menu-shell,.home-menu-grid,.home-menu-card,.home-card,
+.panel,.panel-head,.panel-body,.card,.settings-grid,.settings-card,.settings-section,
+.data-wrap,.table-wrap,.table-responsive,.toolbar,.controls,.filter,.filter-box,
+.form-grid,.field,.field-row,.master-note,.notice,.info-box,.hint,.legend,
+.terminal,.terminal-panel,.supplier-card,.announcement-card,.incident-card,.dock-card,
+.ramp-card,.yard-card,.truck-card,.report-card,.calendar-card,.heat-card,.tower-card,
+.receiving-card,.gate-card,.order-card,.epal-card,.unannounced-card,.operation-card,
+.planner-card,.overview-hero,.overview-panel,.overview-card,.overview-kpi,.ranking-row,
+.performance-kpi,.dash-clean-kpi,.supplier-history-card,.truck-history-card,
+.user-card,.role-card,.permission-card,.admin-card,.permission-item,.permission-row,
+.holiday-admin,.holiday-row,.week-day,.week-day-head,.week-summary,.week-summary div,
+.week-delivery,.week-map-day,.week-map-item,.daily-map-board,.daily-map-toolbar,
+.schedule-wrap,.schedule-table,.schedule-grid,.map-grid,.expanded-schedule-map,
+.overview-executive,.overview-exec-kpi,.overview-focus-card,.overview-operational-kpis,
+.overview-detail-drilldown,.overview-best-below-chart
+){
+  background:#ffffff!important;
+  background-image:none!important;
+  color:#16212a!important;
+  border-color:#d7dee3!important;
+  box-shadow:none!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode :is(input,select,textarea){
+  background:#ffffff!important;
+  color:#16212a!important;
+  border-color:#cfd8de!important;
+  box-shadow:none!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode :is(table,thead,tbody,tr,th,td){
+  background:#ffffff!important;
+  color:#16212a!important;
+  border-color:#dfe5e9!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode th{
+  background:#f7f9fa!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode :is(.secondary,.action,button:not(.primary):not(.danger):not(.delete-all-btn)){
+  background:#ffffff!important;
+  color:#263640!important;
+  border-color:#ccd6dc!important;
+  box-shadow:none!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode .nav-btn{
+  background:#ffffff!important;color:#3f505b!important;border-color:transparent!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode .nav-btn:hover{
+  background:#f5f7f9!important;color:#17232c!important;
+}
+html[data-yardivo-main-theme="light"] body.light-mode .nav-btn.active{
+  background:#eef5fb!important;color:#126fc9!important;border-color:#cbddec!important;
+}
+/* Status / alert / graph semantics deliberately keep their operational colors. */
+html[data-yardivo-main-theme="light"] body.light-mode :is(
+.status-badge,.badge,.chip,.booked,.status-pill,.announcement-detail-status,
+.overview-full-bar,.danger-zone,.holiday-warning.show,.primary,.delete-all-btn
+){
+  /* semantic owner styles remain authoritative */
+}
+/* Maps can keep their spatial canvas; surrounding UI stays white. */
+html[data-yardivo-main-theme="light"] body.light-mode #myYard,
+html[data-yardivo-main-theme="light"] body.light-mode #myYard .myy-shell{
+  background:#fff!important;
+}
+
+/* Settings: light mode has no palette choices. Only DARK / ORIGINAL remain as dark presets. */
+#settings #yardivoDarkStyleSettings .yardivo-dark-style-option[data-dark-style="blue"],
+#settings #yardivoThemeSettingsV2 [data-dark-look="blue"],
+#settings [data-light-look],
+#settings [data-light-style],
+#settings input[name="yardivoLightStyle"],
+#settings .yardivo-light-style-option,
+#settings #yardivoLightGreenSettings{
+  display:none!important;
+}
+</style>
+
+<script id="yardivo-settings-dark-only-holidays-v1-20260901">
+(function(){
+'use strict';
+
+function normalizeSettings(){
+  /* Keep Settings palette choices only for the two DARK appearances. */
+  const p=document.getElementById('yardivoDarkStyleSettings');
+  if(p){
+    const h=p.querySelector('h2'); if(h)h.textContent='DARK MODE';
+    const s=p.querySelector('.panel-head small');if(s)s.textContent='Odaberi izgled koji se koristi kada je uključen Dark mode.';
+    p.querySelectorAll('.yardivo-dark-style-option').forEach(x=>{
+      const v=x.dataset.darkStyle;
+      if(v==='blue')x.style.setProperty('display','none','important');
+      if(v==='graphite'){
+        const a=x.querySelector('strong');if(a)a.textContent='DARK';
+        const b=x.querySelector('small');if(b)b.textContent='Tamni crno-sivi YARDIVO izgled.';
+      }
+      if(v==='original'){
+        const a=x.querySelector('strong');if(a)a.textContent='ORIGINAL';
+        const b=x.querySelector('small');if(b)b.textContent='Originalni YARDIVO tamno-plavi izgled.';
+      }
+    });
+  }
+  const v2=document.getElementById('yardivoThemeSettingsV2');
+  if(v2){
+    const t=v2.querySelector('.yt-title');if(t)t.textContent='DARK MODE';
+    v2.querySelectorAll('[data-dark-look]').forEach(x=>{
+      const v=x.dataset.darkLook;
+      if(v==='blue')x.style.setProperty('display','none','important');
+      if(v==='graphite')x.textContent='DARK';
+      if(v==='original')x.textContent='ORIGINAL';
+    });
+  }
+  /* Remove any legacy Settings-only Light palette panels/options, but not the global Light/Dark switch. */
+  document.querySelectorAll(
+    '#settings [data-light-look],#settings [data-light-style],#settings input[name="yardivoLightStyle"],'+
+    '#settings .yardivo-light-style-option,#settings #yardivoLightGreenSettings'
+  ).forEach(x=>{
+    const panel=x.closest('.panel');
+    if(panel && panel.querySelectorAll('[data-light-look],[data-light-style],input[name="yardivoLightStyle"],.yardivo-light-style-option').length){
+      panel.style.setProperty('display','none','important');
+    }else x.style.setProperty('display','none','important');
+  });
+}
+
+/* The built-in 2026 Croatian holiday list is preserved. Do not clear/replace it.
+   Existing custom days remain in studenac_custom_holidays and Add Custom Holiday stays available. */
+function refreshHolidays(){
+  try{renderHolidayAdmin?.()}catch(_){}
+}
+
+window.addEventListener('load',()=>setTimeout(()=>{normalizeSettings();refreshHolidays()},900),{once:true});
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-view="settings"],[data-home-target="settings"]')){
+    setTimeout(()=>{normalizeSettings();refreshHolidays()},120);
+  }
+},true);
+window.addEventListener('yardivo:login',()=>setTimeout(normalizeSettings,120));
+window.YardivoSettingsCleanup={apply:normalizeSettings,refreshHolidays};
 })();
 </script>
 
