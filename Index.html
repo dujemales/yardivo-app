@@ -7155,6 +7155,34 @@ AUTOMATSKA PREPORUKA</small>
 <div class="performance-kpi"><small>PROSJEČNO KAŠNJENJE</small><strong id="ovAvgDelay">0 min</strong><span>samo zakašnjeli dolasci</span></div>
 <div class="performance-kpi"><small>UKUPNO INCIDENATA</small><strong id="ovIncidents">0</strong><span>evidentirani problemi isporuke</span></div><div class="performance-kpi"><small>PROMJENE NAJAVA</small><strong id="ovChanges">0</strong><span>evidentirane izmjene termina</span></div><div class="performance-kpi"><small>PROSJEČAN ISTOVAR</small><strong id="ovAvgUnload">0 min</strong><span>stvarna vremena istovara</span></div><div class="performance-kpi"><small>ISKORIŠTENOST RAMPI</small><strong id="ovDockUtil">0%</strong><span>prema rezerviranim minutama</span></div>
 </div>
+
+<section class="panel overview-full-supplier-chart" id="overviewFullSupplierChartPanel">
+  <div class="panel-head">
+    <div>
+      <h2>POUZDANOST SVIH DOBAVLJAČA</h2>
+      <small id="overviewFullChartSubtitle">Svaki dobavljač · pouzdanost 0–100% · od crvenog prema zelenom</small>
+    </div>
+    <div class="overview-full-chart-legend" aria-label="Legenda pouzdanosti">
+      <span><i style="--c:hsl(0 76% 44%)"></i>LOŠIJE</span>
+      <span><i style="--c:hsl(60 76% 44%)"></i>SREDNJE</span>
+      <span><i style="--c:hsl(120 76% 39%)"></i>BOLJE</span>
+    </div>
+  </div>
+  <div class="overview-full-chart-scroll" id="overviewFullChartScroll">
+    <div class="overview-full-chart-axis">
+      <span style="bottom:100%">100</span>
+      <span style="bottom:75%">75</span>
+      <span style="bottom:50%">50</span>
+      <span style="bottom:25%">25</span>
+      <span style="bottom:0%">0</span>
+    </div>
+    <div class="overview-full-chart-gridlines"></div>
+    <div class="overview-full-chart-bars" id="overviewFullSupplierBars">
+      <div class="overview-empty">Učitavanje dobavljača...</div>
+    </div>
+  </div>
+</section>
+
 <div class="overview-layout">
 <section class="panel">
 <div class="panel-head"><div><h2>SVI DOBAVLJAČI</h2><small id="overviewSupplierCount">0 dobavljača · kompletna lista</small></div><input id="overviewSearch" placeholder="Pretraži dobavljača..."/></div>
@@ -26631,6 +26659,420 @@ document.addEventListener('click',e=>{
   if(e.target.closest?.('[data-theme],[data-yardivo-theme],#themeToggle,#themeSwitch'))setTimeout(normalize,0);
 },true);
 window.addEventListener('load',normalize,{once:true});
+})();
+</script>
+
+
+<style id="yardivo-light-mode-zero-navy-v2-20260901">
+/* FINAL LIGHT-MODE CLEANUP — no structural navy remains anywhere in the app. */
+html[data-yardivo-main-theme="light"] body,
+body.light-mode{
+  --yv-light-bg:#fff;
+  --yv-light-line:#d7e0e6;
+  --yv-light-text:#13202a;
+  --yv-light-muted:#617481;
+  --yv-light-soft:#f5f8fa;
+}
+
+/* Admin / Settings forms and permission matrix */
+html[data-yardivo-main-theme="light"] :is(
+  #settings input,#settings select,#settings textarea,
+  #settings .permission-item,#settings .permission-row,#settings .permission-grid>*,
+  #settings .role-permission,#settings .user-permission,
+  #settings .admin-users-note,#settings .admin-user-note,#settings .settings-note,
+  #settings [class*="permission"],#settings [class*="admin-user"],
+  .settings input,.settings select,.settings textarea
+),
+body.light-mode :is(
+  #settings input,#settings select,#settings textarea,
+  #settings .permission-item,#settings .permission-row,#settings .permission-grid>*,
+  #settings .role-permission,#settings .user-permission,
+  #settings .admin-users-note,#settings .admin-user-note,#settings .settings-note,
+  #settings [class*="permission"],#settings [class*="admin-user"],
+  .settings input,.settings select,.settings textarea
+){
+  background:#fff!important;
+  background-image:none!important;
+  color:#13202a!important;
+  border-color:#cbd6dd!important;
+}
+
+/* Generic form/control cleanup across ALL sections. */
+html[data-yardivo-main-theme="light"] :is(
+  .view input:not([type="checkbox"]):not([type="radio"]),
+  .view select,.view textarea,
+  .view .field,.view .form-field,.view .input-wrap,.view .select-wrap,
+  .view .filter,.view .filter-box,.view .toolbar,.view .controls,
+  .view .notice,.view .info-box,.view .hint,.view .legend,
+  .view .list-item,.view .table-wrap,.view .data-grid,
+  .view .accordion,.view .accordion-item
+),
+body.light-mode :is(
+  .view input:not([type="checkbox"]):not([type="radio"]),
+  .view select,.view textarea,
+  .view .field,.view .form-field,.view .input-wrap,.view .select-wrap,
+  .view .filter,.view .filter-box,.view .toolbar,.view .controls,
+  .view .notice,.view .info-box,.view .hint,.view .legend,
+  .view .list-item,.view .table-wrap,.view .data-grid,
+  .view .accordion,.view .accordion-item
+){
+  background:#fff!important;
+  background-image:none!important;
+  color:#13202a!important;
+  border-color:#d7e0e6!important;
+}
+
+/* Catch legacy hard-coded navy containers by common YARDIVO component names. */
+html[data-yardivo-main-theme="light"] :is(
+  .terminal,.terminal-panel,.supplier-card,.supplier-row,.announcement-card,
+  .incident-card,.dock-card,.ramp-card,.yard-card,.truck-card,
+  .report-card,.calendar-card,.heat-card,.tower-card,.receiving-card,
+  .gate-card,.order-card,.epal-card,.unannounced-card,.operation-card,
+  .planner-card,.overview-kpi,.ranking-row,.ranking-track,
+  .user-card,.role-card,.permission-card,.admin-card,
+  .week-map-kpi,.week-map-list,.week-map-item,
+  .daily-map-summary,.daily-ramp-detail,.daily-ramp-capacity,
+  .myy-hud,.myy-legend
+),
+body.light-mode :is(
+  .terminal,.terminal-panel,.supplier-card,.supplier-row,.announcement-card,
+  .incident-card,.dock-card,.ramp-card,.yard-card,.truck-card,
+  .report-card,.calendar-card,.heat-card,.tower-card,.receiving-card,
+  .gate-card,.order-card,.epal-card,.unannounced-card,.operation-card,
+  .planner-card,.overview-kpi,.ranking-row,.ranking-track,
+  .user-card,.role-card,.permission-card,.admin-card,
+  .week-map-kpi,.week-map-list,.week-map-item,
+  .daily-map-summary,.daily-ramp-detail,.daily-ramp-capacity,
+  .myy-hud,.myy-legend
+){
+  background:#fff!important;
+  background-image:none!important;
+  color:#13202a!important;
+  border-color:#d7e0e6!important;
+  box-shadow:none!important;
+}
+
+/* Buttons that were navy become white/light-neutral. Primary action buttons keep their blue action color. */
+html[data-yardivo-main-theme="light"] .view button:not(.primary):not(.danger):not(.confirm):not([class*="status"]):not([class*="booking"]),
+body.light-mode .view button:not(.primary):not(.danger):not(.confirm):not([class*="status"]):not([class*="booking"]){
+  background:#fff!important;
+  background-image:none!important;
+  color:#19313f!important;
+  border-color:#cbd6dd!important;
+}
+html[data-yardivo-main-theme="light"] .view button:not(.primary):not(.danger):not(.confirm):hover,
+body.light-mode .view button:not(.primary):not(.danger):not(.confirm):hover{
+  background:#f4f8fa!important;
+  border-color:#aebfc9!important;
+}
+
+/* Top application header is white too. */
+html[data-yardivo-main-theme="light"] :is(.topbar,.top-bar,.app-header,.header-bar,.warehouse-bar),
+body.light-mode :is(.topbar,.top-bar,.app-header,.header-bar,.warehouse-bar){
+  background:#fff!important;
+  background-image:none!important;
+  color:#13202a!important;
+  border-color:#d7e0e6!important;
+}
+
+/* Sidebar + logo region fully white. */
+html[data-yardivo-main-theme="light"] :is(.sidebar,.sidebar-head,.sidebar-header,.sidebar-logo,.brand,.brand-box),
+body.light-mode :is(.sidebar,.sidebar-head,.sidebar-header,.sidebar-logo,.brand,.brand-box){
+  background:#fff!important;
+  background-image:none!important;
+  color:#13202a!important;
+  border-color:#d7e0e6!important;
+}
+
+/* Explicit Settings screen from supplied screenshot. */
+html[data-yardivo-main-theme="light"] #settings :is(
+  .settings-admin-grid,.admin-users-grid,.user-management-grid,
+  .permissions-grid,.permission-grid,.settings-grid,
+  label,fieldset
+),
+body.light-mode #settings :is(
+  .settings-admin-grid,.admin-users-grid,.user-management-grid,
+  .permissions-grid,.permission-grid,.settings-grid,
+  label,fieldset
+){
+  color:#13202a!important;
+  border-color:#d7e0e6!important;
+}
+html[data-yardivo-main-theme="light"] #settings label,
+body.light-mode #settings label{
+  background:transparent!important;
+}
+html[data-yardivo-main-theme="light"] #settings input[type="checkbox"],
+body.light-mode #settings input[type="checkbox"]{
+  accent-color:#2489eb!important;
+}
+
+/* Keep operational semantic/status fills untouched. Do not flatten:
+   booked/status badges, incidents, success/warning/error, graph bars. */
+</style>
+
+
+<style id="yardivo-overview-fullwidth-chart-v1-20260901">
+#overview .overview-full-supplier-chart{
+  width:100%!important;
+  max-width:none!important;
+  margin:12px 0!important;
+  box-sizing:border-box!important;
+}
+#overview .overview-full-supplier-chart .panel-head{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:14px!important;
+}
+#overview .overview-full-chart-legend{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+  font-size:8px;
+  font-weight:900;
+  color:var(--theme-muted,#8195a3);
+}
+#overview .overview-full-chart-legend span{display:inline-flex;align-items:center;gap:5px}
+#overview .overview-full-chart-legend i{
+  width:9px;height:9px;border-radius:2px;background:var(--c);display:inline-block
+}
+#overview .overview-full-chart-scroll{
+  position:relative!important;
+  width:100%!important;
+  min-height:430px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  padding:22px 20px 18px 54px!important;
+  box-sizing:border-box!important;
+  border-top:1px solid var(--theme-border-soft,#dbe3e8)!important;
+  scrollbar-width:thin;
+}
+#overview .overview-full-chart-axis{
+  position:absolute;
+  left:8px;
+  top:30px;
+  bottom:92px;
+  width:35px;
+  z-index:3;
+}
+#overview .overview-full-chart-axis span{
+  position:absolute;right:0;transform:translateY(50%);
+  font-size:8px;font-weight:900;color:var(--theme-muted,#718391)
+}
+#overview .overview-full-chart-gridlines{
+  position:absolute;
+  left:54px;right:20px;top:30px;bottom:92px;
+  pointer-events:none;
+  background:
+    linear-gradient(to bottom,
+      rgba(125,145,158,.20) 0 1px,transparent 1px 24.8%,
+      rgba(125,145,158,.16) 25% calc(25% + 1px),transparent calc(25% + 1px) 49.8%,
+      rgba(125,145,158,.16) 50% calc(50% + 1px),transparent calc(50% + 1px) 74.8%,
+      rgba(125,145,158,.16) 75% calc(75% + 1px),transparent calc(75% + 1px) 99.7%,
+      rgba(125,145,158,.20) 100%);
+}
+#overview .overview-full-chart-bars{
+  position:relative!important;
+  z-index:2;
+  display:flex!important;
+  align-items:flex-end!important;
+  gap:14px!important;
+  width:max-content!important;
+  min-width:100%!important;
+  height:360px!important;
+  box-sizing:border-box!important;
+  padding:8px 10px 0!important;
+}
+#overview .overview-full-bar-item{
+  position:relative!important;
+  flex:0 0 76px!important;
+  width:76px!important;
+  height:100%!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  flex-direction:column!important;
+  cursor:pointer!important;
+  user-select:none!important;
+}
+#overview .overview-full-bar-value{
+  width:100%;
+  height:24px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:1000;
+}
+#overview .overview-full-bar-track{
+  position:relative;
+  width:42px!important;
+  height:246px!important;
+  display:flex!important;
+  align-items:flex-end!important;
+  border:1px solid rgba(120,140,155,.22)!important;
+  border-bottom-color:rgba(120,140,155,.42)!important;
+  border-radius:5px 5px 2px 2px!important;
+  background:rgba(120,140,155,.05)!important;
+  overflow:visible!important;
+}
+#overview .overview-full-bar{
+  width:100%!important;
+  min-height:4px!important;
+  border-radius:4px 4px 1px 1px!important;
+  transition:none!important;
+  animation:none!important;
+}
+#overview .overview-full-bar-score{
+  margin-top:5px!important;
+  min-width:44px!important;
+  padding:3px 5px!important;
+  text-align:center!important;
+  border:1px solid var(--theme-border,#d7e0e6)!important;
+  border-radius:999px!important;
+  background:var(--theme-panel,#fff)!important;
+  color:var(--theme-text,#13202a)!important;
+  font-size:8px!important;
+  font-weight:1000!important;
+}
+#overview .overview-full-bar-name{
+  width:76px!important;
+  height:44px!important;
+  margin-top:5px!important;
+  overflow:hidden!important;
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:3!important;
+  text-align:center!important;
+  font-size:7px!important;
+  line-height:1.2!important;
+  font-weight:900!important;
+  color:var(--theme-muted,#60727f)!important;
+}
+#overview .overview-full-bar-item:hover .overview-full-bar-track,
+#overview .overview-full-bar-item.selected .overview-full-bar-track{
+  outline:2px solid rgba(36,137,235,.50)!important;
+  outline-offset:2px!important;
+}
+body.light-mode #overview .overview-full-supplier-chart,
+html[data-yardivo-main-theme="light"] #overview .overview-full-supplier-chart,
+body.light-mode #overview .overview-full-chart-scroll,
+html[data-yardivo-main-theme="light"] #overview .overview-full-chart-scroll{
+  background:#fff!important;
+  color:#13202a!important;
+}
+@media(max-width:800px){
+  #overview .overview-full-chart-scroll{min-height:400px!important}
+  #overview .overview-full-chart-bars{height:330px!important}
+  #overview .overview-full-bar-item{flex-basis:68px!important;width:68px!important}
+  #overview .overview-full-bar-name{width:68px!important}
+}
+</style>
+
+<script id="yardivo-overview-fullwidth-chart-v1-20260901-js">
+(function(){
+'use strict';
+let raf=0;
+
+function esc(v){
+  return String(v??'').replace(/[&<>"']/g,m=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
+}
+function color(v){
+  if(v==null||!Number.isFinite(Number(v)))return '#7d8991';
+  const n=Math.max(0,Math.min(100,Number(v)));
+  return `hsl(${Math.round(n*1.2)} 76% ${n>=75?39:44}%)`;
+}
+function rows(){
+  try{
+    const x=window.YardivoOverviewMaster?.currentStats?.();
+    return Array.isArray(x)?x:[];
+  }catch(e){
+    console.warn('Overview full chart stats',e);
+    return [];
+  }
+}
+function renderNow(){
+  raf=0;
+  const host=document.getElementById('overviewFullSupplierBars');
+  if(!host)return;
+
+  const sel=document.getElementById('overviewSupplierSelect');
+  const selected=sel?.value||'';
+  const data=rows().filter(Boolean).sort((a,b)=>{
+    const ar=a.reliability==null?101:Number(a.reliability);
+    const br=b.reliability==null?101:Number(b.reliability);
+    return ar-br || a.name.localeCompare(b.name,'hr');
+  });
+
+  const subtitle=document.getElementById('overviewFullChartSubtitle');
+  if(subtitle)subtitle.textContent=`${data.length} dobavljača · svaki stupac = jedan dobavljač · pouzdanost 0–100%`;
+
+  if(!data.length){
+    host.innerHTML='<div class="overview-empty">Nema dobavljača za prikaz.</div>';
+    return;
+  }
+
+  host.style.minWidth=Math.max(1000,data.length*90)+'px';
+  host.innerHTML=data.map(x=>{
+    const r=x.reliability==null?0:Math.max(0,Math.min(100,Number(x.reliability)));
+    const c=color(x.reliability);
+    const pct=x.reliability==null?'—':`${Math.round(r)}%`;
+    const score=x.score10==null?'—':`${x.score10}/10`;
+    const cls=selected===x.name?' selected':'';
+    return `<div class="overview-full-bar-item${cls}" data-overview-full-supplier="${esc(x.name)}"
+      title="${esc(x.name)} · ${pct} · ${score} · ${x.evaluated||0} obrađeno">
+      <div class="overview-full-bar-value" style="color:${c}">${pct}</div>
+      <div class="overview-full-bar-track">
+        <div class="overview-full-bar" style="height:${x.reliability==null?2:r}%;background:${c}"></div>
+      </div>
+      <div class="overview-full-bar-score">${score}</div>
+      <div class="overview-full-bar-name">${esc(x.name)}</div>
+    </div>`;
+  }).join('');
+
+  host.querySelectorAll('[data-overview-full-supplier]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const name=el.dataset.overviewFullSupplier||'';
+      if(sel && [...sel.options].some(o=>o.value===name)){
+        sel.value=name;
+        try{window.YardivoOverviewMaster?.render?.()}catch(_){}
+        schedule();
+      }
+    });
+  });
+}
+function schedule(){
+  if(raf)return;
+  raf=requestAnimationFrame(renderNow);
+}
+
+window.addEventListener('load',()=>setTimeout(schedule,1000),{once:true});
+window.addEventListener('yardivo:data-synced',schedule);
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-view="overview"],[data-home-target="overview"]'))setTimeout(schedule,100);
+},true);
+document.addEventListener('change',e=>{
+  if(e.target?.id==='overviewSupplierSelect')schedule();
+},true);
+
+/* Master render can finish after normalized Supabase rows arrive; this custom event
+   gives the wide graph a clean refresh without polling. */
+window.addEventListener('yardivo:overview-refresh',schedule);
+
+window.YardivoOverviewFullChart={render:schedule};
+})();
+</script>
+
+
+<script id="yardivo-overview-fullchart-master-bridge-v1-20260901">
+(function(){
+'use strict';
+function ping(){window.dispatchEvent(new CustomEvent('yardivo:overview-refresh'))}
+window.addEventListener('yardivo:data-synced',()=>setTimeout(ping,120));
+document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-view="overview"],[data-home-target="overview"]'))setTimeout(ping,180);
+},true);
 })();
 </script>
 
