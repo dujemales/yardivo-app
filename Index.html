@@ -25225,5 +25225,217 @@ window.YardivoLoginFinalizer={finalize:finalizeLogin};
 })();
 </script>
 
+
+<script id="yardivo-canonical-login-router-v1-20260901">
+(function(){
+'use strict';
+
+let busy=false;
+
+function message(text,kind){
+  const e=document.getElementById('loginError');
+  if(!e)return;
+  e.textContent=text;
+  if(kind==='ok'){
+    e.style.borderColor='#2f6d48';
+    e.style.background='#0f2419';
+    e.style.color='#9ee0b6';
+  }else if(kind==='work'){
+    e.style.borderColor='#285f88';
+    e.style.background='#0c2030';
+    e.style.color='#a8d8f7';
+  }else{
+    e.style.borderColor='#7b3138';
+    e.style.background='#2b1115';
+    e.style.color='#ff9ba0';
+  }
+}
+
+async function directSupabaseLogin(){
+  const username=(document.getElementById('loginUser')?.value||'').trim().toLowerCase();
+  const password=document.getElementById('loginPass')?.value||'';
+  const chosen=document.getElementById('loginRole')?.value||'';
+
+  if(!/^[a-z0-9._-]{3,40}$/.test(username)||!password){
+    message('Upiši korisničko ime i lozinku.','error');
+    return false;
+  }
+
+  const base='https://utkleufcoaxnhrhcmdkb.supabase.co';
+  const key='sb_publishable_Ix_TndQyIFrGyfIyKEKySg_3GHwAMlL';
+  const headers={'apikey':key,'Content-Type':'application/json'};
+
+  const authRes=await fetch(base+'/auth/v1/token?grant_type=password',{
+    method:'POST',
+    headers,
+    body:JSON.stringify({email:username+'@yardivo.local',password})
+  });
+  const auth=await authRes.json().catch(()=>({}));
+  if(!authRes.ok||!auth?.access_token){
+    throw new Error(auth?.error_description||auth?.msg||auth?.message||'Pogrešno korisničko ime ili lozinka.');
+  }
+
+  headers.Authorization='Bearer '+auth.access_token;
+
+  /* Keep the established first-login password rotation behavior. */
+  if(auth.user?.user_metadata?.yardivo_password_rotated!==true){
+    let next='';
+    while(true){
+      next=window.prompt('SIGURNOSNA NADOGRADNJA\nPostavi novu YARDIVO lozinku (najmanje 10 znakova).')||'';
+      if(next.length>=10)break;
+      if(!next)throw new Error('Promjena lozinke je obavezna prije ulaska u YARDIVO.');
+      alert('Nova lozinka mora imati najmanje 10 znakova.');
+    }
+    const upd=await fetch(base+'/auth/v1/user',{
+      method:'PUT',
+      headers,
+      body:JSON.stringify({password:next,data:{...(auth.user?.user_metadata||{}),yardivo_password_rotated:true}})
+    });
+    if(!upd.ok)throw new Error('Promjena lozinke nije uspjela.');
+  }
+
+  const profRes=await fetch(base+'/rest/v1/rpc/yardivo_my_profile',{
+    method:'POST',
+    headers,
+    body:'{}'
+  });
+  const pdata=await profRes.json().catch(()=>null);
+  if(!profRes.ok)throw new Error(pdata?.message||'Ne mogu učitati korisnički profil.');
+
+  const p=Array.isArray(pdata)?pdata[0]:pdata;
+  if(!p||!p.active)throw new Error('Račun nije aktivan.');
+
+  const aliases={porta:'gate',gate:'gate',inventory:'inventory',reception:'reception',admin:'admin'};
+  const role=aliases[String(p.app_role||'').toLowerCase()]||String(p.app_role||'').toLowerCase();
+  const selected=aliases[String(chosen||'').toLowerCase()]||String(chosen||'').toLowerCase();
+
+  if(selected!==role){
+    const labels={admin:'Admin',inventory:'Upravljanje zalihama',reception:'Prijam',gate:'Porta'};
+    throw new Error('Ovom korisniku je dodijeljena rola "'+(labels[role]||role)+'". Odaberi tu rolu za prijavu.');
+  }
+
+  /* Synchronize the official Supabase client too, when the CDN library is available. */
+  try{
+    if(window.supabase?.createClient){
+      const c=window.__yardivoAuthClient || window.supabase.createClient(base,key,{
+        auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}
+      });
+      window.__yardivoAuthClient=c;
+      if(auth.refresh_token){
+        await c.auth.setSession({access_token:auth.access_token,refresh_token:auth.refresh_token});
+      }
+    }
+  }catch(_){}
+
+  const session={
+    user:String(p.username||username),
+    username:String(p.username||username),
+    role,
+    location:String(p.location||'VG'),
+    authUserId:auth.user?.id||'',
+    loginAt:new Date().toISOString(),
+    rememberMe:!!document.getElementById('rememberMe')?.checked,
+    serverAuthorized:true
+  };
+
+  try{
+    window.currentSession=session;
+    if(typeof currentSession!=='undefined')currentSession=session;
+    localStorage.removeItem('yardivo_custom_session');
+    localStorage.removeItem('yardivo_remembered_session');
+    sessionStorage.removeItem('studenac_demo_session');
+    localStorage.setItem('yardivo_last_location',session.location);
+  }catch(_){window.currentSession=session}
+
+  if(typeof enterApp==='function'){
+    enterApp();
+  }else{
+    const overlay=document.getElementById('loginOverlay');
+    if(overlay)overlay.style.display='none';
+    document.body.classList.remove('yardivo-prelogin');
+    const home=document.getElementById('homeMenu');
+    if(home){
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      home.classList.add('active');
+      home.style.display='';
+    }
+  }
+
+  try{window.YardivoExactRBAC?.apply?.()}catch(_){}
+  try{window.YardivoSupabase?.syncNow?.()}catch(_){}
+  return true;
+}
+
+async function canonicalLogin(){
+  if(busy)return;
+  busy=true;
+  const btn=document.getElementById('loginSubmitBtn');
+  if(btn)btn.disabled=true;
+  message('Provjera podataka i prijava…','work');
+
+  try{
+    let ok=false;
+    let primaryError=null;
+
+    /* Use the existing server-authoritative auth path first. */
+    if(window.YardivoAuth?.login){
+      try{
+        ok=await window.YardivoAuth.login();
+      }catch(e){
+        primaryError=e;
+      }
+    }
+
+    /* If the Supabase JS library did not load, use direct Supabase REST auth.
+       This makes Login independent from the external supabase-js CDN. */
+    if(!ok){
+      const errText=document.getElementById('loginError')?.textContent||'';
+      const libraryMissing=!window.supabase?.createClient || /biblioteka nije učitana/i.test(errText);
+      if(libraryMissing || primaryError){
+        ok=await directSupabaseLogin();
+      }
+    }
+
+    if(ok){
+      message('Prijava uspješna. Otvaram YARDIVO…','ok');
+      return;
+    }
+
+    /* Existing authoritativeLogin normally writes the exact server error itself. */
+    const current=document.getElementById('loginError')?.textContent||'';
+    if(!current || /Provjera podataka/i.test(current)){
+      message('Prijava nije uspjela. Provjeri podatke i odabranu rolu.','error');
+    }
+  }catch(e){
+    message(e?.message||'Prijava nije uspjela.','error');
+  }finally{
+    busy=false;
+    if(btn)btn.disabled=false;
+  }
+}
+
+/* Capture at DOCUMENT level, before every old target/bubble login listener.
+   This makes PRIJAVA have exactly one canonical action. */
+document.addEventListener('click',function(e){
+  const btn=e.target?.closest?.('#loginSubmitBtn');
+  if(!btn)return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+  canonicalLogin();
+},true);
+
+document.addEventListener('submit',function(e){
+  if(e.target?.id!=='loginForm')return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+  canonicalLogin();
+},true);
+
+window.YardivoCanonicalLogin={login:canonicalLogin,direct:directSupabaseLogin};
+})();
+</script>
+
 </body>
 </html>
