@@ -14850,7 +14850,7 @@ const META_KEY='yardivo_supabase_sync_meta_v2';
 const POLL_MS=60000;
 const DEBOUNCE_MS=220;
 
-let applyingRemote=false,flushing=false,bootstrapped=false,lastRevision=0,sb=null,authReady=false;
+let applyingRemote=false,flushing=false,bootstrapped=false,lastRevision=0,sb=null,authReady=false,freshLoginAuth=false;
 const revisions=new Map();
 const lastValues=new Map();
 const timers=new Map();
@@ -14948,7 +14948,7 @@ function conflictNotice(key){
   try{showYmsToast?.('warning','PROMJENA DRUGOG KORISNIKA',`"${key}" je u međuvremenu promijenjen. Učitana je novija verzija; ponovi svoju radnju ako je još potrebna.`)}catch(e){}
 }
 function appAuthReady(){
-  try{return !!currentSession && currentSession.serverAuthorized===true && !!currentSession.authUserId}catch(_){return false}
+  try{return freshLoginAuth===true && !!currentSession && currentSession.serverAuthorized===true && !!currentSession.authUserId}catch(_){return false}
 }
 function ensureClient(){
   if(!configured())throw new Error('Supabase nije konfiguriran.');
@@ -14985,13 +14985,20 @@ async function connect(){
   return c;
 }
 async function authenticateSync(accessToken,refreshToken){
-  if(!accessToken||!refreshToken||!appAuthReady())return false;
+  if(!accessToken||!refreshToken||!currentSession?.serverAuthorized||!currentSession?.authUserId)return false;
+  freshLoginAuth=true;
   const c=ensureClient();
   const {data,error}=await c.auth.setSession({access_token:accessToken,refresh_token:refreshToken});
   if(error)throw error;
   if(!data?.session || data.session.user?.id!==currentSession?.authUserId){
-    authReady=false;bootstrapped=false;
+    freshLoginAuth=false;authReady=false;bootstrapped=false;
     throw new Error('YARDIVO_AUTH_SESSION_MISMATCH');
+  }
+  const {data:profile,error:profileError}=await c.rpc('yardivo_my_profile');
+  const pr=Array.isArray(profile)?profile[0]:profile;
+  if(profileError||!pr?.active||String(pr.username||'').toLowerCase()!==String(currentSession.username||currentSession.user||'').toLowerCase()){
+    freshLoginAuth=false;authReady=false;bootstrapped=false;
+    throw new Error('YARDIVO_AUTH_PROFILE_MISMATCH');
   }
   authReady=true;bootstrapped=false;
   await initialSync();
@@ -15326,6 +15333,14 @@ async function flushQueue(){
         lastRevision=Math.max(lastRevision,Number(r?.revision)||0);
         q=q.filter(x=>x.id!==item.id);writeQueue(q);
       }catch(e){
+        const msg=errText(e);
+        if(/YARDIVO authorization denied|YARDIVO_AUTH_|JWT|not authorized/i.test(msg)){
+          q=q.filter(x=>x.id!==item.id);writeQueue(q);
+          freshLoginAuth=false;authReady=false;bootstrapped=false;
+          status('● SUPABASE · PONOVNA PRIJAVA POTREBNA','warn');
+          const box=document.getElementById('yardivoSyncErrorBox');if(box)box.style.display='none';
+          return false;
+        }
         const hit=q.find(x=>x.id===item.id);if(hit)hit.attempts=(hit.attempts||0)+1;
         writeQueue(q);showSyncError('QUEUE '+item.op+' '+item.key,e);return false;
       }
@@ -15385,7 +15400,7 @@ async function initialSync(){
 
   /* Drop obsolete queued writes for local-only keys from the earlier broad-sync build. */
   try{
-    const cleaned=readQueue().filter(item=>shouldSync(item.key));
+    const cleaned=readQueue().filter(item=>shouldSync(item.key) && item.key!=='studenac_yms_announcements');
     writeQueue(cleaned);
   }catch(e){}
 
@@ -15394,7 +15409,7 @@ async function initialSync(){
     await connect();
     const remote=await bootstrapRemote();lastRevision=Number(remote.revision)||0;
     const remoteKeys=Object.keys(remote.state||{}).filter(shouldSync);
-    const localKeys=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(shouldSync(k))localKeys.push(k)}
+    const localKeys=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(shouldSync(k)&&k!=='studenac_yms_announcements')localKeys.push(k)}
     if(remoteKeys.length){
       await applySnapshot(remote.state);
     }else if(localKeys.length){
@@ -31242,5 +31257,6 @@ body[data-yardivo-role="gate"] [data-home-target="settings"]{display:none!import
 #dashboard .yardivo-export-btn::after{content:" · KRAJ DANA";font-size:10px;opacity:.75}
 </style>
 <script id="yardivo-dashboard-daily-xlsx-label-v1-20260902">(function(){function f(){const b=document.querySelector('#dashboard [data-xlsx-view="dashboard"]');if(b){b.innerHTML='📊 DNEVNO IZVJEŠĆE XLSX';b.title='Izvezi samo današnje stanje prijama i rezultate u Excel'}}document.addEventListener('DOMContentLoaded',f);window.addEventListener('load',()=>setTimeout(f,800));document.addEventListener('click',e=>{if(e.target.closest('[data-view="dashboard"],[data-home-target="dashboard"]'))setTimeout(f,100)},true)})();</script>
+<script id="yardivo-github-pages-stale-sync-cleanup-v2-20260902">(function(){try{for(const k of ['yardivo_supabase_offline_queue_v1','yardivo_supabase_offline_queue_v2']){const q=JSON.parse(localStorage.getItem(k)||'[]');if(Array.isArray(q))localStorage.setItem(k,JSON.stringify(q.filter(x=>x&&x.key!=='studenac_yms_announcements')))}}catch(_){}const b=document.getElementById('yardivoSyncErrorBox');if(b)b.style.display='none'})();</script>
 </body>
 </html>
