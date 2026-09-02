@@ -13898,7 +13898,7 @@ body.yardivo-role-switching [data-announcement-context-menu]{display:none!import
   window.YardivoRoleMenuFix={close:closeAllMenus,enforce:enforceMenuPermissions};
 })();
 </script>
-<script id="yardivo-porta-home-menu-final-fix">
+<script id="yardivo-porta-home-menu-final-fix" type="application/x-yardivo-disabled">
 (function(){
   const PORTA_ALLOWED=new Set(['checkin','yard','docks','settings']);
 
@@ -14015,7 +14015,7 @@ body.yardivo-role-switching [data-announcement-context-menu]{display:none!import
 <style id="yardivo-porta-home-cards-real-fix-style">
 #homeMenuGrid .porta-generated-card{display:flex!important}
 </style>
-<script id="yardivo-porta-home-cards-real-fix">
+<script id="yardivo-porta-home-cards-real-fix" type="application/x-yardivo-disabled">
 (function(){
   const PORTA_CARDS=[
     {target:'checkin',icon:'▤',title:'Prijava dolaska',desc:'Provjera najave, tablica i vozača te odobrenje ulaza u dvorište.'},
@@ -20315,7 +20315,7 @@ window.YARDIVO_ROLE_VIEWS_V3101=ROLE;window.yardivoApplyAuthoritativeRoles=apply
 const old=window.applyRoleAccess;window.applyRoleAccess=function(){try{old?.apply(this,arguments)}catch(e){}apply()};
 window.addEventListener('load',()=>setTimeout(apply,100));document.addEventListener('click',()=>setTimeout(apply,0),true);setInterval(apply,2000);
 })();</script>
-<script id="yardivo-v3102-porta-only-views">
+<script id="yardivo-v3102-porta-only-views" type="application/x-yardivo-disabled">
 (function(){
  const PORTA_ALLOWED=new Set(['homeMenu','checkin','unannounced','myYard','docks']);
  function role(){
@@ -30719,6 +30719,30 @@ window.addEventListener('load',()=>setTimeout(()=>{
 },900),{once:true});
 
 
+
+function stabilizeGateSidebar(){
+ if(role()!=='gate')return;
+ const order=['homeMenu','checkin','unannounced','myYard','docks'];
+ const buttons=[...document.querySelectorAll('.nav-btn[data-view]')];
+ const parent=buttons[0]?.parentElement;
+ if(!parent)return;
+ const byView=new Map(buttons.map(b=>[b.dataset.view,b]));
+ order.forEach(v=>{const b=byView.get(v);if(b)parent.appendChild(b)});
+ buttons.forEach(b=>{
+   const ok=order.includes(b.dataset.view);
+   b.classList.toggle('role-hidden',!ok);
+   if(ok){
+     b.style.removeProperty('display');
+     b.style.removeProperty('visibility');
+     b.style.removeProperty('opacity');
+     b.removeAttribute('hidden');
+     b.removeAttribute('aria-disabled');
+   }else{
+     b.style.setProperty('display','none','important');
+   }
+ });
+}
+
 function stabilizeInventorySidebar(){
  if(role()!=='inventory')return;
  const order=['homeMenu','dashboard','controlTower','suppliers','orderSearch','announcements','dailyMap','weeklyMap','overview','incidents','unannounced','epal','myYard','reports','settings'];
@@ -30742,9 +30766,9 @@ function stabilizeInventorySidebar(){
 }
 
 const baseApply=apply;
-apply=function(){baseApply();stabilizeInventorySidebar()};
+apply=function(){baseApply();stabilizeInventorySidebar();stabilizeGateSidebar()};
 apply();
-window.YardivoRoleStableFinal={apply,open:activate,allowed,matrix:MATRIX,stabilizeInventorySidebar};
+window.YardivoRoleStableFinal={apply,open:activate,allowed,matrix:MATRIX,stabilizeInventorySidebar,stabilizeGateSidebar};
 })();
 </script>
 
@@ -31108,6 +31132,19 @@ html[data-yardivo-role="inventory"] .nav-btn[data-view="reports"],
 html[data-yardivo-role="inventory"] .nav-btn[data-view="settings"]{
  visibility:visible!important;opacity:1!important;
 }
+</style>
+
+
+<style id="yardivo-gate-sidebar-stable-v2-20260902">
+html[data-yardivo-role="gate"] .nav-btn[data-view]{display:none!important}
+html[data-yardivo-role="gate"] .nav-btn[data-view="homeMenu"],
+html[data-yardivo-role="gate"] .nav-btn[data-view="checkin"],
+html[data-yardivo-role="gate"] .nav-btn[data-view="unannounced"],
+html[data-yardivo-role="gate"] .nav-btn[data-view="myYard"],
+html[data-yardivo-role="gate"] .nav-btn[data-view="docks"]{
+ display:flex!important;visibility:visible!important;opacity:1!important;
+}
+html[data-yardivo-role="gate"] .nav-btn[data-view="epal"]{display:none!important}
 </style>
 
 </body>
