@@ -17106,7 +17106,18 @@ function dockSheet(){
 
 function payload(view){
   const d=new Date(),stamp=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-  if(view==='dashboard')return {fileName:`YARDIVO_Dashboard_${stamp}.xlsx`,sheets:[annSheet('Sve najave',anns()),incidentSheet(),supplierSheet()]};
+  if(view==='dashboard'){
+ const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`,A=anns().filter(a=>a.date===iso),I=incs().filter(i=>i.date===iso);
+ const arrived=A.filter(a=>a.actualDate||a.actualTime||a.yardArrivalAt||a.dockArrivalAt||a.receivedAt||a.rejectedAt);
+ const received=A.filter(a=>a.receivedAt||/zaprim|zavr|received/i.test(String(a.status||''))),rejected=A.filter(a=>a.rejectedAt||/odbij|reject/i.test(String(a.status||'')));
+ const pending=A.filter(a=>!received.includes(a)&&!rejected.includes(a)),late=arrived.filter(a=>{try{return Number(delayMinutes(a)||0)>15}catch(_){return false}}),onTime=Math.max(0,arrived.length-late.length);
+ const noShow=A.filter(a=>!arrived.includes(a)&&String(a.time||'')<'14:00'),pallets=A.reduce((n,a)=>n+Number(a.pallets||0),0),sku=A.reduce((n,a)=>n+Number(a.sku||0),0);
+ const avgLate=late.length?Math.round(late.reduce((n,a)=>{try{return n+Number(delayMinutes(a)||0)}catch(_){return n}},0)/late.length):0;
+ const summary={name:'Dnevni izvještaj',headers:['POKAZATELJ','REZULTAT'],rows:[['Planirano danas',A.length],['Stiglo',arrived.length],['Zaprimljeno',received.length],['Odbijeno',rejected.length],['Još čeka / nije završeno',pending.length],['Na vrijeme',onTime],['Točnost dolazaka',arrived.length?Math.round(onTime/arrived.length*100)+'%':'0%'],['Kašnjenja > 15 min',late.length],['No-show do 14:00',noShow.length],['Prosječno kašnjenje',avgLate+' min'],['Palete',pallets],['SKU',sku],['Dobavljači',new Set(A.map(a=>a.supplier).filter(Boolean)).size],['Incidenti',I.length]],meta:[['YARDIVO','DNEVNO STANJE PRIJAMA'],['Datum',iso],['Lokacija',locName()],['Generirano',new Date().toLocaleString('hr-HR')]]};
+ const detail=annSheet('Detalj prijama',A,[['YARDIVO','Dnevni detalj prijama'],['Datum',iso],['Lokacija',locName()]]);
+ const incidentToday={...incidentSheet(),name:'Incidenti danas',rows:I.map(i=>[safe(i.id),safe(i.date),safe(i.supplier),safe(i.type||i.reason),safe(i.severity),Number(i.pallets||0),Number(i.sku||0),safe(i.announcementId),safe(i.note||i.description),safe(i.createdBy),fmt(i.createdAt)])};
+ return {fileName:`YARDIVO_Dnevno_stanje_prijama_${iso}.xlsx`,sheets:[summary,detail,incidentToday],dashboardReport:true};
+}
   if(view==='announcements')return {fileName:`YARDIVO_Najave_${stamp}.xlsx`,sheets:[annSheet('Najave',anns(),[['YARDIVO','Sve najave'],['Lokacija',locName()]])]};
   if(view==='suppliers')return {fileName:`YARDIVO_Dobavljaci_${stamp}.xlsx`,sheets:[supplierSheet(),annSheet('Najave dobavljača',anns()),incidentSheet()]};
   if(view==='orderSearch')return {fileName:`YARDIVO_Narudzbe_${stamp}.xlsx`,sheets:[annSheet('Narudžbe',anns().filter(a=>a.orderNumber),[['YARDIVO','Pretraga narudžbi']])]};
@@ -17139,6 +17150,12 @@ function exportView(view,btn){
       body.push(Array.isArray(s.headers)?s.headers:[]);
       (s.rows||[]).forEach(r=>body.push(r));
       const ws=XLSX.utils.aoa_to_sheet(body);
+      if(p.dashboardReport){
+        const hr=(Array.isArray(s.meta)?s.meta.length+1:0);
+        ws['!freeze']={xSplit:0,ySplit:hr+1,topLeftCell:'A'+(hr+2),activePane:'bottomLeft',state:'frozen'};
+        if((s.headers||[]).length)ws['!autofilter']={ref:XLSX.utils.encode_range({s:{r:hr,c:0},e:{r:Math.max(hr,body.length-1),c:Math.max(0,s.headers.length-1)}})};
+        for(let c=0;c<(s.headers||[]).length;c++){const cell=ws[XLSX.utils.encode_cell({r:hr,c})];if(cell)cell.s={font:{bold:true},alignment:{vertical:'center',wrapText:true}}}
+      }
       const maxCols=Math.max(1,...body.map(r=>r.length));
       ws['!cols']=Array.from({length:maxCols},(_,c)=>{
         let n=10;
@@ -31183,5 +31200,6 @@ body[data-yardivo-role="gate"] [data-home-target="settings"]{display:none!import
 <style id="yardivo-dashboard-xlsx-endofday-v1-20260902">
 #dashboard .yardivo-export-btn::after{content:" · KRAJ DANA";font-size:10px;opacity:.75}
 </style>
+<script id="yardivo-dashboard-daily-xlsx-label-v1-20260902">(function(){function f(){const b=document.querySelector('#dashboard [data-xlsx-view="dashboard"]');if(b){b.innerHTML='📊 DNEVNO IZVJEŠĆE XLSX';b.title='Izvezi samo današnje stanje prijama i rezultate u Excel'}}document.addEventListener('DOMContentLoaded',f);window.addEventListener('load',()=>setTimeout(f,800));document.addEventListener('click',e=>{if(e.target.closest('[data-view="dashboard"],[data-home-target="dashboard"]'))setTimeout(f,100)},true)})();</script>
 </body>
 </html>
