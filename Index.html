@@ -13882,17 +13882,13 @@ body.yardivo-role-switching [data-announcement-context-menu]{display:none!import
   }
 
   // Detect login role/session changes and clean transient UI immediately.
-  let last='';
-  setInterval(()=>{
-    let user='';try{user=String(currentSession?.username||currentSession?.user||currentSession?.name||'')}catch(e){}
-    const sig=user+'|'+role();
-    if(sig!==last){
-      document.body.classList.add('yardivo-role-switching');
-      closeAllMenus();
-      last=sig;
-      setTimeout(()=>document.body.classList.remove('yardivo-role-switching'),80);
-    }
-  },250);
+  function onRoleChanged(){
+    document.body.classList.add('yardivo-role-switching');
+    closeAllMenus();
+    setTimeout(()=>document.body.classList.remove('yardivo-role-switching'),80);
+  }
+  window.addEventListener('yardivo:login',onRoleChanged);
+  window.addEventListener('yardivo:view-opened',closeAllMenus);
 
   window.addEventListener('storage',closeAllMenus);
   window.YardivoRoleMenuFix={close:closeAllMenus,enforce:enforceMenuPermissions};
@@ -14150,7 +14146,7 @@ body.yardivo-porta-role [data-home-target="notifications"]{
  visibility:hidden!important;
 }
 </style>
-<script id="yardivo-porta-no-warnings-hard-fix-js">
+<script id="yardivo-porta-no-warnings-hard-fix-js" type="application/x-yardivo-disabled">
 (function(){
  function role(){
    let r='';
@@ -14364,12 +14360,8 @@ body[data-yms-role="gate"] [data-home-target="operations"]{display:none!importan
   document.getElementById('incAnnouncement')?.addEventListener('input',syncIncidentFromAnnouncement);
 
   // Keep notification access correct after every role/session change.
-  let last='';
-  setInterval(()=>{
-    let user='';try{user=String(currentSession?.username||currentSession?.user||'')}catch(e){}
-    const sig=user+'|'+role();
-    if(sig!==last){last=sig;applyNotifAccess()}
-  },500);
+  window.addEventListener('yardivo:login',()=>setTimeout(applyNotifAccess,0));
+  window.addEventListener('yardivo:view-opened',()=>applyNotifAccess());
 
   document.addEventListener('click',e=>{
     if(e.target.closest('[data-view="homeMenu"],[data-view="operations"],[data-home-target="operations"]'))setTimeout(applyNotifAccess,20);
@@ -16835,22 +16827,16 @@ function homeIsVisible(){
   const h=document.getElementById('homeMenu');
   return !!h&&(h.classList.contains('active')||document.body.classList.contains('home-menu-mode'));
 }
-let readyTimer=null;
 function stabilizeHome(){
-  document.documentElement.classList.remove('yardivo-home-ready');
-  clearTimeout(readyTimer);
-  readyTimer=setTimeout(()=>{
-    try{window.YardivoRoleAccessFinal?.apply?.()}catch(e){}
-    // Normalize all cards after dynamic modules have added theirs.
-    const grid=document.getElementById('homeMenuGrid');
-    if(grid){
-      grid.querySelectorAll('.home-menu-card').forEach(card=>{
-        card.style.removeProperty('width');
-        card.style.removeProperty('height');
-      });
-    }
-    document.documentElement.classList.add('yardivo-home-ready');
-  },450);
+ try{window.YardivoRoleStableFinal?.apply?.()}catch(e){}
+ const grid=document.getElementById('homeMenuGrid');
+ if(grid){
+   grid.querySelectorAll('.home-menu-card').forEach(card=>{
+     card.style.removeProperty('width');
+     card.style.removeProperty('height');
+   });
+ }
+ document.documentElement.classList.add('yardivo-home-ready');
 }
 
 document.addEventListener('click',e=>{
@@ -16863,11 +16849,11 @@ window.addEventListener('load',()=>{
   setTimeout(forceMasterOverview,900);
 });
 
-setInterval(()=>{
-  if(homeIsVisible()&&!document.documentElement.classList.contains('yardivo-home-ready'))stabilizeHome();
-  const ov=document.getElementById('overview');
-  if(ov&&(ov.classList.contains('active')||getComputedStyle(ov).display!=='none'))forceMasterOverview();
-},1600);
+window.addEventListener('yardivo:view-opened',e=>{
+ const view=e?.detail?.view;
+ if(view==='homeMenu')stabilizeHome();
+ if(view==='overview')setTimeout(forceMasterOverview,0);
+});
 
 window.YardivoOverviewSupplierLock={masterSupplierNames,ensureOverviewAllSuppliers,forceMasterOverview};
 })();
@@ -17568,7 +17554,7 @@ setInterval(()=>{
   setPhaseClasses();
   const now=fingerprint();
   if(now!==fp){render();checkNew()}else syncBadges();
-},500);
+},1200);
 
 window.YardivoNotifications={load,save,markRead,markAllRead:markAll,unreadCount,render,open:openReader};
 })();
@@ -20481,8 +20467,12 @@ function enforce(){
 window.yardivoEnforceSettingsRBAC=enforce;
 window.addEventListener('yardivo:login',()=>setTimeout(enforce,30));
 window.addEventListener('load',()=>setTimeout(enforce,250));
-document.addEventListener('click',()=>setTimeout(enforce,0),true);
-setInterval(enforce,1500);
+document.addEventListener('click',e=>{
+ if(e.target.closest?.('[data-view="settings"],[data-home-target="settings"]'))setTimeout(enforce,0);
+},true);
+window.addEventListener('yardivo:view-opened',e=>{
+ if(e?.detail?.view==='settings')enforce();
+});
 })();
 </script>
 <style id="yardivo-qa-no-flash-and-myyard-v1">
@@ -31166,6 +31156,15 @@ body[data-yardivo-role="gate"] [data-home-target="epal"]{
  opacity:0!important;
  pointer-events:none!important;
 }
+</style>
+
+
+<style id="yardivo-ux-stability-cleanup-v1-20260902">
+.nav-btn.role-hidden,[data-home-target].role-hidden{display:none!important}
+html.yardivo-home-ready #homeMenuGrid{visibility:visible}
+html[data-yardivo-role="gate"] .nav-btn[data-view="controlTower"],
+html[data-yardivo-role="gate"] .nav-btn[data-view="controltower"],
+html[data-yardivo-role="gate"] .nav-btn[data-view="epal"]{display:none!important}
 </style>
 
 </body>
