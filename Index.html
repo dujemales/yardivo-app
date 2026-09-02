@@ -5879,7 +5879,7 @@ html.yardivo-welcome-complete #yardivoWelcomeBar{
 </meta><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="yardivo-build" content="2026-09-02-online-v2-no-legacy-queue">
+<meta name="yardivo-build" content="2026-09-02-online-v3-yardivo-only">
 </head>
 <body>
 <button aria-label="Uključi full screen" id="yardivoFullscreenBtn" title="Full screen" type="button"><span class="fs-icon">⛶</span><span class="fs-label">FULL SCREEN</span></button>
@@ -8261,8 +8261,8 @@ function updateWarehouseToolbar(){
 document.getElementById('globalWarehouse')?.addEventListener('change',e=>setGlobalWarehouse(e.target.value));
 
 // ===== STUDENAC: dolasci, kašnjenja, overview i incidenti =====
-let incidents=JSON.parse(safeStorage.getItem('studenac_yms_incidents')||'[]');
-const saveIncidents=()=>safeStorage.setItem('studenac_yms_incidents',JSON.stringify(incidents));
+let incidents=JSON.parse(safeStorage.getItem('yardivo_yms_incidents_v1')||'[]');
+const saveIncidents=()=>safeStorage.setItem('yardivo_yms_incidents_v1',JSON.stringify(incidents));
 const TOLERANCE_MIN=15;
 
 function plannedDateTime(a){return new Date(`${a.date}T${a.time}:00`)}
@@ -9183,12 +9183,12 @@ document.getElementById('overviewSearch')?.addEventListener('input',renderOvervi
 
 // ===== STUDENAC: najave i automatsko planiranje =====
 function loadPersistedAnnouncements(){
-  const keys=['yardivo_yms_announcements_v1','studenac_yms_announcements'];
+  const keys=['yardivo_yms_announcements_v1'];
   let best=[];
   for(const k of keys){
     try{
       const raw=safeStorage.getItem(k);
-      if(!raw||raw==='studenac_yms_announcements')continue;
+      if(!raw||raw==='yardivo_yms_announcements_v1')continue;
       const parsed=JSON.parse(raw);
       if(Array.isArray(parsed)&&parsed.length>=best.length)best=parsed;
     }catch(e){}
@@ -9198,7 +9198,7 @@ function loadPersistedAnnouncements(){
     try{
       const raw=JSON.stringify(best);
       safeStorage.setItem('yardivo_yms_announcements_v1',raw);
-      safeStorage.setItem('studenac_yms_announcements',raw);
+      safeStorage.setItem('yardivo_yms_announcements_v1',raw);
     }catch(e){}
   }
   return best;
@@ -9209,7 +9209,7 @@ const saveAnnouncements=()=>{
   try{
     // One shared persistent store for ALL accounts/roles in this browser.
     safeStorage.setItem('yardivo_yms_announcements_v1',raw);
-    safeStorage.setItem('studenac_yms_announcements',raw);
+    safeStorage.setItem('yardivo_yms_announcements_v1',raw);
     safeStorage.setItem('yardivo_data_last_saved_at',new Date().toISOString());
   }catch(e){
     console.error('YARDIVO: spremanje najava nije uspjelo',e);
@@ -11258,7 +11258,7 @@ function deleteAllOperationalData(){
   announcements=[];
 
   const announcementKeys=[
-    'studenac_yms_announcements',
+    'yardivo_yms_announcements_v1',
     'studenac_announcements',
     'yardivo_announcements',
     'yms_announcements'
@@ -11318,7 +11318,7 @@ function updateHomeLocationUI(){
   if(storageStatus){
     let persisted=0,lastSaved='';
     try{
-      const raw=safeStorage.getItem('yardivo_yms_announcements_v1')||safeStorage.getItem('studenac_yms_announcements')||'[]';
+      const raw=safeStorage.getItem('yardivo_yms_announcements_v1')||safeStorage.getItem('yardivo_yms_announcements_v1')||'[]';
       persisted=JSON.parse(raw).length||0;
       lastSaved=safeStorage.getItem('yardivo_data_last_saved_at')||'';
     }catch(e){}
@@ -13236,7 +13236,7 @@ if(select){
 <script id="yardivo-clean-operational-core">
 (function(){
 'use strict';
-const KEY='yardivo_yms_announcements_v1', LEG='studenac_yms_announcements';
+const KEY='yardivo_yms_announcements_v1', LEG='yardivo_yms_announcements_v1';
 const HOME={
  reception:new Set(['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','controltower','controlTower','settings','unannounced','epal','orderSearch','liveYard']),
  inventory:new Set(['dashboard','yard','docks','announcements','dailyMap','weeklyMap','suppliers','overview','incidents','incidentArchive','notifications','settings']),
@@ -13360,7 +13360,7 @@ window.YardivoCleanCore={load,save,role,applyHome,driverOpen,driverSave,gateFind
 
   // Existing users with obsolete Manager role cannot accidentally retain that permission set.
   try{
-    const keys=['yardivo_users','yardivo_yms_users','studenac_yms_users'];
+    const keys=['yardivo_users','yardivo_yms_users','yardivo_legacy_users_removed'];
     keys.forEach(k=>{
       const raw=localStorage.getItem(k); if(!raw)return;
       let users; try{users=JSON.parse(raw)}catch(e){return}
@@ -13464,7 +13464,7 @@ window.YardivoCleanCore={load,save,role,applyHome,driverOpen,driverSave,gateFind
 (function(){
   const QA_KEY='yardivo_overview_qa_seed_v1';
   const DATA_KEY='yardivo_yms_announcements_v1';
-  const LEGACY_KEY='studenac_yms_announcements';
+  const LEGACY_KEY='yardivo_yms_announcements_v1';
 
   function localDate(){
     const d=new Date();
@@ -13533,14 +13533,14 @@ window.YardivoCleanCore={load,save,role,applyHome,driverOpen,driverSave,gateFind
 
     // QA incidents for Overview penalty/incident analytics.
     try{
-      let inc=JSON.parse(localStorage.getItem('studenac_yms_incidents')||'[]');
+      let inc=JSON.parse(localStorage.getItem('yardivo_yms_incidents_v1')||'[]');
       inc=inc.filter(i=>!i.qaOverviewTest);
       inc.push(
         {id:base+101,date:localDate(),supplier:'Atlantic',type:'Oštećenje robe',severity:'Visoka',status:'Otvoren',pallets:2,sku:4,value:450,note:'QA test incident',qaOverviewTest:true},
         {id:base+102,date:localDate(),supplier:'Kraš',type:'Temperatura',severity:'Srednja',status:'Otvoren',pallets:1,sku:2,value:120,note:'QA test incident',qaOverviewTest:true},
         {id:base+103,date:localDate(),supplier:'Vindija',type:'Dokumentacija',severity:'Niska',status:'Zatvoren',pallets:0,sku:1,value:0,note:'QA test incident',qaOverviewTest:true}
       );
-      localStorage.setItem('studenac_yms_incidents',JSON.stringify(inc));
+      localStorage.setItem('yardivo_yms_incidents_v1',JSON.stringify(inc));
       if(Array.isArray(incidents))incidents.splice(0,incidents.length,...inc);
     }catch(e){}
     localStorage.setItem(QA_KEY,'1');
@@ -19703,7 +19703,7 @@ window.YardivoMyYard={render,show,setDate:function(d){st.date=d;render()}};
 function role(){let r='';try{r=String(currentSession?.role||window.currentSession?.role||'').toLowerCase().trim()}catch(e){};if(r==='prijam')r='reception';if(r==='zalihe'||r.includes('zalih'))r='inventory';if(r==='porta'||r==='portir')r='gate';return r}
 function persist(){
  try{saveAnnouncements()}catch(e){
-  try{safeStorage.setItem('studenac_yms_announcements',JSON.stringify(announcements));safeStorage.setItem('yardivo_yms_announcements_v1',JSON.stringify(announcements))}catch(_){}
+  try{safeStorage.setItem('yardivo_yms_announcements_v1',JSON.stringify(announcements));safeStorage.setItem('yardivo_yms_announcements_v1',JSON.stringify(announcements))}catch(_){}
  }
 }
 function refreshAll(){
@@ -24407,6 +24407,26 @@ window.addEventListener('yardivo:welcome-complete',()=>{
 window.YardivoLoginFinalizer={finalize:finalizeLogin};
 })();
 </script>
+
+<script id="yardivo-remove-studenac-legacy-v1-20260902">
+(function(){
+ try{
+   const migrations=[
+     ['studenac'+'_yms_announcements','yardivo_yms_announcements_v1'],
+     ['studenac'+'_yms_incidents','yardivo_yms_incidents_v1']
+   ];
+   for(const [oldKey,newKey] of migrations){
+     const oldValue=localStorage.getItem(oldKey);
+     if(oldValue!=null && localStorage.getItem(newKey)==null)localStorage.setItem(newKey,oldValue);
+     localStorage.removeItem(oldKey);
+   }
+   for(const qk of ['yardivo_supabase_offline_queue_v1','yardivo_supabase_offline_queue_v2']){
+     localStorage.removeItem(qk);
+   }
+ }catch(_){}
+})();
+</script>
+
 <script id="yardivo-online-sync-v2-20260902">
 (function(){
 'use strict';
@@ -24414,8 +24434,8 @@ window.YardivoLoginFinalizer={finalize:finalizeLogin};
 const BASE='https://utkleufcoaxnhrhcmdkb.supabase.co';
 const KEY='sb_publishable_Ix_TndQyIFrGyfIyKEKySg_3GHwAMlL';
 const EDGE=BASE+'/functions/v1/yardivo-sync';
-const ANN_KEYS=new Set(['yardivo_yms_announcements_v1','studenac_yms_announcements']);
-const INC_KEYS=new Set(['studenac_yms_incidents']);
+const ANN_KEYS=new Set(['yardivo_yms_announcements_v1']);
+const INC_KEYS=new Set(['yardivo_yms_incidents_v1']);
 const STATE_EXACT=new Set(['yardivo_live_notifications_v1','yardivo_master_notifications_v1']);
 const CLIENT_KEY='yardivo_client_id_v1';
 
@@ -24491,11 +24511,11 @@ function parseArray(v){try{const a=JSON.parse(v||'[]');return Array.isArray(a)?a
 function idOf(x){return String(x?.id??x?.announcement_id??x?.incident_id??'').trim()}
 function currentAnnouncements(){
   let v=null;
-  try{v=localStorage.getItem('yardivo_yms_announcements_v1');if(v==null)v=localStorage.getItem('studenac_yms_announcements')}catch(_){}
+  try{v=localStorage.getItem('yardivo_yms_announcements_v1');if(v==null)v=localStorage.getItem('yardivo_yms_announcements_v1')}catch(_){}
   return parseArray(v);
 }
 function currentIncidents(){
-  let v=null;try{v=localStorage.getItem('studenac_yms_incidents')}catch(_){}
+  let v=null;try{v=localStorage.getItem('yardivo_yms_incidents_v1')}catch(_){}
   return parseArray(v);
 }
 function mapData(items){
@@ -24522,8 +24542,8 @@ function applyBootstrap(d){
   try{
     const aj=JSON.stringify(A),ij=JSON.stringify(I);
     Storage.prototype.setItem.call(localStorage,'yardivo_yms_announcements_v1',aj);
-    Storage.prototype.setItem.call(localStorage,'studenac_yms_announcements',aj);
-    Storage.prototype.setItem.call(localStorage,'studenac_yms_incidents',ij);
+    Storage.prototype.setItem.call(localStorage,'yardivo_yms_announcements_v1',aj);
+    Storage.prototype.setItem.call(localStorage,'yardivo_yms_incidents_v1',ij);
     for(const r of (Array.isArray(d?.state)?d.state:[])){
       if(!r?.key||!stateKey(String(r.key)))continue;
       if(r.deleted)Storage.prototype.removeItem.call(localStorage,String(r.key));
@@ -28370,7 +28390,7 @@ function clearNotificationUi(){
 }
 function clearAnnouncementStorage(){
   const exact=[
-    'yardivo_yms_announcements_v1','studenac_yms_announcements','studenac_announcements',
+    'yardivo_yms_announcements_v1','yardivo_yms_announcements_v1','studenac_announcements',
     'yardivo_announcements','yms_announcements',
     'yardivo_live_notifications_v1','yardivo_notification_seen_v5'
   ];
@@ -28456,7 +28476,7 @@ async function fullDelete(){
 
   /* Write canonical empty announcement arrays before transport sync. */
   try{safeStorage.setItem('yardivo_yms_announcements_v1','[]')}catch(_){}
-  try{safeStorage.setItem('studenac_yms_announcements','[]')}catch(_){}
+  try{safeStorage.setItem('yardivo_yms_announcements_v1','[]')}catch(_){}
   try{localStorage.setItem(RESET_FLAG,new Date().toISOString())}catch(_){}
 
   try{await deleteRemoteRows(ids)}catch(e){console.warn('YARDIVO full reset sync',e)}
@@ -29286,9 +29306,9 @@ const PRESERVE_EXACT=new Set([
 ]);
 
 const OPERATIONAL_EXACT=new Set([
-  'yardivo_yms_announcements_v1','studenac_yms_announcements','studenac_announcements',
+  'yardivo_yms_announcements_v1','yardivo_yms_announcements_v1','studenac_announcements',
   'yardivo_announcements','yms_announcements',
-  'studenac_yms_incidents','yardivo_incidents',
+  'yardivo_yms_incidents_v1','yardivo_incidents',
   'yardivo_live_notifications_v1','yardivo_notification_seen_v5','yardivo_last_incident_notice',
   'yardivo_epal_transactions_v1','yardivo_epal_initial_stock_v1',
   'yms_trucks_v2',
@@ -29322,8 +29342,8 @@ function clearOperationalStorage(){
     });
   });
   try{safeStorage.removeItem('yardivo_yms_announcements_v1')}catch(_){}
-  try{safeStorage.removeItem('studenac_yms_announcements')}catch(_){}
-  try{safeStorage.removeItem('studenac_yms_incidents')}catch(_){}
+  try{safeStorage.removeItem('yardivo_yms_announcements_v1')}catch(_){}
+  try{safeStorage.removeItem('yardivo_yms_incidents_v1')}catch(_){}
 }
 
 function zeroDom(){
@@ -29430,8 +29450,8 @@ async function wipe(){
 
   /* Persist canonical empties before clearing compatibility caches. */
   try{safeStorage.setItem('yardivo_yms_announcements_v1','[]')}catch(_){}
-  try{safeStorage.setItem('studenac_yms_announcements','[]')}catch(_){}
-  try{safeStorage.setItem('studenac_yms_incidents','[]')}catch(_){}
+  try{safeStorage.setItem('yardivo_yms_announcements_v1','[]')}catch(_){}
+  try{safeStorage.setItem('yardivo_yms_incidents_v1','[]')}catch(_){}
   try{localStorage.setItem('yardivo_live_notifications_v1','[]')}catch(_){}
 
   await clearNormalizedRows();
@@ -29440,8 +29460,8 @@ async function wipe(){
 
   /* Recreate only canonical empty datasets so no legacy fallback can restore old records. */
   try{safeStorage.setItem('yardivo_yms_announcements_v1','[]')}catch(_){}
-  try{safeStorage.setItem('studenac_yms_announcements','[]')}catch(_){}
-  try{safeStorage.setItem('studenac_yms_incidents','[]')}catch(_){}
+  try{safeStorage.setItem('yardivo_yms_announcements_v1','[]')}catch(_){}
+  try{safeStorage.setItem('yardivo_yms_incidents_v1','[]')}catch(_){}
   try{localStorage.setItem('yardivo_live_notifications_v1','[]')}catch(_){}
   try{localStorage.setItem('yardivo_operational_full_reset_v1',new Date().toISOString())}catch(_){}
 
