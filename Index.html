@@ -14947,7 +14947,10 @@ function conflictNotice(key){
   },4200);
   try{showYmsToast?.('warning','PROMJENA DRUGOG KORISNIKA',`"${key}" je u međuvremenu promijenjen. Učitana je novija verzija; ponovi svoju radnju ako je još potrebna.`)}catch(e){}
 }
-async function connect(){
+function appAuthReady(){
+  try{return !!currentSession && currentSession.serverAuthorized===true && !!currentSession.authUserId}catch(_){return false}
+}
+function ensureClient(){
   if(!configured())throw new Error('Supabase nije konfiguriran.');
   if(!window.supabase?.createClient)throw new Error('Supabase JS biblioteka nije učitana.');
   if(!sb){
@@ -14956,23 +14959,44 @@ async function connect(){
     });
     try{
       sb.auth.onAuthStateChange((event,session)=>{
-        authReady=!!session && session.user?.is_anonymous!==true;
-        if(!authReady){bootstrapped=false}
+        const sameUser=!currentSession?.authUserId || session?.user?.id===currentSession.authUserId;
+        authReady=!!session && session.user?.is_anonymous!==true && sameUser && appAuthReady();
+        if(!authReady)bootstrapped=false;
       });
     }catch(_){}
   }
-  const {data}=await sb.auth.getSession();
-  if(!data?.session){
-    authReady=false;
+  return sb;
+}
+async function connect(){
+  if(!appAuthReady()){
+    authReady=false;bootstrapped=false;
     throw new Error('YARDIVO_AUTH_REQUIRED');
   }
-  if(data.session.user?.is_anonymous===true){
-    authReady=false;
-    try{await sb.auth.signOut({scope:'local'})}catch(_){}
+  const c=ensureClient();
+  const {data}=await c.auth.getSession();
+  const session=data?.session;
+  const sameUser=!!session && (!currentSession?.authUserId || session.user?.id===currentSession.authUserId);
+  if(!session || session.user?.is_anonymous===true || !sameUser){
+    authReady=false;bootstrapped=false;
+    if(session && !sameUser){try{await c.auth.signOut({scope:'local'})}catch(_){}}
     throw new Error('YARDIVO_AUTH_REQUIRED');
   }
   authReady=true;
-  return sb;
+  return c;
+}
+async function authenticateSync(accessToken,refreshToken){
+  if(!accessToken||!refreshToken||!appAuthReady())return false;
+  const c=ensureClient();
+  const {data,error}=await c.auth.setSession({access_token:accessToken,refresh_token:refreshToken});
+  if(error)throw error;
+  if(!data?.session || data.session.user?.id!==currentSession?.authUserId){
+    authReady=false;bootstrapped=false;
+    throw new Error('YARDIVO_AUTH_SESSION_MISMATCH');
+  }
+  authReady=true;bootstrapped=false;
+  await initialSync();
+  ensureRealtime();
+  return true;
 }
 function readQueue(){try{const q=JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY)||'[]');return Array.isArray(q)?q:[]}catch(e){return[]}}
 function writeQueue(q){
@@ -15352,6 +15376,12 @@ Storage.prototype.removeItem=function(key){
 
 async function initialSync(){
   if(!configured()){bootstrapped=true;status('● SUPABASE · NIJE KONFIGURIRAN','warn');return}
+  if(!appAuthReady()){
+    authReady=false;bootstrapped=false;
+    status('● SUPABASE · ČEKA PRIJAVU','');
+    const box=document.getElementById('yardivoSyncErrorBox');if(box)box.style.display='none';
+    return;
+  }
 
   /* Drop obsolete queued writes for local-only keys from the earlier broad-sync build. */
   try{
@@ -15428,7 +15458,7 @@ async function ensureRealtime(){
 window.YardivoSupabase={
   syncNow:initialSync,flushQueue,pending:()=>readQueue().length,
   getRevision:()=>lastRevision,getKeyRevision:key=>revisions.get(key)||0,
-  client:()=>sb,realtime:ensureRealtime
+  client:()=>sb,realtime:ensureRealtime,authenticate:authenticateSync
 };
 window.addEventListener('online',()=>setTimeout(initialSync,150));
 window.addEventListener('focus',()=>setTimeout(poll,80));
@@ -25144,6 +25174,17 @@ async function authenticate(){
     serverAuthorized:true
   };
   persistSession(session);
+
+  /* Hand the exact authenticated session to the canonical sync owner.
+     This prevents GitHub Pages from attempting queued writes with a stale/anonymous session. */
+  try{
+    if(window.YardivoSupabase?.authenticate && auth.access_token && auth.refresh_token){
+      Promise.race([
+        window.YardivoSupabase.authenticate(auth.access_token,auth.refresh_token),
+        new Promise(resolve=>setTimeout(()=>resolve(false),2200))
+      ]).catch(e=>console.warn('YARDIVO sync auth bridge',e));
+    }
+  }catch(_){}
 
   /* Synchronize Supabase JS auth in the background; it must never block Login UI. */
   try{
