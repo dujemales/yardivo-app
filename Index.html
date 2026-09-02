@@ -15727,7 +15727,7 @@ function role(){
   if(r==='porta'||r==='portir')r='gate';
   return r;
 }
-function allowed(){return ['admin','inventory','reception','gate'].includes(role())}
+function allowed(){return ['admin','inventory','reception'].includes(role())}
 function canEdit(){return ['admin','inventory','reception'].includes(role())}
 function nowUser(){try{return currentSession?.username||currentSession?.user||currentSession?.name||''}catch(e){return ''}}
 function localDate(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
@@ -16018,7 +16018,7 @@ function role(){
  if(r==='porta'||r==='portir')r='gate';
  return r;
 }
-function allowed(){return ['admin','inventory','reception','gate'].includes(role())}
+function allowed(){return ['admin','inventory','reception'].includes(role())}
 function admin(){return role()==='admin'}
 function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function anns(){try{return Array.isArray(announcements)?announcements:[]}catch(e){return []}}
@@ -31145,6 +31145,27 @@ html[data-yardivo-role="gate"] .nav-btn[data-view="docks"]{
  display:flex!important;visibility:visible!important;opacity:1!important;
 }
 html[data-yardivo-role="gate"] .nav-btn[data-view="epal"]{display:none!important}
+</style>
+
+
+<style id="yardivo-gate-no-epal-controltower-v4-20260902">
+html[data-yardivo-role="gate"] .nav-btn[data-view="controlTower"],
+html[data-yardivo-role="gate"] .nav-btn[data-view="controltower"],
+html[data-yardivo-role="gate"] .nav-btn[data-view="epal"],
+body[data-yardivo-role="gate"] .nav-btn[data-view="controlTower"],
+body[data-yardivo-role="gate"] .nav-btn[data-view="controltower"],
+body[data-yardivo-role="gate"] .nav-btn[data-view="epal"],
+html[data-yardivo-role="gate"] [data-home-target="controlTower"],
+html[data-yardivo-role="gate"] [data-home-target="controltower"],
+html[data-yardivo-role="gate"] [data-home-target="epal"],
+body[data-yardivo-role="gate"] [data-home-target="controlTower"],
+body[data-yardivo-role="gate"] [data-home-target="controltower"],
+body[data-yardivo-role="gate"] [data-home-target="epal"]{
+ display:none!important;
+ visibility:hidden!important;
+ opacity:0!important;
+ pointer-events:none!important;
+}
 </style>
 
 </body>
