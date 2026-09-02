@@ -10,7 +10,7 @@ Designed & Developed by Duje Maleš
 <script id="yardivo-production-bootstrap-guard-v4-20260902">
 (function(){
   'use strict';
-  window.__YARDIVO_BUILD__='20260902-v4-online';
+  window.__YARDIVO_BUILD__='20260902-v5-smart-admin';
   const nativeFetch=window.fetch?.bind(window);
   if(nativeFetch){
     window.fetch=function(input,init){
@@ -34,8 +34,8 @@ Designed & Developed by Duje Maleš
     const old=document.getElementById('yardivoSyncErrorBox'); if(old) old.remove();
     const badge=document.createElement('div');
     badge.id='yardivoBuildBadge';
-    badge.textContent='YARDIVO ONLINE · BUILD V4';
-    badge.title='20260902-v4-online';
+    badge.textContent='YARDIVO ONLINE · BUILD V5';
+    badge.title='20260902-v5-smart-admin';
     badge.style.cssText='position:fixed;right:8px;bottom:8px;z-index:2147483646;font:700 10px/1.2 system-ui;padding:5px 7px;border-radius:6px;background:#0d1b29;color:#94a9b9;border:1px solid #26435a;opacity:.72;pointer-events:none';
     document.body.appendChild(badge);
   },{once:true});
@@ -30892,5 +30892,72 @@ body[data-yardivo-role="gate"] [data-home-target="settings"]{display:none!import
 #dashboard .yardivo-export-btn::after{content:" · KRAJ DANA";font-size:10px;opacity:.75}
 </style>
 <script id="yardivo-dashboard-daily-xlsx-label-v1-20260902">(function(){function f(){const b=document.querySelector('#dashboard [data-xlsx-view="dashboard"]');if(b){b.innerHTML='📊 DNEVNO IZVJEŠĆE XLSX';b.title='Izvezi samo današnje stanje prijama i rezultate u Excel'}}document.addEventListener('DOMContentLoaded',f);window.addEventListener('load',()=>setTimeout(f,800));document.addEventListener('click',e=>{if(e.target.closest('[data-view="dashboard"],[data-home-target="dashboard"]'))setTimeout(f,100)},true)})();</script>
+
+<style id="yardivo-smart-admin-setting-v1-style">
+#yardivoSmartAdminSettings .ysas-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:4px 0}
+#yardivoSmartAdminSettings .ysas-copy{max-width:720px}
+#yardivoSmartAdminSettings .ysas-copy strong{display:block;font-size:12px;margin-bottom:4px}
+#yardivoSmartAdminSettings .ysas-copy small{display:block;color:#8fa7b8;line-height:1.45}
+#yardivoSmartAdminSettings .ysas-switch{position:relative;width:54px;height:30px;flex:0 0 auto}
+#yardivoSmartAdminSettings .ysas-switch input{opacity:0;width:0;height:0}
+#yardivoSmartAdminSettings .ysas-slider{position:absolute;inset:0;border-radius:99px;background:#5a2730;border:1px solid #81414b;cursor:pointer;transition:.18s}
+#yardivoSmartAdminSettings .ysas-slider:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;border-radius:50%;background:#fff;transition:.18s}
+#yardivoSmartAdminSettings input:checked + .ysas-slider{background:#12613b;border-color:#278457}
+#yardivoSmartAdminSettings input:checked + .ysas-slider:before{transform:translateX(24px)}
+#yardivoSmartAdminStatus{font-weight:900}
+</style>
+<script id="yardivo-smart-admin-setting-v1-20260902">
+(function(){
+'use strict';
+const CFG_KEY='yardivo_auto_replan_cfg_v1';
+function role(){try{return String(window.currentSession?.role||'').toLowerCase().trim()}catch(_){return''}}
+function cfg(){try{return {enabled:true,mode:'AUTO_SAFE',lateThreshold:20,horizonMinutes:240,maxShiftMinutes:240,scanSeconds:30,...JSON.parse(localStorage.getItem(CFG_KEY)||'{}')}}catch(_){return {enabled:true,mode:'AUTO_SAFE'}}}
+function isOn(c=cfg()){return c.enabled!==false&&c.mode!=='PAUSED'}
+function apply(c){
+  const on=isOn(c);
+  document.documentElement.classList.toggle('yardivo-smart-off',!on);
+  document.documentElement.classList.toggle('yardivo-smart-on',on);
+  try{window.YardivoSmartReplanning?.applyState?.()}catch(_){}
+  const nav=document.querySelector('.nav-btn[data-view="smartReplanning"]');
+  if(nav)nav.style.setProperty('display',on?'':'none',on?'':'important');
+  if(!on){
+    const v=document.getElementById('smartReplanning');
+    if(v){v.classList.remove('active');v.style.setProperty('display','none','important')}
+    document.getElementById('yardivoAutoReplanAlertStack')?.replaceChildren();
+  }
+}
+function save(on){
+  if(role()!=='admin')return;
+  const c=cfg();c.enabled=!!on;c.mode=on?'AUTO_SAFE':'PAUSED';
+  localStorage.setItem(CFG_KEY,JSON.stringify(c));
+  apply(c);
+  window.dispatchEvent(new StorageEvent('storage',{key:CFG_KEY,newValue:JSON.stringify(c)}));
+}
+function render(){
+  const p=document.getElementById('yardivoSmartAdminSettings');if(!p)return;
+  const on=isOn();
+  const x=document.getElementById('yardivoSmartAdminToggle'),s=document.getElementById('yardivoSmartAdminStatus');
+  if(x)x.checked=on;
+  if(s){s.textContent=on?'UKLJUČENO':'ISKLJUČENO';s.style.color=on?'#61d98c':'#ff7078'}
+}
+function inject(){
+  const root=document.querySelector('#settings .settings-grid');if(!root)return;
+  let p=document.getElementById('yardivoSmartAdminSettings');
+  if(role()!=='admin'){if(p)p.remove();return}
+  if(!p){
+    p=document.createElement('section');p.className='panel';p.id='yardivoSmartAdminSettings';
+    p.innerHTML='<div class="panel-head"><div><h2>YARDIVO SMART PREPORUKE</h2><small>Admin kontrola automatskih preporuka i preplaniranja</small></div><span id="yardivoSmartAdminStatus"></span></div><div class="master-settings-body"><div class="ysas-row"><div class="ysas-copy"><strong>Automatske Smart preporuke</strong><small>Kada je isključeno, YARDIVO ne prikazuje Smart preporuke, ne pokreće automatsko preplaniranje i ne generira Smart upozorenja. Samo Admin može promijeniti ovu postavku.</small></div><label class="ysas-switch" title="Uključi / isključi YARDIVO Smart preporuke"><input id="yardivoSmartAdminToggle" type="checkbox"><span class="ysas-slider"></span></label></div></div>';
+    root.prepend(p);
+    document.getElementById('yardivoSmartAdminToggle').addEventListener('change',e=>{save(e.target.checked);render()});
+  }
+  render();
+}
+document.addEventListener('click',e=>{if(e.target.closest('[data-view="settings"],[data-home-target="settings"]'))setTimeout(inject,30)});
+window.addEventListener('load',()=>setTimeout(()=>{apply(cfg());inject()},1900));
+setInterval(()=>{if(document.getElementById('settings')?.classList.contains('active'))inject()},3000);
+window.YardivoSmartAdminSettings={inject,save,render};
+})();
+</script>
+
 </body>
 </html>
