@@ -5876,7 +5876,11 @@ html.yardivo-welcome-complete #yardivoWelcomeBar{
   width:100%!important;
 }
 </style>
-</meta></head>
+</meta><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="yardivo-build" content="2026-09-02-online-v2-no-legacy-queue">
+</head>
 <body>
 <button aria-label="Uključi full screen" id="yardivoFullscreenBtn" title="Full screen" type="button"><span class="fs-icon">⛶</span><span class="fs-label">FULL SCREEN</span></button>
 <div aria-label="YARDIVO copyright" id="yardivoBrandFooter"><span><strong>YARDIVO™</strong> · Yard Management System · Designed &amp; Created by Duje Maleš · © 2026</span></div>
@@ -14834,654 +14838,6 @@ body[data-yms-role="gate"] [data-home-target="operations"]{display:none!importan
 #yardivoDbStatus.warn{color:#ffd074;border-color:#806020;background:#2d2209}
 #yardivoDbStatus.bad{color:#ff9c9c;border-color:#8f3434;background:#2b1111}
 </style>
-<script id="yardivo-supabase-sync" type="application/x-yardivo-disabled">
-(function(){
-'use strict';
-
-/* YARDIVO Supabase sync v2 — CAS + dedupe + conflict protection */
-const YARDIVO_SUPABASE_CONFIG={
-  url:'https://utkleufcoaxnhrhcmdkb.supabase.co',
-  publishableKey:'sb_publishable_Ix_TndQyIFrGyfIyKEKySg_3GHwAMlL',
-  authMode:'password'
-};
-
-const OFFLINE_QUEUE_KEY='yardivo_supabase_offline_queue_v2';
-const META_KEY='yardivo_supabase_sync_meta_v2';
-const POLL_MS=60000;
-const DEBOUNCE_MS=220;
-
-let applyingRemote=false,flushing=false,bootstrapped=false,lastRevision=0,sb=null,authReady=false,freshLoginAuth=false;
-const revisions=new Map();
-const lastValues=new Map();
-const timers=new Map();
-const inFlight=new Map();
-
-const clientId=(()=>{
-  let id=localStorage.getItem('yardivo_client_id_v1');
-  if(!id){id='Y-'+Date.now()+'-'+Math.random().toString(36).slice(2);localStorage.setItem('yardivo_client_id_v1',id)}
-  return id;
-})();
-
-function configured(){
-  return /^https:\/\/.+\.supabase\.co$/i.test(YARDIVO_SUPABASE_CONFIG.url)
-    && /^sb_publishable_|^eyJ/i.test(YARDIVO_SUPABASE_CONFIG.publishableKey);
-}
-function excludedKey(k){
-  return [
-    'yardivo_session','studenac_session','studenac_active_warehouse',
-    'yardivo_theme','yardivo_font_scale',
-    'yardivo_custom_session','yardivo_remembered_session',
-    'yardivo_data_last_saved_at','yardivo_last_incident_notice',
-    'yardivo_last_location','yardivo_supplier_scores_v1',
-    'yardivo_master_font_v1',
-    OFFLINE_QUEUE_KEY,META_KEY,
-    'yardivo_supabase_offline_queue_v1','yardivo_supabase_sync_meta_v1',
-    'yardivo_client_id_v1'
-  ].includes(k);
-}
-function shouldSync(k){
-  if(!k||excludedKey(k))return false;
-
-  /* Only shared operational state belongs in multi-user sync.
-     User/session/device/derived keys stay local to prevent false CAS conflicts. */
-  const sharedExact=new Set([
-    'studenac_yms_announcements',
-    'yardivo_yms_announcements_v1',
-    'yardivo_live_notifications_v1',
-    'yardivo_master_notifications_v1'
-  ]);
-  if(sharedExact.has(k))return true;
-
-  return (
-    k.startsWith('yardivo_unannounced_') ||
-    k.startsWith('studenac_yms_incidents') ||
-    k.startsWith('yardivo_incident_') ||
-    k.startsWith('yardivo_pallet_') ||
-    k.startsWith('studenac_pallet_') ||
-    k.startsWith('yardivo_ramp_') ||
-    k.startsWith('yardivo_capacity_') ||
-    k.startsWith('yardivo_war_room_') ||
-    k.startsWith('yardivo_replanning_')
-  );
-}
-function currentUser(){
-  try{return currentSession?.username||currentSession?.user||currentSession?.name||''}catch(e){return ''}
-}
-function status(text,cls,detail){
-  let el=document.getElementById('yardivoDbStatus');
-  if(!el){el=document.createElement('div');el.id='yardivoDbStatus';document.body.appendChild(el)}
-  el.className=cls||'';el.textContent=text;
-  el.title=detail||'';
-}
-function errText(e){
-  try{
-    return [e?.message,e?.details,e?.hint,e?.code].filter(Boolean).join(' | ') || String(e||'Nepoznata greška');
-  }catch(_){return String(e||'Nepoznata greška')}
-}
-function showSyncError(where,e){
-  const msg=errText(e);
-  console.error('[YARDIVO SUPABASE]',where,e);
-  status('⚠ SUPABASE GREŠKA · KLIKNI ZA DETALJE','bad',where+' — '+msg);
-  let box=document.getElementById('yardivoSyncErrorBox');
-  if(!box){
-    box=document.createElement('div');box.id='yardivoSyncErrorBox';
-    box.style.cssText='display:none;position:fixed;right:18px;bottom:58px;z-index:100001;max-width:520px;padding:14px;border:1px solid #a94747;border-radius:10px;background:#260d0d;color:#ffd0d0;font:12px/1.45 monospace;white-space:pre-wrap;box-shadow:0 12px 30px rgba(0,0,0,.45)';
-    document.body.appendChild(box);
-  }
-  box.textContent=where+'\n'+msg;
-  box.style.display='block';
-  setTimeout(()=>{if(box)box.style.display='none'},15000);
-}
-document.addEventListener('click',e=>{
-  const el=e.target.closest?.('#yardivoDbStatus');
-  if(!el||!el.title)return;
-  let box=document.getElementById('yardivoSyncErrorBox');
-  if(box){box.textContent=el.title;box.style.display='block'}
-});
-let conflictTimer=null;
-function conflictNotice(key){
-  status('⚠ SUPABASE · PODACI OSVJEŽENI — DRUGI KORISNIK JE MIJENJAO ZAPIS','warn');
-  clearTimeout(conflictTimer);
-  conflictTimer=setTimeout(()=>{
-    if(readQueue().length===0)status('● SUPABASE · ONLINE','ok');
-  },4200);
-  try{showYmsToast?.('warning','PROMJENA DRUGOG KORISNIKA',`"${key}" je u međuvremenu promijenjen. Učitana je novija verzija; ponovi svoju radnju ako je još potrebna.`)}catch(e){}
-}
-function appAuthReady(){
-  try{return freshLoginAuth===true && !!currentSession && currentSession.serverAuthorized===true && !!currentSession.authUserId}catch(_){return false}
-}
-function ensureClient(){
-  if(!configured())throw new Error('Supabase nije konfiguriran.');
-  if(!window.supabase?.createClient)throw new Error('Supabase JS biblioteka nije učitana.');
-  if(!sb){
-    sb=window.supabase.createClient(YARDIVO_SUPABASE_CONFIG.url,YARDIVO_SUPABASE_CONFIG.publishableKey,{
-      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}
-    });
-    try{
-      sb.auth.onAuthStateChange((event,session)=>{
-        const sameUser=!currentSession?.authUserId || session?.user?.id===currentSession.authUserId;
-        authReady=!!session && session.user?.is_anonymous!==true && sameUser && appAuthReady();
-        if(!authReady)bootstrapped=false;
-      });
-    }catch(_){}
-  }
-  return sb;
-}
-async function connect(){
-  if(!appAuthReady()){
-    authReady=false;bootstrapped=false;
-    throw new Error('YARDIVO_AUTH_REQUIRED');
-  }
-  const c=ensureClient();
-  const {data}=await c.auth.getSession();
-  const session=data?.session;
-  const sameUser=!!session && (!currentSession?.authUserId || session.user?.id===currentSession.authUserId);
-  if(!session || session.user?.is_anonymous===true || !sameUser){
-    authReady=false;bootstrapped=false;
-    if(session && !sameUser){try{await c.auth.signOut({scope:'local'})}catch(_){}}
-    throw new Error('YARDIVO_AUTH_REQUIRED');
-  }
-  authReady=true;
-  return c;
-}
-async function authenticateSync(accessToken,refreshToken){
-  if(!accessToken||!refreshToken||!currentSession?.serverAuthorized||!currentSession?.authUserId)return false;
-  freshLoginAuth=true;
-  const c=ensureClient();
-  const {data,error}=await c.auth.setSession({access_token:accessToken,refresh_token:refreshToken});
-  if(error)throw error;
-  if(!data?.session || data.session.user?.id!==currentSession?.authUserId){
-    freshLoginAuth=false;authReady=false;bootstrapped=false;
-    throw new Error('YARDIVO_AUTH_SESSION_MISMATCH');
-  }
-  const {data:profile,error:profileError}=await c.rpc('yardivo_my_profile');
-  const pr=Array.isArray(profile)?profile[0]:profile;
-  if(profileError||!pr?.active||String(pr.username||'').toLowerCase()!==String(currentSession.username||currentSession.user||'').toLowerCase()){
-    freshLoginAuth=false;authReady=false;bootstrapped=false;
-    throw new Error('YARDIVO_AUTH_PROFILE_MISMATCH');
-  }
-  authReady=true;bootstrapped=false;
-  await initialSync();
-  ensureRealtime();
-  return true;
-}
-function readQueue(){try{const q=JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY)||'[]');return Array.isArray(q)?q:[]}catch(e){return[]}}
-function writeQueue(q){
-  Storage.prototype.setItem.call(localStorage,OFFLINE_QUEUE_KEY,JSON.stringify(q));
-  if(q.length)status(`● SUPABASE OFFLINE RED · ${q.length} ČEKA`,'warn');
-}
-function enqueue(op,key,value,expectedRevision){
-  let q=readQueue().filter(x=>x.key!==key);
-  q.push({id:Date.now()+'-'+Math.random().toString(36).slice(2),op,key,value:value==null?null:String(value),
-    expectedRevision:Number(expectedRevision)||0,createdAt:new Date().toISOString(),attempts:0});
-  if(q.length>300)q=q.slice(-300);
-  writeQueue(q);
-}
-
-/* ===== PRODUCTION NORMALIZED TRANSPORT V1 =====
-   Announcements/incidents are row-based in Supabase.
-   localStorage arrays remain only as the compatibility API for the existing UI. */
-const YARDIVO_NORMALIZED_ANN_KEYS=new Set(['studenac_yms_announcements','yardivo_yms_announcements_v1']);
-const YARDIVO_NORMALIZED_INC_KEYS=new Set(['studenac_yms_incidents']);
-const normalizedRowRevisions=new Map();
-function normalizedKind(key){
-  if(YARDIVO_NORMALIZED_ANN_KEYS.has(key))return'announcement';
-  if(YARDIVO_NORMALIZED_INC_KEYS.has(key))return'incident';
-  return'';
-}
-function normalizedCanonical(key){
-  const k=normalizedKind(key);
-  return k==='announcement'?'yardivo_yms_announcements_v1':k==='incident'?'studenac_yms_incidents':key;
-}
-function normalizedAliases(key){
-  return normalizedKind(key)==='announcement'
-    ?['studenac_yms_announcements','yardivo_yms_announcements_v1']
-    :normalizedKind(key)==='incident'?['studenac_yms_incidents']:[key];
-}
-function normalizedSpec(key){
-  const k=normalizedKind(key);
-  if(k==='announcement')return{table:'yardivo_announcements',id:'announcement_id',upsert:'yardivo_upsert_announcement_cas',del:'yardivo_delete_announcement_cas'};
-  if(k==='incident')return{table:'yardivo_incidents',id:'incident_id',upsert:'yardivo_upsert_incident_cas',del:'yardivo_delete_incident_cas'};
-  return null;
-}
-function normalizedItemId(x){
-  return String(x?.id??x?.announcement_id??x?.incident_id??'').trim();
-}
-function jsonStable(x){try{return JSON.stringify(x)}catch(_){return''}}
-async function normalizedRows(key){
-  const spec=normalizedSpec(key);if(!spec)return[];
-  const c=await connect();const out=[];let from=0;const page=750;
-  while(true){
-    const {data,error}=await c.from(spec.table)
-      .select(`${spec.id},payload,revision,deleted,updated_at`)
-      .order(spec.id,{ascending:true}).range(from,from+page-1);
-    if(error)throw error;
-    const rows=data||[];out.push(...rows);
-    if(rows.length<page)break;
-    from+=page;
-    if(from>50000)throw new Error('YARDIVO normalized dataset safety limit exceeded');
-  }
-  return out;
-}
-async function fetchNormalizedKey(key){
-  const rows=await normalizedRows(key);let max=0,updatedAt='';const live=[];
-  const kind=normalizedKind(key),spec=normalizedSpec(key);
-  for(const r of rows){
-    const rr=Number(r.revision)||0,id=String(r?.[spec.id]||'');
-    max=Math.max(max,rr);
-    if(id)normalizedRowRevisions.set(kind+':'+id,rr);
-    if(String(r.updated_at||'')>updatedAt)updatedAt=String(r.updated_at||'');
-    if(!r.deleted&&r.payload&&typeof r.payload==='object')live.push(r.payload);
-  }
-  const value=JSON.stringify(live),canonical=normalizedCanonical(key);
-  for(const alias of normalizedAliases(key)){revisions.set(alias,max);lastValues.set(alias,value)}
-  return{key:canonical,value_json:value,revision:max,updated_at:updatedAt,updated_by:'normalized-row-api',deleted:false};
-}
-async function normalizedLatestRevision(key){
-  const spec=normalizedSpec(key);if(!spec)return 0;
-  const c=await connect();
-  const {data,error}=await c.from(spec.table).select('revision').order('revision',{ascending:false}).limit(1);
-  if(error)throw error;
-  return Number(data?.[0]?.revision)||0;
-}
-async function syncNormalizedSet(key,value){
-  const spec=normalizedSpec(key);if(!spec)throw new Error('Unknown normalized dataset');
-  const canonical=normalizedCanonical(key);
-  let next;try{next=JSON.parse(String(value||'[]'))}catch(_){throw new Error('Neispravan JSON za '+canonical)}
-  if(!Array.isArray(next))throw new Error('Normalized dataset mora biti array: '+canonical);
-
-  let oldRaw=lastValues.get(canonical);
-  if(oldRaw==null){const remote=await fetchNormalizedKey(canonical);oldRaw=String(remote.value_json||'[]')}
-  let prev=[];try{prev=JSON.parse(oldRaw||'[]')}catch(_){prev=[]}
-  if(!Array.isArray(prev))prev=[];
-
-  const oldMap=new Map(prev.map(x=>[normalizedItemId(x),x]).filter(([id])=>id));
-  const newMap=new Map(next.map(x=>[normalizedItemId(x),x]).filter(([id])=>id));
-  if(newMap.size!==next.length)throw new Error('Svaka stavka mora imati jedinstveni id.');
-
-  const changed=[];
-  for(const [id,item] of newMap){
-    const before=oldMap.get(id);
-    if(!before||jsonStable(before)!==jsonStable(item))changed.push(item);
-  }
-  const removed=[...oldMap.keys()].filter(id=>!newMap.has(id));
-  if(!changed.length&&!removed.length){
-    const rev=revisions.get(canonical)||0;
-    for(const alias of normalizedAliases(canonical)){lastValues.set(alias,String(value));revisions.set(alias,rev)}
-    return{ok:true,revision:rev,deduped:true,normalized:true,rows:0};
-  }
-
-  const c=await connect();let max=revisions.get(canonical)||0,kind=normalizedKind(canonical);
-  for(const item of changed){
-    const id=normalizedItemId(item),expected=Number(normalizedRowRevisions.get(kind+':'+id)||0);
-    const {data,error}=await c.rpc(spec.upsert,{p_payload:item,p_expected_revision:expected});
-    if(error)throw error;
-    const r=data||{};
-    if(r.conflict){
-      const remote=await fetchNormalizedKey(canonical);
-      const state={};for(const alias of normalizedAliases(canonical))state[alias]={value:remote.value_json,revision:remote.revision,updatedAt:remote.updated_at||'',updatedBy:'normalized-row-api',deleted:false};
-      await applySnapshot(state);conflictNotice(canonical);
-      return{ok:false,conflict:true,revision:Number(r.current_revision)||remote.revision,normalized:true};
-    }
-    const nr=Number(r.new_revision)||0;normalizedRowRevisions.set(kind+':'+id,nr);max=Math.max(max,nr);
-  }
-  for(const id of removed){
-    const expected=Number(normalizedRowRevisions.get(kind+':'+id)||0);
-    const {data,error}=await c.rpc(spec.del,{p_id:id,p_expected_revision:expected});
-    if(error)throw error;
-    const r=data||{};
-    if(r.conflict){
-      const remote=await fetchNormalizedKey(canonical);
-      const state={};for(const alias of normalizedAliases(canonical))state[alias]={value:remote.value_json,revision:remote.revision,updatedAt:remote.updated_at||'',updatedBy:'normalized-row-api',deleted:false};
-      await applySnapshot(state);conflictNotice(canonical);
-      return{ok:false,conflict:true,revision:Number(r.current_revision)||remote.revision,normalized:true};
-    }
-    const nr=Number(r.new_revision)||0;normalizedRowRevisions.set(kind+':'+id,nr);max=Math.max(max,nr);
-  }
-
-  const finalValue=JSON.stringify(next);
-  for(const alias of normalizedAliases(canonical)){revisions.set(alias,max);lastValues.set(alias,finalValue)}
-  lastRevision=Math.max(lastRevision,max);
-  return{ok:true,revision:max,normalized:true,rows:changed.length+removed.length,upserts:changed.length,deletes:removed.length};
-}
-
-async function fetchKey(key){
-  if(normalizedKind(key))return await fetchNormalizedKey(key);
-  const c=await connect();
-  const {data,error}=await c.from('yardivo_app_state')
-    .select('key,value_json,revision,updated_at,updated_by,deleted')
-    .eq('key',key).maybeSingle();
-  if(error)throw error;
-  return data||null;
-}
-function parseAtomicResult(data){
-  const r=Array.isArray(data)?data[0]:data;
-  return r||{};
-}
-async function atomicSet(key,value,expectedRevision){
-  const c=await connect();
-  const {data,error}=await c.rpc('yardivo_atomic_update',{
-    p_key:key,p_value_json:String(value),p_expected_revision:Number(expectedRevision)||0,
-    p_updated_by:currentUser(),p_client_id:clientId
-  });
-  if(error)throw error;
-  const r=parseAtomicResult(data);
-  return {
-    ok:r.success===true,
-    conflict:r.conflict===true,
-    revision:Number(r.new_revision||r.current_revision)||0
-  };
-}
-/* Existing delete RPC is retained; deletes are rare and still refresh revision afterwards. */
-async function sendDelete(key){
-  if(normalizedKind(key)){
-    return {ok:true,revision:revisions.get(normalizedCanonical(key))||0,normalized:true,protected:true};
-  }
-  const c=await connect();
-  const {data,error}=await c.rpc('yardivo_delete_state',{
-    p_key:key,p_client_id:clientId,p_user:currentUser()
-  });
-  if(error)throw error;
-  return {ok:true,revision:Number(data)||0};
-}
-async function bootstrapRemote(){
-  const c=await connect();
-  const {data,error}=await c.from('yardivo_app_state')
-    .select('key,value_json,revision,updated_at,updated_by,deleted')
-    .order('revision',{ascending:true});
-  if(error)throw error;
-  const state={};let max=0;
-  (data||[]).forEach(r=>{
-    if(normalizedKind(r.key))return;
-    const rev=Number(r.revision)||0;
-    max=Math.max(max,rev);revisions.set(r.key,rev);
-    if(!r.deleted)lastValues.set(r.key,String(r.value_json??''));
-    state[r.key]={value:r.deleted?null:r.value_json,revision:rev,updatedAt:r.updated_at||'',updatedBy:r.updated_by||'',deleted:!!r.deleted};
-  });
-  for(const key of ['yardivo_yms_announcements_v1','studenac_yms_incidents']){
-    const r=await fetchNormalizedKey(key);
-    max=Math.max(max,Number(r.revision)||0);
-    for(const alias of normalizedAliases(key)){
-      state[alias]={value:r.value_json,revision:r.revision,updatedAt:r.updated_at||'',updatedBy:'normalized-row-api',deleted:false};
-    }
-  }
-  return {state,revision:max};
-}
-async function getChanges(since){
-  const c=await connect();
-  const {data,error}=await c.from('yardivo_app_state')
-    .select('key,revision,updated_at,updated_by,deleted')
-    .order('revision',{ascending:true});
-  if(error)throw error;
-
-  const changed=(data||[]).filter(r=>!normalizedKind(r.key)&&shouldSync(r.key)&&(Number(r.revision)||0)>Number(revisions.get(r.key)||0));
-  let max=Number(since)||0;
-  (data||[]).forEach(r=>{if(!normalizedKind(r.key))max=Math.max(max,Number(r.revision)||0)});
-
-  const rows=await Promise.all(changed.map(r=>fetchKey(r.key))),state={};
-  rows.forEach(r=>{
-    if(!r||!shouldSync(r.key))return;
-    const rev=Number(r.revision)||0;
-    revisions.set(r.key,rev);
-    if(!r.deleted)lastValues.set(r.key,String(r.value_json??'')); else lastValues.delete(r.key);
-    state[r.key]={value:r.deleted?null:r.value_json,revision:rev,updatedAt:r.updated_at||'',updatedBy:r.updated_by||'',deleted:!!r.deleted};
-  });
-
-  for(const key of ['yardivo_yms_announcements_v1','studenac_yms_incidents']){
-    const latest=await normalizedLatestRevision(key),canonical=normalizedCanonical(key);
-    max=Math.max(max,latest);
-    if(latest>Number(revisions.get(canonical)||0)){
-      const r=await fetchNormalizedKey(canonical);
-      for(const alias of normalizedAliases(canonical)){
-        state[alias]={value:r.value_json,revision:r.revision,updatedAt:r.updated_at||'',updatedBy:'normalized-row-api',deleted:false};
-      }
-    }
-  }
-  return {state,revision:max};
-}
-function refreshViews(){
-  try{reloadAnnouncementsFromPersistentStorage?.()}catch(e){}
-  try{render?.()}catch(e){}
-  try{renderAnnouncements?.()}catch(e){}
-  try{renderAnnouncementSchedule?.()}catch(e){}
-  try{renderReceiving?.()}catch(e){}
-  try{renderDailyMap?.()}catch(e){}
-  try{renderWeeklyMap?.()}catch(e){}
-  try{renderOverview?.()}catch(e){}
-  try{YardivoLiveYardTV3D?.render?.()}catch(e){}
-}
-async function applySnapshot(state){
-  let changed=false;applyingRemote=true;
-  try{
-    for(const [key,r] of Object.entries(state||{})){
-      if(!shouldSync(key))continue;
-      revisions.set(key,Number(r?.revision)||0);
-      if(r?.deleted||r?.value==null){
-        lastValues.delete(key);
-        if(localStorage.getItem(key)!==null){Storage.prototype.removeItem.call(localStorage,key);changed=true}
-      }else{
-        const v=String(r.value);
-        lastValues.set(key,v);
-        if(localStorage.getItem(key)!==v){Storage.prototype.setItem.call(localStorage,key,v);changed=true}
-      }
-    }
-  }finally{applyingRemote=false}
-  if(changed)refreshViews();
-}
-async function resolveConflict(key){
-  const remote=await fetchKey(key);
-  if(!remote)return false;
-  lastRevision=Math.max(lastRevision,Number(remote.revision)||0);
-  revisions.set(key,Number(remote.revision)||0);
-  await applySnapshot({[key]:{value:remote.deleted?null:remote.value_json,revision:Number(remote.revision)||0,deleted:!!remote.deleted}});
-  conflictNotice(key);
-  return true;
-}
-async function sendSet(key,value){
-  if(!shouldSync(key)||applyingRemote)return {ok:true,revision:revisions.get(key)||0};
-  value=String(value);
-  if(normalizedKind(key)){
-    const canonical=normalizedCanonical(key);
-    if(lastValues.get(canonical)===value)return {ok:true,revision:revisions.get(canonical)||0,deduped:true,normalized:true};
-    const prior=inFlight.get(canonical)||Promise.resolve();
-    const task=prior.catch(()=>{}).then(()=>syncNormalizedSet(canonical,value))
-      .finally(()=>{if(inFlight.get(canonical)===task)inFlight.delete(canonical)});
-    inFlight.set(canonical,task);
-    return task;
-  }
-  /* Major write-amplification fix: identical state never reaches Supabase. */
-  if(lastValues.get(key)===value)return {ok:true,revision:revisions.get(key)||0,deduped:true};
-
-  /* Serialize writes per key in this browser. */
-  const prior=inFlight.get(key)||Promise.resolve();
-  const task=prior.catch(()=>{}).then(async()=>{
-    let expected=revisions.get(key);
-    if(expected==null){
-      const remote=await fetchKey(key);
-      if(!remote){
-        /* Existing schema's insert/upsert RPC is only used for a brand-new key. */
-        const c=await connect();
-        const {data,error}=await c.rpc('yardivo_put_state',{p_key:key,p_value:value,p_client_id:clientId,p_user:currentUser()});
-        if(error)throw error;
-        const rev=Number(data)||0;revisions.set(key,rev);lastValues.set(key,value);lastRevision=Math.max(lastRevision,rev);
-        return {ok:true,revision:rev,created:true};
-      }
-      expected=Number(remote.revision)||0;revisions.set(key,expected);lastValues.set(key,String(remote.value_json??''));
-      if(String(remote.value_json??'')===value)return {ok:true,revision:expected,deduped:true};
-    }
-    const r=await atomicSet(key,value,expected);
-    if(r.conflict||!r.ok){
-      await resolveConflict(key);
-      return {ok:false,conflict:true,revision:r.revision};
-    }
-    revisions.set(key,r.revision);lastValues.set(key,value);lastRevision=Math.max(lastRevision,r.revision);
-    return r;
-  }).finally(()=>{if(inFlight.get(key)===task)inFlight.delete(key)});
-  inFlight.set(key,task);
-  return task;
-}
-async function flushQueue(){
-  if(flushing)return false;
-  let q=readQueue();if(!q.length)return true;flushing=true;
-  try{
-    for(const item of [...q]){
-      try{
-        let r;
-        if(item.op==='delete')r=await sendDelete(item.key);
-        else r=await sendSet(item.key,item.value??'');
-        if(r?.conflict){q=q.filter(x=>x.id!==item.id);writeQueue(q);continue}
-        lastRevision=Math.max(lastRevision,Number(r?.revision)||0);
-        q=q.filter(x=>x.id!==item.id);writeQueue(q);
-      }catch(e){
-        const msg=errText(e);
-        if(/YARDIVO authorization denied|YARDIVO_AUTH_|JWT|not authorized/i.test(msg)){
-          q=q.filter(x=>x.id!==item.id);writeQueue(q);
-          freshLoginAuth=false;authReady=false;bootstrapped=false;
-          status('● SUPABASE · PONOVNA PRIJAVA POTREBNA','warn');
-          const box=document.getElementById('yardivoSyncErrorBox');if(box)box.style.display='none';
-          return false;
-        }
-        const hit=q.find(x=>x.id===item.id);if(hit)hit.attempts=(hit.attempts||0)+1;
-        writeQueue(q);showSyncError('QUEUE '+item.op+' '+item.key,e);return false;
-      }
-    }
-    status('● SUPABASE · SVE SINKRONIZIRANO','ok');return true;
-  }finally{flushing=false}
-}
-function scheduleSet(key,value){
-  if(!shouldSync(key)||applyingRemote||!authReady)return;
-  value=String(value);
-  if(lastValues.get(key)===value)return;
-  clearTimeout(timers.get(key));
-  timers.set(key,setTimeout(async()=>{
-    timers.delete(key);
-    try{
-      const r=await sendSet(key,value);
-      if(r?.ok!==false)status('● SUPABASE · SPREMLJENO','ok');
-    }catch(e){
-      enqueue('set',key,value,revisions.get(key)||0);
-      showSyncError('SET '+key,e);
-    }
-  },DEBOUNCE_MS));
-}
-async function deleteKey(key){
-  if(!shouldSync(key)||applyingRemote||!authReady)return;
-  try{
-    const r=await sendDelete(key);
-    lastRevision=Math.max(lastRevision,Number(r?.revision)||0);
-    revisions.delete(key);lastValues.delete(key);
-  }catch(e){enqueue('delete',key,null,revisions.get(key)||0);showSyncError('DELETE '+key,e)}
-}
-
-const nativeSet=Storage.prototype.setItem;
-const nativeRemove=Storage.prototype.removeItem;
-Storage.prototype.setItem=function(key,value){
-  const k=String(key),v=String(value);
-  const before=this===window.localStorage?this.getItem(k):null;
-  const r=nativeSet.apply(this,arguments);
-  if(this===window.localStorage&&shouldSync(k)&&before!==v)scheduleSet(k,v);
-  return r;
-};
-Storage.prototype.removeItem=function(key){
-  const k=String(key),had=this===window.localStorage?this.getItem(k)!==null:false;
-  const r=nativeRemove.apply(this,arguments);
-  if(this===window.localStorage&&shouldSync(k)&&had)deleteKey(k);
-  return r;
-};
-
-async function initialSync(){
-  if(!configured()){bootstrapped=true;status('● SUPABASE · NIJE KONFIGURIRAN','warn');return}
-  if(!appAuthReady()){
-    authReady=false;bootstrapped=false;
-    status('● SUPABASE · ČEKA PRIJAVU','');
-    const box=document.getElementById('yardivoSyncErrorBox');if(box)box.style.display='none';
-    return;
-  }
-
-  /* Drop obsolete queued writes for local-only keys from the earlier broad-sync build. */
-  try{
-    const cleaned=readQueue().filter(item=>shouldSync(item.key) && item.key!=='studenac_yms_announcements');
-    writeQueue(cleaned);
-  }catch(e){}
-
-  status('● SUPABASE · povezivanje…','');
-  try{
-    await connect();
-    const remote=await bootstrapRemote();lastRevision=Number(remote.revision)||0;
-    const remoteKeys=Object.keys(remote.state||{}).filter(shouldSync);
-    const localKeys=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(shouldSync(k)&&k!=='studenac_yms_announcements')localKeys.push(k)}
-    if(remoteKeys.length){
-      await applySnapshot(remote.state);
-    }else if(localKeys.length){
-      for(const key of localKeys){
-        try{await sendSet(key,localStorage.getItem(key)??'')}catch(e){enqueue('set',key,localStorage.getItem(key)??'',0)}
-      }
-    }
-    bootstrapped=true;
-    Storage.prototype.setItem.call(sessionStorage,META_KEY,'1');
-    await flushQueue();
-    status(readQueue().length?`● SUPABASE · ${readQueue().length} ČEKA`:'● SUPABASE · ONLINE',readQueue().length?'warn':'ok');
-    refreshViews();
-  }catch(e){
-    if(String(e?.message||e)==='YARDIVO_AUTH_REQUIRED'){
-      authReady=false;bootstrapped=false;
-      status('● SUPABASE · ČEKA PRIJAVU','');
-      return;
-    }
-    bootstrapped=true;
-    status(readQueue().length?`● SUPABASE OFFLINE · ${readQueue().length} ČEKA`:'● SUPABASE OFFLINE · lokalna kopija aktivna','warn');
-    showSyncError('INITIAL SYNC',e);
-  }
-}
-async function poll(){
-  if(!bootstrapped||!configured())return;
-  try{
-    if(!await flushQueue())return;
-    const r=await getChanges(lastRevision);
-    lastRevision=Math.max(lastRevision,Number(r.revision)||lastRevision);
-    if(r.state&&Object.keys(r.state).length)await applySnapshot(r.state);
-    status('● SUPABASE · ONLINE','ok');
-  }catch(e){
-    if(String(e?.message||e)==='YARDIVO_AUTH_REQUIRED'){
-      authReady=false;bootstrapped=false;status('● SUPABASE · ČEKA PRIJAVU','');return;
-    }
-    status(readQueue().length?`● SUPABASE OFFLINE · ${readQueue().length} ČEKA`:'● SUPABASE OFFLINE','warn',errText(e));
-    showSyncError('POLL',e);
-  }
-}
-let realtimeChannel=null;
-async function ensureRealtime(){
-  if(realtimeChannel||!configured())return;
-  try{
-    const c=await connect();
-    realtimeChannel=c.channel('yardivo-app-state-v1')
-      .on('postgres_changes',{event:'*',schema:'public',table:'yardivo_app_state'},async payload=>{
-        try{
-          const key=payload?.new?.key||payload?.old?.key;
-          if(!key||!shouldSync(key))return;
-          const row=await fetchKey(key);
-          if(!row){return}
-          const rev=Number(row.revision)||0;
-          if(rev<=Number(revisions.get(key)||0))return;
-          lastRevision=Math.max(lastRevision,rev);
-          await applySnapshot({[key]:{value:row.deleted?null:row.value_json,revision:rev,updatedAt:row.updated_at||'',updatedBy:row.updated_by||'',deleted:!!row.deleted}});
-        }catch(e){console.warn('YARDIVO realtime update failed',e)}
-      })
-      .subscribe();
-  }catch(e){console.warn('YARDIVO realtime unavailable; polling fallback remains active',e)}
-}
-window.YardivoSupabase={
-  syncNow:initialSync,flushQueue,pending:()=>readQueue().length,
-  getRevision:()=>lastRevision,getKeyRevision:key=>revisions.get(key)||0,
-  client:()=>sb,realtime:ensureRealtime,authenticate:authenticateSync
-};
-window.addEventListener('online',()=>setTimeout(initialSync,150));
-window.addEventListener('focus',()=>setTimeout(poll,80));
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(poll,80)});
-window.addEventListener('load',()=>setTimeout(async()=>{await initialSync();ensureRealtime()},180));
-setInterval(poll,POLL_MS);
-})();
-</script>
 <style id="yardivo-unannounced-style">
 .unannounced-panel{display:none;margin-top:12px;padding:14px;border:1px solid #b97819;border-radius:10px;background:linear-gradient(135deg,#33230d,#211707)}
 .unannounced-panel.show{display:block}.unannounced-panel h3{margin:0 0 5px;color:#ffca66;font-size:13px}.unannounced-panel p{margin:0 0 12px;color:#d9ba85;font-size:10px}
@@ -25051,6 +24407,252 @@ window.addEventListener('yardivo:welcome-complete',()=>{
 window.YardivoLoginFinalizer={finalize:finalizeLogin};
 })();
 </script>
+<script id="yardivo-online-sync-v2-20260902">
+(function(){
+'use strict';
+
+const BASE='https://utkleufcoaxnhrhcmdkb.supabase.co';
+const KEY='sb_publishable_Ix_TndQyIFrGyfIyKEKySg_3GHwAMlL';
+const EDGE=BASE+'/functions/v1/yardivo-sync';
+const ANN_KEYS=new Set(['yardivo_yms_announcements_v1','studenac_yms_announcements']);
+const INC_KEYS=new Set(['studenac_yms_incidents']);
+const STATE_EXACT=new Set(['yardivo_live_notifications_v1','yardivo_master_notifications_v1']);
+const CLIENT_KEY='yardivo_client_id_v1';
+
+let accessToken='',refreshToken='',tokenExp=0,ready=false,applying=false,client=null;
+let dirtyAnn=false,dirtyInc=false,pushing=false,pulling=false;
+const dirtyState=new Map(),timers=new Map();
+let annSnapshot=new Map(),incSnapshot=new Map();
+
+const clientId=(()=>{
+  let v='';try{v=localStorage.getItem(CLIENT_KEY)||''}catch(_){}
+  if(!v){v='Y-'+Date.now()+'-'+Math.random().toString(36).slice(2);try{localStorage.setItem(CLIENT_KEY,v)}catch(_){}}
+  return v;
+})();
+
+function status(text,cls='',detail=''){
+  let el=document.getElementById('yardivoDbStatus');
+  if(!el){el=document.createElement('div');el.id='yardivoDbStatus';document.body.appendChild(el)}
+  el.className=cls;el.textContent=text;el.title=detail;
+}
+function clearLegacyErrors(){
+  try{
+    const b=document.getElementById('yardivoSyncErrorBox');if(b)b.remove();
+    for(const k of ['yardivo_supabase_offline_queue_v1','yardivo_supabase_offline_queue_v2','yardivo_supabase_sync_meta_v1','yardivo_supabase_sync_meta_v2'])localStorage.removeItem(k);
+  }catch(_){}
+}
+function errorText(e){return String(e?.message||e||'Nepoznata greška')}
+function showOnlineError(where,e){
+  const msg=errorText(e);
+  console.error('[YARDIVO ONLINE]',where,e);
+  status('⚠ ONLINE BAZA · VEZA NIJE SPREMLJENA','bad',where+' — '+msg);
+}
+function parseJwt(t){
+  try{
+    const raw=(t.split('.')[1]||'').replace(/-/g,'+').replace(/_/g,'/');
+    return JSON.parse(atob(raw+'='.repeat((4-raw.length%4)%4)))||{};
+  }catch(_){return{}}
+}
+function setTokens(a,r){
+  accessToken=String(a||'');refreshToken=String(r||'');
+  tokenExp=Number(parseJwt(accessToken)?.exp||0)*1000;
+}
+async function refreshAccess(){
+  if(!refreshToken)throw new Error('PONOVNA PRIJAVA POTREBNA.');
+  const res=await fetch(BASE+'/auth/v1/token?grant_type=refresh_token',{
+    method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({refresh_token:refreshToken})
+  });
+  const d=await res.json().catch(()=>({}));
+  if(!res.ok||!d?.access_token)throw new Error(d?.message||d?.error_description||'Obnova prijave nije uspjela.');
+  setTokens(d.access_token,d.refresh_token||refreshToken);
+  if(client)await client.auth.setSession({access_token:accessToken,refresh_token:refreshToken});
+}
+async function token(){
+  if(!accessToken)throw new Error('YARDIVO_AUTH_REQUIRED');
+  if(tokenExp&&Date.now()>tokenExp-60000)await refreshAccess();
+  return accessToken;
+}
+async function edge(action,payload={}){
+  const t=await token();
+  const res=await fetch(EDGE,{
+    method:'POST',
+    headers:{apikey:KEY,Authorization:'Bearer '+t,'Content-Type':'application/json'},
+    body:JSON.stringify({action,clientId,...payload})
+  });
+  const d=await res.json().catch(()=>({}));
+  if(!res.ok||d?.ok===false)throw new Error(d?.error||('HTTP '+res.status));
+  return d;
+}
+function stateKey(k){
+  return STATE_EXACT.has(k)||/^(yardivo_unannounced_|yardivo_incident_|yardivo_pallet_|studenac_pallet_|yardivo_ramp_|yardivo_capacity_|yardivo_replanning_)/.test(k);
+}
+function parseArray(v){try{const a=JSON.parse(v||'[]');return Array.isArray(a)?a:[]}catch(_){return[]}}
+function idOf(x){return String(x?.id??x?.announcement_id??x?.incident_id??'').trim()}
+function currentAnnouncements(){
+  let v=null;
+  try{v=localStorage.getItem('yardivo_yms_announcements_v1');if(v==null)v=localStorage.getItem('studenac_yms_announcements')}catch(_){}
+  return parseArray(v);
+}
+function currentIncidents(){
+  let v=null;try{v=localStorage.getItem('studenac_yms_incidents')}catch(_){}
+  return parseArray(v);
+}
+function mapData(items){
+  const m=new Map();for(const x of items||[]){const id=idOf(x);if(id)m.set(id,JSON.stringify(x))}
+  return m;
+}
+function diff(snapshot,items){
+  const now=mapData(items),upserts=[],deletes=[];
+  for(const x of items||[]){const id=idOf(x);if(id&&snapshot.get(id)!==JSON.stringify(x))upserts.push(x)}
+  for(const id of snapshot.keys())if(!now.has(id))deletes.push(id);
+  return {now,upserts,deletes};
+}
+function renderAll(){
+  const fns=['reloadAnnouncementsFromPersistentStorage','render','renderAnnouncements','renderAnnouncementSchedule','renderReceiving','renderDailyMap','renderWeeklyMap','renderOverview','renderIncidents','renderOperationsPro','renderControlTower','renderUnannounced','renderEpal'];
+  for(const n of fns){try{if(typeof window[n]==='function')window[n]()}catch(_){}}
+  try{window.YardivoNotifications?.render?.()}catch(_){}
+  try{window.YardivoMyYard?.render?.()}catch(_){}
+  try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+}
+function applyBootstrap(d){
+  const A=Array.isArray(d?.announcements)?d.announcements:[];
+  const I=Array.isArray(d?.incidents)?d.incidents:[];
+  applying=true;
+  try{
+    const aj=JSON.stringify(A),ij=JSON.stringify(I);
+    Storage.prototype.setItem.call(localStorage,'yardivo_yms_announcements_v1',aj);
+    Storage.prototype.setItem.call(localStorage,'studenac_yms_announcements',aj);
+    Storage.prototype.setItem.call(localStorage,'studenac_yms_incidents',ij);
+    for(const r of (Array.isArray(d?.state)?d.state:[])){
+      if(!r?.key||!stateKey(String(r.key)))continue;
+      if(r.deleted)Storage.prototype.removeItem.call(localStorage,String(r.key));
+      else Storage.prototype.setItem.call(localStorage,String(r.key),String(r.value_json??''));
+    }
+  }finally{applying=false}
+  annSnapshot=mapData(A);incSnapshot=mapData(I);
+  dirtyAnn=false;dirtyInc=false;dirtyState.clear();
+}
+async function pull(){
+  if(!ready||pulling||pushing||dirtyAnn||dirtyInc||dirtyState.size)return false;
+  pulling=true;
+  try{
+    const d=await edge('bootstrap');
+    applyBootstrap(d);renderAll();status('● ONLINE BAZA · ONLINE','ok');
+    try{window.dispatchEvent(new CustomEvent('yardivo:data-synced',{detail:{source:'online-v2'}}))}catch(_){}
+    return true;
+  }catch(e){showOnlineError('UČITAVANJE',e);return false}
+  finally{pulling=false}
+}
+async function pushAnnouncements(){
+  if(!ready||!dirtyAnn)return true;
+  const items=currentAnnouncements(),d=diff(annSnapshot,items);
+  if(d.upserts.length)await edge('upsert_announcements',{items:d.upserts});
+  if(d.deletes.length)await edge('delete_announcements',{ids:d.deletes});
+  annSnapshot=d.now;dirtyAnn=false;return true;
+}
+async function pushIncidents(){
+  if(!ready||!dirtyInc)return true;
+  const role=String(window.currentSession?.role||'').toLowerCase();
+  if(role==='gate'){dirtyInc=false;return true}
+  const items=currentIncidents(),d=diff(incSnapshot,items);
+  if(d.upserts.length)await edge('upsert_incidents',{items:d.upserts});
+  if(d.deletes.length)await edge('delete_incidents',{ids:d.deletes});
+  incSnapshot=d.now;dirtyInc=false;return true;
+}
+async function pushState(){
+  for(const [k,v] of [...dirtyState.entries()]){
+    if(v===null)await edge('delete_state',{key:k});
+    else await edge('set_state',{key:k,value:v});
+    dirtyState.delete(k);
+  }
+}
+async function flush(){
+  if(!ready||pushing)return false;
+  pushing=true;
+  try{
+    await pushAnnouncements();await pushIncidents();await pushState();
+    status('● ONLINE BAZA · SVE SPREMLJENO','ok');
+    return true;
+  }catch(e){showOnlineError('SPREMANJE',e);return false}
+  finally{pushing=false}
+}
+function schedule(kind,key,value){
+  if(!ready||applying)return;
+  if(kind==='ann')dirtyAnn=true;
+  else if(kind==='inc')dirtyInc=true;
+  else if(kind==='state')dirtyState.set(key,value);
+  const bucket=kind==='ann'?'ann':kind==='inc'?'inc':'state:'+key;
+  clearTimeout(timers.get(bucket));
+  timers.set(bucket,setTimeout(()=>{timers.delete(bucket);flush()},kind==='state'?350:500));
+}
+function kindFor(k){
+  if(ANN_KEYS.has(k))return'ann';
+  if(INC_KEYS.has(k))return'inc';
+  if(stateKey(k))return'state';
+  return'';
+}
+
+const nativeSet=Storage.prototype.setItem,nativeRemove=Storage.prototype.removeItem;
+Storage.prototype.setItem=function(k,v){
+  const r=nativeSet.apply(this,arguments);
+  if(this===window.localStorage&&!applying){const kind=kindFor(String(k));if(kind)schedule(kind,String(k),String(v))}
+  return r;
+};
+Storage.prototype.removeItem=function(k){
+  const key=String(k),kind=this===window.localStorage?kindFor(key):'';
+  const r=nativeRemove.apply(this,arguments);
+  if(this===window.localStorage&&!applying&&kind){
+    if(kind==='ann'){dirtyAnn=true;schedule('ann',key,'[]')}
+    else if(kind==='inc'){dirtyInc=true;schedule('inc',key,'[]')}
+    else schedule('state',key,null);
+  }
+  return r;
+};
+
+async function getClient(){
+  if(!window.supabase?.createClient)return null;
+  if(!client){
+    client=window.__yardivoAuthClient||window.supabase.createClient(BASE,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+    window.__yardivoAuthClient=client;
+  }
+  if(accessToken&&refreshToken){
+    const {error}=await client.auth.setSession({access_token:accessToken,refresh_token:refreshToken});
+    if(error)throw error;
+  }
+  return client;
+}
+async function authenticate(a,r){
+  setTokens(a,r);clearLegacyErrors();
+  const claim=parseJwt(accessToken);
+  if(!claim?.sub||claim?.is_anonymous===true)throw new Error('NEVAŽEĆA ONLINE PRIJAVA.');
+  const c=await getClient();if(c)await c.auth.setSession({access_token:accessToken,refresh_token:refreshToken});
+  const health=await edge('health');
+  if(Number(health?.version||0)<2)throw new Error('ONLINE SYNC NIJE AŽURIRAN.');
+  const serverUser=String(health?.user?.username||'').toLowerCase();
+  const appUser=String(window.currentSession?.username||window.currentSession?.user||'').toLowerCase();
+  if(!serverUser||serverUser!==appUser)throw new Error('ONLINE PROFIL SE NE PODUDARA S PRIJAVLJENIM KORISNIKOM.');
+  const d=await edge('bootstrap');
+  applyBootstrap(d);ready=true;renderAll();status('● ONLINE BAZA · ONLINE','ok');
+  try{window.dispatchEvent(new CustomEvent('yardivo:data-synced',{detail:{source:'online-v2'}}))}catch(_){}
+  return true;
+}
+async function syncNow(){return flush()}
+function online(){return ready}
+function pending(){return Number(dirtyAnn)+Number(dirtyInc)+dirtyState.size}
+
+clearLegacyErrors();
+window.YardivoSupabase={authenticate,syncNow,flushQueue:flush,pending,client:getClient,realtime:()=>{},online};
+window.YardivoOnlineSync=window.YardivoSupabase;
+
+window.addEventListener('online',()=>setTimeout(()=>{if(ready)flush()},250));
+window.addEventListener('focus',()=>setTimeout(()=>{if(ready){if(pending())flush();else pull()}},150));
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&ready)setTimeout(()=>{if(pending())flush();else pull()},180)});
+setInterval(()=>{if(!ready)return;if(pending())flush();else pull()},60000);
+window.addEventListener('load',()=>{clearLegacyErrors();if(!ready)status('● ONLINE BAZA · ČEKA PRIJAVU','')},{once:true});
+})();
+</script>
+
 <script id="yardivo-canonical-login-router-v2-20260901">
 (function(){
 'use strict';
@@ -25219,7 +24821,6 @@ async function login(){
 
     try{window.YardivoRoleStableFinal?.apply?.()}catch(_){}
     try{window.YardivoExactRBAC?.apply?.()}catch(_){}
-    try{window.YardivoSupabase?.syncNow?.()}catch(_){}
     return true;
   }catch(e){
     let msg=String(e?.message||'PRIJAVA NIJE USPJELA.');
@@ -31237,215 +30838,5 @@ body[data-yardivo-role="gate"] [data-home-target="settings"]{display:none!import
 #dashboard .yardivo-export-btn::after{content:" · KRAJ DANA";font-size:10px;opacity:.75}
 </style>
 <script id="yardivo-dashboard-daily-xlsx-label-v1-20260902">(function(){function f(){const b=document.querySelector('#dashboard [data-xlsx-view="dashboard"]');if(b){b.innerHTML='📊 DNEVNO IZVJEŠĆE XLSX';b.title='Izvezi samo današnje stanje prijama i rezultate u Excel'}}document.addEventListener('DOMContentLoaded',f);window.addEventListener('load',()=>setTimeout(f,800));document.addEventListener('click',e=>{if(e.target.closest('[data-view="dashboard"],[data-home-target="dashboard"]'))setTimeout(f,100)},true)})();</script>
-<script id="yardivo-github-pages-stale-sync-cleanup-v2-20260902">(function(){try{for(const k of ['yardivo_supabase_offline_queue_v1','yardivo_supabase_offline_queue_v2']){const q=JSON.parse(localStorage.getItem(k)||'[]');if(Array.isArray(q))localStorage.setItem(k,JSON.stringify(q.filter(x=>x&&x.key!=='studenac_yms_announcements')))}}catch(_){}const b=document.getElementById('yardivoSyncErrorBox');if(b)b.style.display='none'})();</script>
-
-<script id="yardivo-online-edge-sync-v1-20260902">
-(function(){
-'use strict';
-const BASE='https://utkleufcoaxnhrhcmdkb.supabase.co';
-const KEY='sb_publishable_Ix_TndQyIFrGyfIyKEKySg_3GHwAMlL';
-const EDGE=BASE+'/functions/v1/yardivo-sync';
-const CLIENT_KEY='yardivo_client_id_v1';
-const ANN_KEYS=new Set(['yardivo_yms_announcements_v1','studenac_yms_announcements']);
-const INC_KEYS=new Set(['studenac_yms_incidents']);
-const STATE_EXACT=new Set(['yardivo_live_notifications_v1','yardivo_master_notifications_v1']);
-let accessToken='',refreshToken='',tokenExp=0,applying=false,ready=false,client=null;
-const timers=new Map();
-
-const clientId=(()=>{
-  let id='';try{id=localStorage.getItem(CLIENT_KEY)||''}catch(_){}
-  if(!id){id='Y-'+Date.now()+'-'+Math.random().toString(36).slice(2);try{localStorage.setItem(CLIENT_KEY,id)}catch(_){}}
-  return id;
-})();
-
-function status(text,cls,detail){
-  let el=document.getElementById('yardivoDbStatus');
-  if(!el){el=document.createElement('div');el.id='yardivoDbStatus';document.body.appendChild(el)}
-  el.className=cls||'';el.textContent=text;el.title=detail||'';
-}
-function hideOldError(){
-  const b=document.getElementById('yardivoSyncErrorBox');if(b)b.style.display='none';
-}
-function showError(where,e){
-  const msg=String(e?.message||e||'Nepoznata greška');
-  console.error('[YARDIVO ONLINE]',where,e);
-  status('⚠ ONLINE BAZA · '+where,'bad',msg);
-  let b=document.getElementById('yardivoSyncErrorBox');
-  if(!b){
-    b=document.createElement('div');b.id='yardivoSyncErrorBox';
-    b.style.cssText='display:none;position:fixed;right:18px;bottom:58px;z-index:100001;max-width:520px;padding:14px;border:1px solid #a94747;border-radius:10px;background:#260d0d;color:#ffd0d0;font:12px/1.45 monospace;white-space:pre-wrap;box-shadow:0 12px 30px rgba(0,0,0,.45)';
-    document.body.appendChild(b);
-  }
-  b.textContent=where+'\n'+msg;b.style.display='block';
-}
-function parseJwt(t){
-  try{
-    const p=t.split('.')[1],s=p.replace(/-/g,'+').replace(/_/g,'/');
-    const j=JSON.parse(atob(s+'='.repeat((4-s.length%4)%4)));
-    return j||{};
-  }catch(_){return{}}
-}
-function setTokens(a,r){
-  accessToken=String(a||'');refreshToken=String(r||'');
-  const p=parseJwt(accessToken);tokenExp=Number(p.exp||0)*1000;
-}
-async function refresh(){
-  if(!refreshToken)throw new Error('NEMA REFRESH TOKENA — ponovi prijavu.');
-  const res=await fetch(BASE+'/auth/v1/token?grant_type=refresh_token',{
-    method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},
-    body:JSON.stringify({refresh_token:refreshToken})
-  });
-  const d=await res.json().catch(()=>({}));
-  if(!res.ok||!d?.access_token)throw new Error(d?.message||d?.error_description||'Obnova prijave nije uspjela.');
-  setTokens(d.access_token,d.refresh_token||refreshToken);
-  if(client)await client.auth.setSession({access_token:accessToken,refresh_token:refreshToken}).catch(()=>{});
-  return accessToken;
-}
-async function token(){
-  if(!accessToken)throw new Error('YARDIVO_AUTH_REQUIRED');
-  if(tokenExp && Date.now()>tokenExp-60000)await refresh();
-  return accessToken;
-}
-async function edge(action,payload={}){
-  const t=await token();
-  const res=await fetch(EDGE,{
-    method:'POST',
-    headers:{apikey:KEY,Authorization:'Bearer '+t,'Content-Type':'application/json'},
-    body:JSON.stringify({action,clientId,...payload})
-  });
-  const d=await res.json().catch(()=>({}));
-  if(!res.ok||d?.ok===false)throw new Error(d?.error||('HTTP '+res.status));
-  return d;
-}
-function stateKey(k){
-  if(STATE_EXACT.has(k))return true;
-  return /^(yardivo_unannounced_|yardivo_incident_|yardivo_pallet_|studenac_pallet_|yardivo_ramp_|yardivo_capacity_|yardivo_replanning_)/.test(k);
-}
-function syncKind(k){
-  if(ANN_KEYS.has(k))return'announcements';
-  if(INC_KEYS.has(k))return'incidents';
-  if(stateKey(k))return'state';
-  return'';
-}
-function parseArray(s){try{const a=JSON.parse(s||'[]');return Array.isArray(a)?a:[]}catch(_){return[]}}
-function currentAnnouncements(){
-  let v=null;try{v=localStorage.getItem('yardivo_yms_announcements_v1');if(v==null)v=localStorage.getItem('studenac_yms_announcements')}catch(_){}
-  return parseArray(v);
-}
-function currentIncidents(){
-  let v=null;try{v=localStorage.getItem('studenac_yms_incidents')}catch(_){}
-  return parseArray(v);
-}
-function refreshViews(){
-  ['reloadAnnouncementsFromPersistentStorage','render','renderAnnouncements','renderAnnouncementSchedule','renderReceiving','renderDailyMap','renderWeeklyMap','renderOverview','renderIncidents','renderOperationsPro','renderControlTower','renderUnannounced','renderEpal'].forEach(n=>{try{if(typeof window[n]==='function')window[n]()}catch(_){}});
-  try{window.YardivoNotifications?.render?.()}catch(_){}
-  try{window.YardivoMyYard?.render?.()}catch(_){}
-  try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
-}
-async function bootstrap(){
-  status('● ONLINE BAZA · UČITAVANJE…','');
-  const d=await edge('bootstrap');
-  applying=true;
-  try{
-    const aj=JSON.stringify(Array.isArray(d.announcements)?d.announcements:[]);
-    const ij=JSON.stringify(Array.isArray(d.incidents)?d.incidents:[]);
-    Storage.prototype.setItem.call(localStorage,'yardivo_yms_announcements_v1',aj);
-    Storage.prototype.setItem.call(localStorage,'studenac_yms_announcements',aj);
-    Storage.prototype.setItem.call(localStorage,'studenac_yms_incidents',ij);
-    for(const r of (Array.isArray(d.state)?d.state:[])){
-      if(!r?.key||!stateKey(r.key)||r.deleted)continue;
-      Storage.prototype.setItem.call(localStorage,String(r.key),String(r.value_json??''));
-    }
-  }finally{applying=false}
-  ready=true;hideOldError();status('● ONLINE BAZA · ONLINE','ok');
-  refreshViews();
-  try{window.dispatchEvent(new CustomEvent('yardivo:data-synced',{detail:{source:'edge',online:true}}))}catch(_){}
-  return d;
-}
-async function pushKind(kind,key,value){
-  if(!ready||!accessToken||applying)return;
-  try{
-    if(kind==='announcements')await edge('replace_announcements',{items:currentAnnouncements()});
-    else if(kind==='incidents')await edge('replace_incidents',{items:currentIncidents()});
-    else if(kind==='state')await edge('set_state',{key,value:String(value??'')});
-    hideOldError();status('● ONLINE BAZA · SPREMLJENO','ok');
-  }catch(e){showError('SPREMANJE NIJE USPJELO',e)}
-}
-function schedule(k,v){
-  const kind=syncKind(k);if(!kind||!ready||applying)return;
-  const id=kind==='announcements'?'__ann':kind==='incidents'?'__inc':k;
-  clearTimeout(timers.get(id));
-  timers.set(id,setTimeout(()=>{timers.delete(id);pushKind(kind,k,v)},kind==='state'?350:500));
-}
-async function deleteState(k){
-  if(!ready||!accessToken||applying||!stateKey(k))return;
-  try{await edge('delete_state',{key:k});status('● ONLINE BAZA · SPREMLJENO','ok')}catch(e){showError('BRISANJE NIJE USPJELO',e)}
-}
-
-const nativeSet=Storage.prototype.setItem,nativeRemove=Storage.prototype.removeItem;
-Storage.prototype.setItem=function(k,v){
-  const r=nativeSet.apply(this,arguments);
-  if(this===window.localStorage&&!applying)schedule(String(k),String(v));
-  return r;
-};
-Storage.prototype.removeItem=function(k){
-  const key=String(k),kind=this===window.localStorage?syncKind(key):'';
-  const r=nativeRemove.apply(this,arguments);
-  if(this===window.localStorage&&!applying){
-    if(kind==='announcements')schedule(key,'[]');
-    else if(kind==='incidents')schedule(key,'[]');
-    else if(kind==='state')deleteState(key);
-  }
-  return r;
-};
-
-async function getClient(){
-  if(!window.supabase?.createClient)return null;
-  if(!client){
-    client=window.__yardivoAuthClient||window.supabase.createClient(BASE,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
-    window.__yardivoAuthClient=client;
-  }
-  if(accessToken&&refreshToken)await client.auth.setSession({access_token:accessToken,refresh_token:refreshToken}).catch(()=>{});
-  return client;
-}
-async function authenticate(a,r){
-  setTokens(a,r);
-  const p=parseJwt(accessToken);
-  if(!p?.sub||p?.is_anonymous===true)throw new Error('NEVAŽEĆA ONLINE PRIJAVA.');
-  const c=await getClient();if(c){
-    const {error}=await c.auth.setSession({access_token:accessToken,refresh_token:refreshToken});
-    if(error)throw error;
-  }
-  const health=await edge('health');
-  const u=String(health?.user?.username||'').toLowerCase();
-  const current=String(window.currentSession?.username||window.currentSession?.user||'').toLowerCase();
-  if(!u||u!==current)throw new Error('ONLINE PROFIL SE NE PODUDARA S PRIJAVLJENIM KORISNIKOM.');
-  await bootstrap();
-  return true;
-}
-async function syncNow(){
-  if(!ready)return false;
-  await edge('replace_announcements',{items:currentAnnouncements()});
-  const role=String(window.currentSession?.role||'').toLowerCase();
-  if(role!=='gate')await edge('replace_incidents',{items:currentIncidents()});
-  status('● ONLINE BAZA · SVE SINKRONIZIRANO','ok');return true;
-}
-async function reconnect(){
-  if(!accessToken)return;
-  try{await token();if(!ready)await bootstrap();else await syncNow()}catch(e){showError('ONLINE VEZA',e)}
-}
-
-try{
-  for(const k of ['yardivo_supabase_offline_queue_v1','yardivo_supabase_offline_queue_v2','yardivo_supabase_sync_meta_v1','yardivo_supabase_sync_meta_v2'])localStorage.removeItem(k);
-}catch(_){}
-window.YardivoSupabase={authenticate,syncNow,flushQueue:async()=>true,pending:()=>0,client:getClient,realtime:()=>{},online:()=>ready};
-window.YardivoOnlineSync=window.YardivoSupabase;
-window.addEventListener('online',()=>setTimeout(reconnect,250));
-window.addEventListener('focus',()=>{if(ready)setTimeout(reconnect,120)});
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&ready)setTimeout(reconnect,150)});
-window.addEventListener('load',()=>{hideOldError();if(!accessToken)status('● ONLINE BAZA · ČEKA PRIJAVU','')},{once:true});
-})();
-</script>
-
 </body>
 </html>
