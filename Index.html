@@ -14834,7 +14834,7 @@ body[data-yms-role="gate"] [data-home-target="operations"]{display:none!importan
 #yardivoDbStatus.warn{color:#ffd074;border-color:#806020;background:#2d2209}
 #yardivoDbStatus.bad{color:#ff9c9c;border-color:#8f3434;background:#2b1111}
 </style>
-<script id="yardivo-supabase-sync">
+<script id="yardivo-supabase-sync" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
 
@@ -25190,30 +25190,10 @@ async function authenticate(){
   };
   persistSession(session);
 
-  /* Hand the exact authenticated session to the canonical sync owner.
-     This prevents GitHub Pages from attempting queued writes with a stale/anonymous session. */
-  try{
-    if(window.YardivoSupabase?.authenticate && auth.access_token && auth.refresh_token){
-      Promise.race([
-        window.YardivoSupabase.authenticate(auth.access_token,auth.refresh_token),
-        new Promise(resolve=>setTimeout(()=>resolve(false),2200))
-      ]).catch(e=>console.warn('YARDIVO sync auth bridge',e));
-    }
-  }catch(_){}
-
-  /* Synchronize Supabase JS auth in the background; it must never block Login UI. */
-  try{
-    if(window.supabase?.createClient && auth.refresh_token){
-      const c=window.__yardivoAuthClient || window.supabase.createClient(BASE,KEY,{
-        auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}
-      });
-      window.__yardivoAuthClient=c;
-      Promise.race([
-        c.auth.setSession({access_token:auth.access_token,refresh_token:auth.refresh_token}),
-        new Promise(resolve=>setTimeout(resolve,1800))
-      ]).catch(()=>{});
-    }
-  }catch(_){}
+  /* Canonical online bootstrap: login is complete only when the database session is valid.
+     The Edge sync receives this exact JWT; no stale or anonymous browser session can write. */
+  if(!window.YardivoSupabase?.authenticate)throw new Error('ONLINE BAZA NIJE SPREMNA.');
+  await window.YardivoSupabase.authenticate(auth.access_token,auth.refresh_token);
 
   return session;
 }
@@ -31258,5 +31238,214 @@ body[data-yardivo-role="gate"] [data-home-target="settings"]{display:none!import
 </style>
 <script id="yardivo-dashboard-daily-xlsx-label-v1-20260902">(function(){function f(){const b=document.querySelector('#dashboard [data-xlsx-view="dashboard"]');if(b){b.innerHTML='📊 DNEVNO IZVJEŠĆE XLSX';b.title='Izvezi samo današnje stanje prijama i rezultate u Excel'}}document.addEventListener('DOMContentLoaded',f);window.addEventListener('load',()=>setTimeout(f,800));document.addEventListener('click',e=>{if(e.target.closest('[data-view="dashboard"],[data-home-target="dashboard"]'))setTimeout(f,100)},true)})();</script>
 <script id="yardivo-github-pages-stale-sync-cleanup-v2-20260902">(function(){try{for(const k of ['yardivo_supabase_offline_queue_v1','yardivo_supabase_offline_queue_v2']){const q=JSON.parse(localStorage.getItem(k)||'[]');if(Array.isArray(q))localStorage.setItem(k,JSON.stringify(q.filter(x=>x&&x.key!=='studenac_yms_announcements')))}}catch(_){}const b=document.getElementById('yardivoSyncErrorBox');if(b)b.style.display='none'})();</script>
+
+<script id="yardivo-online-edge-sync-v1-20260902">
+(function(){
+'use strict';
+const BASE='https://utkleufcoaxnhrhcmdkb.supabase.co';
+const KEY='sb_publishable_Ix_TndQyIFrGyfIyKEKySg_3GHwAMlL';
+const EDGE=BASE+'/functions/v1/yardivo-sync';
+const CLIENT_KEY='yardivo_client_id_v1';
+const ANN_KEYS=new Set(['yardivo_yms_announcements_v1','studenac_yms_announcements']);
+const INC_KEYS=new Set(['studenac_yms_incidents']);
+const STATE_EXACT=new Set(['yardivo_live_notifications_v1','yardivo_master_notifications_v1']);
+let accessToken='',refreshToken='',tokenExp=0,applying=false,ready=false,client=null;
+const timers=new Map();
+
+const clientId=(()=>{
+  let id='';try{id=localStorage.getItem(CLIENT_KEY)||''}catch(_){}
+  if(!id){id='Y-'+Date.now()+'-'+Math.random().toString(36).slice(2);try{localStorage.setItem(CLIENT_KEY,id)}catch(_){}}
+  return id;
+})();
+
+function status(text,cls,detail){
+  let el=document.getElementById('yardivoDbStatus');
+  if(!el){el=document.createElement('div');el.id='yardivoDbStatus';document.body.appendChild(el)}
+  el.className=cls||'';el.textContent=text;el.title=detail||'';
+}
+function hideOldError(){
+  const b=document.getElementById('yardivoSyncErrorBox');if(b)b.style.display='none';
+}
+function showError(where,e){
+  const msg=String(e?.message||e||'Nepoznata greška');
+  console.error('[YARDIVO ONLINE]',where,e);
+  status('⚠ ONLINE BAZA · '+where,'bad',msg);
+  let b=document.getElementById('yardivoSyncErrorBox');
+  if(!b){
+    b=document.createElement('div');b.id='yardivoSyncErrorBox';
+    b.style.cssText='display:none;position:fixed;right:18px;bottom:58px;z-index:100001;max-width:520px;padding:14px;border:1px solid #a94747;border-radius:10px;background:#260d0d;color:#ffd0d0;font:12px/1.45 monospace;white-space:pre-wrap;box-shadow:0 12px 30px rgba(0,0,0,.45)';
+    document.body.appendChild(b);
+  }
+  b.textContent=where+'\n'+msg;b.style.display='block';
+}
+function parseJwt(t){
+  try{
+    const p=t.split('.')[1],s=p.replace(/-/g,'+').replace(/_/g,'/');
+    const j=JSON.parse(atob(s+'='.repeat((4-s.length%4)%4)));
+    return j||{};
+  }catch(_){return{}}
+}
+function setTokens(a,r){
+  accessToken=String(a||'');refreshToken=String(r||'');
+  const p=parseJwt(accessToken);tokenExp=Number(p.exp||0)*1000;
+}
+async function refresh(){
+  if(!refreshToken)throw new Error('NEMA REFRESH TOKENA — ponovi prijavu.');
+  const res=await fetch(BASE+'/auth/v1/token?grant_type=refresh_token',{
+    method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({refresh_token:refreshToken})
+  });
+  const d=await res.json().catch(()=>({}));
+  if(!res.ok||!d?.access_token)throw new Error(d?.message||d?.error_description||'Obnova prijave nije uspjela.');
+  setTokens(d.access_token,d.refresh_token||refreshToken);
+  if(client)await client.auth.setSession({access_token:accessToken,refresh_token:refreshToken}).catch(()=>{});
+  return accessToken;
+}
+async function token(){
+  if(!accessToken)throw new Error('YARDIVO_AUTH_REQUIRED');
+  if(tokenExp && Date.now()>tokenExp-60000)await refresh();
+  return accessToken;
+}
+async function edge(action,payload={}){
+  const t=await token();
+  const res=await fetch(EDGE,{
+    method:'POST',
+    headers:{apikey:KEY,Authorization:'Bearer '+t,'Content-Type':'application/json'},
+    body:JSON.stringify({action,clientId,...payload})
+  });
+  const d=await res.json().catch(()=>({}));
+  if(!res.ok||d?.ok===false)throw new Error(d?.error||('HTTP '+res.status));
+  return d;
+}
+function stateKey(k){
+  if(STATE_EXACT.has(k))return true;
+  return /^(yardivo_unannounced_|yardivo_incident_|yardivo_pallet_|studenac_pallet_|yardivo_ramp_|yardivo_capacity_|yardivo_replanning_)/.test(k);
+}
+function syncKind(k){
+  if(ANN_KEYS.has(k))return'announcements';
+  if(INC_KEYS.has(k))return'incidents';
+  if(stateKey(k))return'state';
+  return'';
+}
+function parseArray(s){try{const a=JSON.parse(s||'[]');return Array.isArray(a)?a:[]}catch(_){return[]}}
+function currentAnnouncements(){
+  let v=null;try{v=localStorage.getItem('yardivo_yms_announcements_v1');if(v==null)v=localStorage.getItem('studenac_yms_announcements')}catch(_){}
+  return parseArray(v);
+}
+function currentIncidents(){
+  let v=null;try{v=localStorage.getItem('studenac_yms_incidents')}catch(_){}
+  return parseArray(v);
+}
+function refreshViews(){
+  ['reloadAnnouncementsFromPersistentStorage','render','renderAnnouncements','renderAnnouncementSchedule','renderReceiving','renderDailyMap','renderWeeklyMap','renderOverview','renderIncidents','renderOperationsPro','renderControlTower','renderUnannounced','renderEpal'].forEach(n=>{try{if(typeof window[n]==='function')window[n]()}catch(_){}});
+  try{window.YardivoNotifications?.render?.()}catch(_){}
+  try{window.YardivoMyYard?.render?.()}catch(_){}
+  try{window.YardivoMyYardWebGL?.refresh?.()}catch(_){}
+}
+async function bootstrap(){
+  status('● ONLINE BAZA · UČITAVANJE…','');
+  const d=await edge('bootstrap');
+  applying=true;
+  try{
+    const aj=JSON.stringify(Array.isArray(d.announcements)?d.announcements:[]);
+    const ij=JSON.stringify(Array.isArray(d.incidents)?d.incidents:[]);
+    Storage.prototype.setItem.call(localStorage,'yardivo_yms_announcements_v1',aj);
+    Storage.prototype.setItem.call(localStorage,'studenac_yms_announcements',aj);
+    Storage.prototype.setItem.call(localStorage,'studenac_yms_incidents',ij);
+    for(const r of (Array.isArray(d.state)?d.state:[])){
+      if(!r?.key||!stateKey(r.key)||r.deleted)continue;
+      Storage.prototype.setItem.call(localStorage,String(r.key),String(r.value_json??''));
+    }
+  }finally{applying=false}
+  ready=true;hideOldError();status('● ONLINE BAZA · ONLINE','ok');
+  refreshViews();
+  try{window.dispatchEvent(new CustomEvent('yardivo:data-synced',{detail:{source:'edge',online:true}}))}catch(_){}
+  return d;
+}
+async function pushKind(kind,key,value){
+  if(!ready||!accessToken||applying)return;
+  try{
+    if(kind==='announcements')await edge('replace_announcements',{items:currentAnnouncements()});
+    else if(kind==='incidents')await edge('replace_incidents',{items:currentIncidents()});
+    else if(kind==='state')await edge('set_state',{key,value:String(value??'')});
+    hideOldError();status('● ONLINE BAZA · SPREMLJENO','ok');
+  }catch(e){showError('SPREMANJE NIJE USPJELO',e)}
+}
+function schedule(k,v){
+  const kind=syncKind(k);if(!kind||!ready||applying)return;
+  const id=kind==='announcements'?'__ann':kind==='incidents'?'__inc':k;
+  clearTimeout(timers.get(id));
+  timers.set(id,setTimeout(()=>{timers.delete(id);pushKind(kind,k,v)},kind==='state'?350:500));
+}
+async function deleteState(k){
+  if(!ready||!accessToken||applying||!stateKey(k))return;
+  try{await edge('delete_state',{key:k});status('● ONLINE BAZA · SPREMLJENO','ok')}catch(e){showError('BRISANJE NIJE USPJELO',e)}
+}
+
+const nativeSet=Storage.prototype.setItem,nativeRemove=Storage.prototype.removeItem;
+Storage.prototype.setItem=function(k,v){
+  const r=nativeSet.apply(this,arguments);
+  if(this===window.localStorage&&!applying)schedule(String(k),String(v));
+  return r;
+};
+Storage.prototype.removeItem=function(k){
+  const key=String(k),kind=this===window.localStorage?syncKind(key):'';
+  const r=nativeRemove.apply(this,arguments);
+  if(this===window.localStorage&&!applying){
+    if(kind==='announcements')schedule(key,'[]');
+    else if(kind==='incidents')schedule(key,'[]');
+    else if(kind==='state')deleteState(key);
+  }
+  return r;
+};
+
+async function getClient(){
+  if(!window.supabase?.createClient)return null;
+  if(!client){
+    client=window.__yardivoAuthClient||window.supabase.createClient(BASE,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+    window.__yardivoAuthClient=client;
+  }
+  if(accessToken&&refreshToken)await client.auth.setSession({access_token:accessToken,refresh_token:refreshToken}).catch(()=>{});
+  return client;
+}
+async function authenticate(a,r){
+  setTokens(a,r);
+  const p=parseJwt(accessToken);
+  if(!p?.sub||p?.is_anonymous===true)throw new Error('NEVAŽEĆA ONLINE PRIJAVA.');
+  const c=await getClient();if(c){
+    const {error}=await c.auth.setSession({access_token:accessToken,refresh_token:refreshToken});
+    if(error)throw error;
+  }
+  const health=await edge('health');
+  const u=String(health?.user?.username||'').toLowerCase();
+  const current=String(window.currentSession?.username||window.currentSession?.user||'').toLowerCase();
+  if(!u||u!==current)throw new Error('ONLINE PROFIL SE NE PODUDARA S PRIJAVLJENIM KORISNIKOM.');
+  await bootstrap();
+  return true;
+}
+async function syncNow(){
+  if(!ready)return false;
+  await edge('replace_announcements',{items:currentAnnouncements()});
+  const role=String(window.currentSession?.role||'').toLowerCase();
+  if(role!=='gate')await edge('replace_incidents',{items:currentIncidents()});
+  status('● ONLINE BAZA · SVE SINKRONIZIRANO','ok');return true;
+}
+async function reconnect(){
+  if(!accessToken)return;
+  try{await token();if(!ready)await bootstrap();else await syncNow()}catch(e){showError('ONLINE VEZA',e)}
+}
+
+try{
+  for(const k of ['yardivo_supabase_offline_queue_v1','yardivo_supabase_offline_queue_v2','yardivo_supabase_sync_meta_v1','yardivo_supabase_sync_meta_v2'])localStorage.removeItem(k);
+}catch(_){}
+window.YardivoSupabase={authenticate,syncNow,flushQueue:async()=>true,pending:()=>0,client:getClient,realtime:()=>{},online:()=>ready};
+window.YardivoOnlineSync=window.YardivoSupabase;
+window.addEventListener('online',()=>setTimeout(reconnect,250));
+window.addEventListener('focus',()=>{if(ready)setTimeout(reconnect,120)});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&ready)setTimeout(reconnect,150)});
+window.addEventListener('load',()=>{hideOldError();if(!accessToken)status('● ONLINE BAZA · ČEKA PRIJAVU','')},{once:true});
+})();
+</script>
+
 </body>
 </html>
