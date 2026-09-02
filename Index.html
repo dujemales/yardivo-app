@@ -12868,7 +12868,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   setTimeout(clean,800);
 })();
 </script>
-<script id="yardivo-final-authoritative-rbac">
+<script id="yardivo-final-authoritative-rbac" type="application/x-yardivo-disabled">
 (function(){
   // Exact requested permissions.
   const ACCESS={
@@ -20290,7 +20290,7 @@ setInterval(enforceRoles,2500);
 window.YardivoQAWorkflow={approveUnannounced:approve,rejectUnannounced:reject,enforceRoles};
 })();
 </script>
-<script id="yardivo-v3101-authoritative-role-access">(function(){
+<script id="yardivo-v3101-authoritative-role-access" type="application/x-yardivo-disabled">(function(){
 'use strict';
 const ROLE={
  admin:['homeMenu','dashboard','receiving','weeklyMap','dailyMap','settings','checkin','myYard','docks','trucks','suppliers','announcements','weeklyDeliveries','overview','incidents','incidentArchive','shipments','operations','reports','plannerPro','controltower','controlTower','calendar','heatmap','unannounced','epal','orderSearch','liveYard','yardivoWarRoom'],
@@ -20345,7 +20345,7 @@ window.addEventListener('load',()=>setTimeout(apply,100));document.addEventListe
  setTimeout(enforcePorta,50);
 })();
 </script>
-<script id="yardivo-final-rbac-integrity-guard">
+<script id="yardivo-final-rbac-integrity-guard" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
 const VALID=new Set(['admin','inventory','reception','gate']);
@@ -20520,7 +20520,7 @@ body[data-yardivo-role="reception"] #qrMobileSettingsPanel{display:block!importa
  #myYard .myy-shell{min-height:620px!important}
 }
 </style>
-<script id="yardivo-final-atomic-rbac-qa-20260831">
+<script id="yardivo-final-atomic-rbac-qa-20260831" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
 const MATRIX={
@@ -30559,12 +30559,12 @@ body[data-yardivo-role="reception"] [data-view="liveYard"]{
 }
 </style>
 
-<script id="yardivo-role-stability-final-v5-20260901-js">
+<script id="yardivo-role-stability-final-v6-20260902-js">
 (function(){
 'use strict';
 const MATRIX={
  admin:'ALL',
- inventory:new Set(['homeMenu','dashboard','weeklyMap','dailyMap','myYard','announcements','yardivoMyAnnouncements','overview','suppliers','calendar','heatmap','controltower','controlTower','incidents','incidentArchive','reports','settings','unannounced','epal','orderSearch','liveYard']),
+ inventory:new Set(['homeMenu','dashboard','controlTower','suppliers','orderSearch','announcements','dailyMap','weeklyMap','overview','incidents','unannounced','epal','myYard','reports','settings']),
  reception:new Set(['homeMenu','dashboard','receiving','dailyMap','weeklyMap','suppliers','checkin','myYard','docks','operations','incidents','incidentArchive','controltower','controlTower','settings','unannounced','epal','orderSearch','liveYard']),
  gate:new Set(['homeMenu','checkin','unannounced','myYard','docks'])
 };
@@ -30711,14 +30711,40 @@ window.addEventListener('yardivo:login',()=>setTimeout(()=>{
  const active=document.querySelector('.view.active');
  if(active)setChromeForView(active.id);
 },30));
-window.addEventListener('yardivo:data-synced',apply);
+/* Stable sidebar: RBAC is not re-painted on every data sync. */
 window.addEventListener('load',()=>setTimeout(()=>{
  apply();
  const active=document.querySelector('.view.active');
  if(active)setChromeForView(active.id);
 },900),{once:true});
 
-window.YardivoRoleStableFinal={apply,open:activate,allowed,matrix:MATRIX};
+
+function stabilizeInventorySidebar(){
+ if(role()!=='inventory')return;
+ const order=['homeMenu','dashboard','controlTower','suppliers','orderSearch','announcements','dailyMap','weeklyMap','overview','incidents','unannounced','epal','myYard','reports','settings'];
+ const nav=document.querySelector('.sidebar nav,.sidebar .nav,.sidebar-nav,#sidebarNav,.nav-menu');
+ const buttons=[...document.querySelectorAll('.nav-btn[data-view]')];
+ const parent=nav || buttons[0]?.parentElement;
+ if(!parent)return;
+ const byView=new Map(buttons.map(b=>[b.dataset.view,b]));
+ order.forEach(v=>{const b=byView.get(v);if(b)parent.appendChild(b)});
+ buttons.forEach(b=>{
+   const ok=order.includes(b.dataset.view);
+   b.classList.toggle('role-hidden',!ok);
+   if(ok){
+     b.style.removeProperty('display');
+     b.style.removeProperty('visibility');
+     b.removeAttribute('hidden');
+   }else{
+     b.style.setProperty('display','none','important');
+   }
+ });
+}
+
+const baseApply=apply;
+apply=function(){baseApply();stabilizeInventorySidebar()};
+apply();
+window.YardivoRoleStableFinal={apply,open:activate,allowed,matrix:MATRIX,stabilizeInventorySidebar};
 })();
 </script>
 
@@ -31056,6 +31082,31 @@ window.YardivoPasswordChange={change};
   background:#0d2b45!important;
   color:#bfe0ff!important;
   white-space:nowrap;
+}
+</style>
+
+
+<style id="yardivo-inventory-sidebar-stable-v1-20260902">
+html[data-yardivo-role="inventory"] .nav-btn[data-view="checkin"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="docks"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="receiving"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="operations"]{display:none!important}
+html[data-yardivo-role="inventory"] .nav-btn[data-view="homeMenu"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="dashboard"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="controlTower"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="suppliers"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="orderSearch"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="announcements"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="dailyMap"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="weeklyMap"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="overview"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="incidents"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="unannounced"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="epal"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="myYard"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="reports"],
+html[data-yardivo-role="inventory"] .nav-btn[data-view="settings"]{
+ visibility:visible!important;opacity:1!important;
 }
 </style>
 
