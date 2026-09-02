@@ -7536,7 +7536,7 @@ AUTOMATSKA PREPORUKA</small>
 <div><h1>POSTAVKE</h1><p>Administracija YMS sustava</p></div>
 </div>
 <div class="settings-grid">
-<section class="panel" id="qrMobileSettingsPanel">
+<section class="panel" id="qrMobileSettingsPanel" data-yardivo-settings="reception">
 <div class="panel-head">
 <div>
 <h2>QR / MOBILE PRIJAM</h2>
@@ -7559,7 +7559,7 @@ AUTOMATSKA PREPORUKA</small>
 <div class="qr-mobile-mode" id="qrMobileModeInfo">—</div>
 </div>
 </section>
-<section class="panel" id="receptionRampSettings">
+<section class="panel" id="receptionRampSettings" data-yardivo-settings="reception">
 <div class="panel-head">
 <div>
 <h2>UPRAVLJANJE RAMPAMA</h2>
@@ -12402,8 +12402,8 @@ function addNavAndView(){
 function renderArchive(){const host=document.getElementById('incidentGallery');if(!host)return;let a=(typeof incidents!=='undefined'&&Array.isArray(incidents)?incidents:[]);const d=document.getElementById('iaDate')?.value,s=document.getElementById('iaSupplier')?.value,w=document.getElementById('iaWarehouse')?.value,v=document.getElementById('iaSeverity')?.value;a=a.filter(x=>x.photo&&(!d||x.date===d)&&(!s||x.supplier===s)&&(!w||x.warehouse===w)&&(!v||x.severity===v));const sup=document.getElementById('iaSupplier');if(sup&&sup.options.length<=1)[...new Set((typeof incidents!=='undefined'&&Array.isArray(incidents)?incidents:[]).map(x=>x.supplier).filter(Boolean))].sort().forEach(x=>sup.add(new Option(x,x)));document.getElementById('incidentArchiveCount').textContent=`${a.length} fotografija`;host.innerHTML=a.length?a.map(i=>`<article class="incident-photo-card" data-iid="${i.id}"><img src="${i.photo}" alt="Fotografija incidenta"><div class="body"><strong>${i.supplier||'—'}</strong>${i.date||'—'} · ${i.warehouse||'—'}<br>${i.type||'Incident'} · ${i.severity||'—'}<br>Status: ${i.status||'Otvoren'} · ${Number(i.value||0).toFixed(2)} €</div></article>`).join(''):'<div class="overview-empty">Nema fotografija za odabrane filtre.</div>';host.querySelectorAll('[data-iid]').forEach(c=>c.onclick=()=>{const i=(typeof incidents!=='undefined'&&Array.isArray(incidents)?incidents:[]).find(x=>String(x.id)===c.dataset.iid);if(i)alert(`${i.supplier}\n${i.date} · ${i.warehouse||'—'}\n${i.type} · ${i.severity}\nStatus: ${i.status||'Otvoren'}\nOdgovoran: ${i.owner||'—'}\nŠteta: ${Number(i.value||0).toFixed(2)} €\n\n${i.note||''}`)});}
 
 function addSettings(){const grid=document.querySelector('#settings .settings-grid');if(!grid||document.getElementById('masterUserAdmin'))return;grid.insertAdjacentHTML('afterbegin',`<section class="panel" id="masterUserAdmin"><div class="panel-head"><div><h2>KORISNICI, ROLE I PERMISSIONS</h2><small>Admin kreira račune i dodjeljuje pristup</small></div></div><div class="master-settings-body"><div class="master-admin-grid"><div><div class="form-grid"><label>Ime i prezime<input id="muName"></label><label>Username<input id="muUser" autocomplete="off"></label><label>Privremena lozinka<input id="muPass" type="password" autocomplete="new-password"></label><label>Rola<select id="muRole"><option value="inventory">Upravljanje zalihama</option><option value="reception">Prijam</option><option value="gate">Porta</option><option value="management">Voditelj</option><option value="admin">Admin</option></select></label><label>Lokacija<select id="muLocation"><option value="DU">Dugopolje</option><option value="VG">Velika Gorica</option></select></label><label>Status<select id="muStatus"><option value="active">Aktivan</option><option value="disabled">Deaktiviran</option></select></label></div><div class="master-perms" id="muPerms"></div><button class="primary" id="muSave" type="button" style="margin-top:10px">KREIRAJ KORISNIKA</button></div><div><div class="master-note">Rola određuje osnovni pristup. Individualne permissions mogu dodatno uključiti sekcije za konkretnog korisnika.</div><div id="masterUserList" style="margin-top:10px"></div></div></div></div></section>
-<section class="panel"><div class="panel-head"><div><h2>VELIČINA TEKSTA U POLJIMA I TABLICAMA</h2><small>Postavka ostaje spremljena na uređaju</small></div></div><div class="master-settings-body"><div style="display:flex;align-items:center;gap:8px"><button class="secondary" id="fontMinus">A−</button><input id="fontRange" type="range" min="80" max="150" step="5" style="flex:1"><button class="secondary" id="fontPlus">A+</button><button class="secondary" id="fontReset">100%</button><strong id="fontPct">100%</strong></div><div class="font-demo">Primjer teksta u ćelijama i poljima</div></div></section>
-<section class="panel"><div class="panel-head"><div><h2>AUTOMATSKI DNEVNI IZVJEŠTAJ</h2><small>Slanje nakon 14:00 preko Google Apps Script integracije</small></div></div><div class="master-settings-body"><div class="form-grid"><label>E-mail primatelja<input id="repEmail" type="email" placeholder="voditelj@tvrtka.hr"></label><label>Vrijeme slanja<input id="repTime" type="time" value="14:05"></label></div><div class="master-perms" id="repItems"></div><div style="display:flex;gap:8px;margin-top:10px"><button class="primary" id="repSave" type="button">SPREMI POSTAVKE</button><button class="secondary" id="repPreview" type="button">PREGLEDAJ IZVJEŠTAJ</button></div><div class="master-note warn" style="margin-top:10px">Za slanje i kada preglednik nije otvoren, vremenski trigger mora biti postavljen u Google Apps Scriptu. HTML sprema konfiguraciju i može je sinkronizirati.</div></div></section>
+<section class="panel" id="yardivoFontSettings" data-yardivo-settings="inventory reception"><div class="panel-head"><div><h2>VELIČINA TEKSTA U POLJIMA I TABLICAMA</h2><small>Postavka ostaje spremljena na uređaju</small></div></div><div class="master-settings-body"><div style="display:flex;align-items:center;gap:8px"><button class="secondary" id="fontMinus">A−</button><input id="fontRange" type="range" min="80" max="150" step="5" style="flex:1"><button class="secondary" id="fontPlus">A+</button><button class="secondary" id="fontReset">100%</button><strong id="fontPct">100%</strong></div><div class="font-demo">Primjer teksta u ćelijama i poljima</div></div></section>
+<section class="panel" id="yardivoDailyReportSettings" data-yardivo-settings="inventory"><div class="panel-head"><div><h2>AUTOMATSKI DNEVNI IZVJEŠTAJ</h2><small>Slanje nakon 14:00 preko Google Apps Script integracije</small></div></div><div class="master-settings-body"><div class="form-grid"><label>E-mail primatelja<input id="repEmail" type="email" placeholder="voditelj@tvrtka.hr"></label><label>Vrijeme slanja<input id="repTime" type="time" value="14:05"></label></div><div class="master-perms" id="repItems"></div><div style="display:flex;gap:8px;margin-top:10px"><button class="primary" id="repSave" type="button">SPREMI POSTAVKE</button><button class="secondary" id="repPreview" type="button">PREGLEDAJ IZVJEŠTAJ</button></div><div class="master-note warn" style="margin-top:10px">Za slanje i kada preglednik nije otvoren, vremenski trigger mora biti postavljen u Google Apps Scriptu. HTML sprema konfiguraciju i može je sinkronizirati.</div></div></section>
 <section class="panel"><div class="panel-head"><div><h2>GOOGLE SHEETS · CENTRALNA BAZA</h2><small>Apps Script Web App endpoint</small></div><span id="sheetState" class="master-sync-state warn">NIJE POVEZANO</span></div><div class="master-settings-body"><label>Apps Script Web App URL<input id="sheetUrl" placeholder="https://script.google.com/macros/s/.../exec"></label><div style="display:flex;gap:8px;margin-top:10px"><button class="primary" id="sheetSave" type="button">SPREMI POVEZNICU</button><button class="secondary" id="sheetTest" type="button">TEST VEZE</button><button class="secondary" id="sheetPush" type="button">SINKRONIZIRAJ SADA</button></div><div class="master-note" style="margin-top:10px">Sinkronizacija šalje najave, incidente i korisnike centralnom endpointu. Endpoint mora implementirati spremanje u Google Sheets i autorizaciju.</div></div></section>`);setupSettings();}
 function setupSettings(){const perms=document.getElementById('muPerms');const views=['dashboard','overview','announcements','checkin','yard','docks','incidents','incidentArchive','reports','settings'];perms.innerHTML=views.map(v=>`<label><input type="checkbox" value="${v}">${v}</label>`).join('');const items=['Dnevni sažetak','Broj kamiona','Palete','Kašnjenja','No-show','Stanje rampi','Dobavljači','Incidenti'];document.getElementById('repItems').innerHTML=items.map(x=>`<label><input type="checkbox" value="${x}" checked>${x}</label>`).join('');document.getElementById('muSave').onclick=createUser;renderUsers();let fp=Number(LS.getItem(K.font)||100);applyFont(fp);document.getElementById('fontRange').value=fp;document.getElementById('fontMinus').onclick=()=>applyFont(Math.max(80,Number(LS.getItem(K.font)||100)-5));document.getElementById('fontPlus').onclick=()=>applyFont(Math.min(150,Number(LS.getItem(K.font)||100)+5));document.getElementById('fontReset').onclick=()=>applyFont(100);document.getElementById('fontRange').oninput=e=>applyFont(Number(e.target.value));const r=jget(K.report,{email:'',time:'14:05',items});document.getElementById('repEmail').value=r.email||'';document.getElementById('repTime').value=r.time||'14:05';document.getElementById('repSave').onclick=()=>{jset(K.report,{email:repEmail.value.trim(),time:repTime.value,items:[...document.querySelectorAll('#repItems input:checked')].map(x=>x.value)});toast('success','IZVJEŠTAJ','Postavke dnevnog izvještaja su spremljene.')};document.getElementById('repPreview').onclick=()=>{if(typeof openAppView==='function')openAppView('reports');if(typeof renderDailyReport==='function')renderDailyReport()};const sh=jget(K.sheets,{url:''});document.getElementById('sheetUrl').value=sh.url||'';setSheetState(!!sh.url);document.getElementById('sheetSave').onclick=()=>{jset(K.sheets,{url:sheetUrl.value.trim()});setSheetState(!!sheetUrl.value.trim());toast('success','GOOGLE SHEETS','Poveznica je spremljena.')};document.getElementById('sheetTest').onclick=()=>sheetCall('ping');document.getElementById('sheetPush').onclick=()=>sheetCall('sync');}
 function applyFont(p){
@@ -20425,29 +20425,28 @@ window.YardivoUserAdmin={render,create};
 const norm=r=>{r=String(r||'').toLowerCase().trim();if(r==='porta'||r==='portir')return'gate';if(r==='prijam')return'reception';if(r==='zalihe'||r.includes('zalih'))return'inventory';return r};
 function role(){try{return norm(window.currentSession?.role||currentSession?.role)}catch(_){return''}}
 function root(){return document.getElementById('settings')}
-function panels(){return [...(root()?.querySelectorAll('.settings-grid > section,.settings-grid > .panel,.settings-grid > .settings-card,.settings-grid > .settings-section')||[])]}
-
+function panels(){return [...(root()?.querySelectorAll('.settings-grid > section,.settings-grid > .panel,.settings-grid > .settings-card,.settings-grid > .settings-section,.settings-grid > .danger-zone')||[])]}
 function owners(el){
- const explicit=(el.dataset.yardivoSettings||'').split(/\s+/).filter(Boolean);
- if(explicit.length)return explicit;
- if(el.id==='qrMobileSettingsPanel')return ['admin'];
- if(el.id==='receptionRampSettings')return ['admin','reception'];
+ if(el.id==='masterUserAdmin'||el.classList.contains('danger-zone'))return ['admin'];
+ if(el.id==='yardivoFontSettings')return ['admin','inventory','reception'];
+ if(el.id==='yardivoDailyReportSettings')return ['admin','inventory'];
  if(el.id==='yardivoNonWorkingDaysSettings')return ['admin','inventory','reception'];
- if(el.classList.contains('danger-zone'))return ['admin'];
- return ['admin'];
+ if(el.id==='qrMobileSettingsPanel')return ['admin','reception'];
+ if(el.id==='receptionRampSettings')return ['admin','reception'];
+ const tags=(el.dataset.yardivoSettings||'').split(/\s+/).filter(Boolean);
+ return tags.length?['admin',...tags]:['admin'];
 }
 function enforce(){
  const r=role(),rt=root();if(!r||!rt)return;
- if(r==='gate'){
-   document.querySelectorAll('[data-view="settings"],[data-home-target="settings"]').forEach(x=>{
-     x.classList.add('role-hidden');
-     x.style.setProperty('display','none','important');
-   });
-   rt.classList.remove('active');
-   return;
- }
+ const settingsNav=document.querySelectorAll('[data-view="settings"],[data-home-target="settings"]');
+ const mayOpen=r!=='gate';
+ settingsNav.forEach(x=>{
+   x.classList.toggle('role-hidden',!mayOpen);
+   if(mayOpen)x.style.removeProperty('display');else x.style.setProperty('display','none','important');
+ });
+ if(!mayOpen){rt.classList.remove('active');return}
  panels().forEach(el=>{
-   const show=r==='admin'||owners(el).includes(r);
+   const show=owners(el).includes(r);
    el.style.setProperty('display',show?'block':'none','important');
    el.classList.toggle('yardivo-settings-role-hidden',!show);
  });
@@ -20458,11 +20457,9 @@ function enforce(){
 }
 window.yardivoEnforceSettingsRBAC=enforce;
 window.addEventListener('yardivo:login',()=>setTimeout(enforce,30));
-window.addEventListener('load',()=>setTimeout(enforce,250),{once:true});
-window.addEventListener('yardivo:view-opened',e=>{if(e?.detail?.view==='settings')enforce()});
-document.addEventListener('click',e=>{
- if(e.target.closest?.('[data-view="settings"],[data-home-target="settings"]'))setTimeout(enforce,0);
-},true);
+window.addEventListener('load',()=>setTimeout(enforce,950),{once:true});
+window.addEventListener('yardivo:view-opened',e=>{if(e?.detail?.view==='settings')setTimeout(enforce,0)});
+document.addEventListener('click',e=>{if(e.target.closest?.('[data-view="settings"],[data-home-target="settings"]'))setTimeout(enforce,0)},true);
 })();
 </script>
 <style id="yardivo-qa-no-flash-and-myyard-v1">
@@ -31089,6 +31086,41 @@ body[data-yardivo-role="inventory"] #settings #receptionRampSettings,
 body[data-yardivo-role="inventory"] #settings .danger-zone{
  display:none!important;
 }
+</style>
+
+
+<style id="yardivo-settings-all-roles-final-v3-20260902">
+/* Admin sees all settings. */
+html[data-yardivo-role="admin"] #settings .settings-grid > *,
+body[data-yardivo-role="admin"] #settings .settings-grid > *{display:block!important}
+
+/* Inventory: only settings relevant to Inventory. */
+html[data-yardivo-role="inventory"] #settings .settings-grid > *,
+body[data-yardivo-role="inventory"] #settings .settings-grid > *{display:none!important}
+html[data-yardivo-role="inventory"] #settings #yardivoFontSettings,
+html[data-yardivo-role="inventory"] #settings #yardivoDailyReportSettings,
+html[data-yardivo-role="inventory"] #settings #yardivoNonWorkingDaysSettings,
+body[data-yardivo-role="inventory"] #settings #yardivoFontSettings,
+body[data-yardivo-role="inventory"] #settings #yardivoDailyReportSettings,
+body[data-yardivo-role="inventory"] #settings #yardivoNonWorkingDaysSettings{display:block!important}
+
+/* Reception: operational settings only. */
+html[data-yardivo-role="reception"] #settings .settings-grid > *,
+body[data-yardivo-role="reception"] #settings .settings-grid > *{display:none!important}
+html[data-yardivo-role="reception"] #settings #yardivoFontSettings,
+html[data-yardivo-role="reception"] #settings #qrMobileSettingsPanel,
+html[data-yardivo-role="reception"] #settings #receptionRampSettings,
+html[data-yardivo-role="reception"] #settings #yardivoNonWorkingDaysSettings,
+body[data-yardivo-role="reception"] #settings #yardivoFontSettings,
+body[data-yardivo-role="reception"] #settings #qrMobileSettingsPanel,
+body[data-yardivo-role="reception"] #settings #receptionRampSettings,
+body[data-yardivo-role="reception"] #settings #yardivoNonWorkingDaysSettings{display:block!important}
+
+/* Gate/Porta has no Settings section. */
+html[data-yardivo-role="gate"] [data-view="settings"],
+html[data-yardivo-role="gate"] [data-home-target="settings"],
+body[data-yardivo-role="gate"] [data-view="settings"],
+body[data-yardivo-role="gate"] [data-home-target="settings"]{display:none!important}
 </style>
 
 </body>
