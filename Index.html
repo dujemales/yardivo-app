@@ -64,7 +64,7 @@ html.yardivo-booting .login-overlay{visibility:hidden!important;opacity:0!import
 })();
 </script>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>YARDIVO - YARD MANAGEMENT SYSTEM</title>
 <style>
 :root{--bg:#07111d;--bg2:#091827;--panel:#0b1623;--panel2:#0d1b2a;--line:#1c2c3c;--line2:#233749;--text:#f7f9fc;--muted:#8fa2b7;--blue:#1f7cf5;--blue2:#0d5bc6;--green:#31d16b;--red:#ff424c;--orange:#ff922b;--purple:#9e61ff;--yellow:#ffc02e}
@@ -5404,7 +5404,7 @@ html[data-theme="light"] .yam-busy{background:#fde7ea;color:#94404b;border-color
 <link href="icon-192.png" rel="icon" sizes="192x192" type="image/png"/>
 <link href="apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
 <link href="manifest.webmanifest" rel="manifest"/>
-<meta content="#071925" name="theme-color"/>
+<meta content="#071925" name="theme-color">
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="YARDIVO" name="apple-mobile-web-app-title"/>
@@ -7112,7 +7112,6 @@ AUTOMATSKA PREPORUKA</small>
 <div class="performance-kpi"><small>PROSJEČNO KAŠNJENJE</small><strong id="ovAvgDelay">0 min</strong><span>samo zakašnjeli dolasci</span></div>
 <div class="performance-kpi"><small>UKUPNO INCIDENATA</small><strong id="ovIncidents">0</strong><span>evidentirani problemi isporuke</span></div><div class="performance-kpi"><small>PROMJENE NAJAVA</small><strong id="ovChanges">0</strong><span>evidentirane izmjene termina</span></div><div class="performance-kpi"><small>PROSJEČAN ISTOVAR</small><strong id="ovAvgUnload">0 min</strong><span>stvarna vremena istovara</span></div><div class="performance-kpi"><small>ISKORIŠTENOST RAMPI</small><strong id="ovDockUtil">0%</strong><span>prema rezerviranim minutama</span></div>
 </div></section>
-
 <section class="panel overview-full-supplier-chart" id="overviewFullSupplierChartPanel">
 <div class="panel-head">
 <div>
@@ -7593,7 +7592,7 @@ AUTOMATSKA PREPORUKA</small>
 <div class="ramp-settings-list" id="rampSettingsList" style="margin-top:12px"></div>
 </div>
 </section>
-<section class="panel">
+<section class="panel" data-yardivo-settings="inventory reception" id="yardivoNonWorkingDaysSettings">
 <div class="panel-head"><div><h2>NERADNI DANI PRIJAMA</h2><small>Državni blagdani i interne iznimke</small></div></div>
 <div class="panel-body">
 <div class="holiday-admin" id="holidayAdminList"></div>
@@ -20423,56 +20422,47 @@ window.YardivoUserAdmin={render,create};
 <script id="yardivo-final-settings-rbac-20260831">
 (function(){
 'use strict';
-const norm=r=>{r=String(r||'').toLowerCase();if(r==='porta')return'gate';if(r==='prijam')return'reception';if(r==='zalihe'||r.includes('zalih'))return'inventory';return r};
-const INVENTORY_WORDS=['najav','termin','dobavlja','supplier','kalendar','calendar','tjed','weekly','kapacitet','capacity','epal','palet'];
-const RECEPTION_WORDS=['prijam','receiv','ramp','dock','check-in','checkin','qr','mobile','operacij','status'];
-const ADMIN_WORDS=['korisnik','user','rola','role','sigurn','security','lokacij','location','audit','sistem','system','global','master'];
+const norm=r=>{r=String(r||'').toLowerCase().trim();if(r==='porta'||r==='portir')return'gate';if(r==='prijam')return'reception';if(r==='zalihe'||r.includes('zalih'))return'inventory';return r};
+function role(){try{return norm(window.currentSession?.role||currentSession?.role)}catch(_){return''}}
+function root(){return document.getElementById('settings')}
+function panels(){return [...(root()?.querySelectorAll('.settings-grid > section,.settings-grid > .panel,.settings-grid > .settings-card,.settings-grid > .settings-section')||[])]}
 
-function textOf(el){return ((el.id||'')+' '+(el.className||'')+' '+(el.getAttribute?.('data-settings-section')||'')+' '+(el.textContent||'')).toLowerCase()}
-function hasAny(t,a){return a.some(x=>t.includes(x))}
-function settingsRoot(){return document.getElementById('settings')}
-
-function classify(el){
- const t=textOf(el);
- if(hasAny(t,ADMIN_WORDS))return 'admin';
- if(hasAny(t,INVENTORY_WORDS))return 'inventory';
- if(hasAny(t,RECEPTION_WORDS))return 'reception';
- return 'admin'; // fail closed: unknown settings are Admin-only
-}
-function candidateSections(root){
- if(!root)return[];
- let nodes=[...root.querySelectorAll('[data-settings-section],.settings-section,.settings-card,.setting-card,.control-card,.panel')];
- // Keep only reasonably high-level blocks, avoiding nested duplicates.
- return nodes.filter((el,i,a)=>!a.some(other=>other!==el&&other.contains(el)));
+function owners(el){
+ const explicit=(el.dataset.yardivoSettings||'').split(/\s+/).filter(Boolean);
+ if(explicit.length)return explicit;
+ if(el.id==='qrMobileSettingsPanel')return ['admin'];
+ if(el.id==='receptionRampSettings')return ['admin','reception'];
+ if(el.id==='yardivoNonWorkingDaysSettings')return ['admin','inventory','reception'];
+ if(el.classList.contains('danger-zone'))return ['admin'];
+ return ['admin'];
 }
 function enforce(){
- const role=norm(window.currentSession?.role);
- const root=settingsRoot();
- if(!role||!root)return;
- if(role==='gate'){
-   document.querySelectorAll('[data-view="settings"],[data-home-target="settings"]').forEach(x=>{x.style.display='none';x.classList.add('role-hidden')});
-   root.classList.remove('active'); return;
- }
- if(role==='admin'){
-   candidateSections(root).forEach(x=>x.style.removeProperty('display'));
+ const r=role(),rt=root();if(!r||!rt)return;
+ if(r==='gate'){
+   document.querySelectorAll('[data-view="settings"],[data-home-target="settings"]').forEach(x=>{
+     x.classList.add('role-hidden');
+     x.style.setProperty('display','none','important');
+   });
+   rt.classList.remove('active');
    return;
  }
- candidateSections(root).forEach(el=>{
-   const owner=classify(el);
-   el.style.display=(owner===role)?'':'none';
+ panels().forEach(el=>{
+   const show=r==='admin'||owners(el).includes(r);
+   el.style.setProperty('display',show?'block':'none','important');
+   el.classList.toggle('yardivo-settings-role-hidden',!show);
  });
- // Hard block user administration for every non-admin role.
- root.querySelectorAll('#masterUserAdmin,#masterUserList,[data-admin-only],.admin-only').forEach(x=>x.style.display='none');
+ rt.querySelectorAll('#masterUserAdmin,#masterUserList,[data-admin-only],.admin-only,.danger-zone').forEach(x=>{
+   const show=r==='admin';
+   x.style.setProperty('display',show?'':'none',show?'':'important');
+ });
 }
 window.yardivoEnforceSettingsRBAC=enforce;
 window.addEventListener('yardivo:login',()=>setTimeout(enforce,30));
-window.addEventListener('load',()=>setTimeout(enforce,250));
+window.addEventListener('load',()=>setTimeout(enforce,250),{once:true});
+window.addEventListener('yardivo:view-opened',e=>{if(e?.detail?.view==='settings')enforce()});
 document.addEventListener('click',e=>{
  if(e.target.closest?.('[data-view="settings"],[data-home-target="settings"]'))setTimeout(enforce,0);
 },true);
-window.addEventListener('yardivo:view-opened',e=>{
- if(e?.detail?.view==='settings')enforce();
-});
 })();
 </script>
 <style id="yardivo-qa-no-flash-and-myyard-v1">
@@ -27078,7 +27068,6 @@ window.YardivoDarkPaletteIsolation={apply};
   display:none!important;
 }
 </style>
-
 <style id="yardivo-overview-manager-layout-v1-20260901">
 #overview{
   max-width:none!important;
@@ -27201,8 +27190,6 @@ html[data-yardivo-main-theme="light"] body.light-mode #overview .overview-operat
   #overview .performance-kpis{grid-template-columns:1fr 1fr!important}
 }
 </style>
-
-
 <script id="yardivo-overview-manager-summary-v1-20260901">
 (function(){
 'use strict';
@@ -27297,8 +27284,6 @@ document.addEventListener('change',e=>{
 window.YardivoOverviewManagerSummary={render};
 })();
 </script>
-
-
 <style id="yardivo-light-total-white-strict-v1-20260901">
 /* STRICT LIGHT: no dark/navy structural surface is allowed to leak into the application. */
 html[data-yardivo-main-theme="light"],
@@ -27398,7 +27383,6 @@ html[data-yardivo-main-theme="light"] body.light-mode #myYard .myy-shell{
   display:none!important;
 }
 </style>
-
 <script id="yardivo-settings-dark-only-holidays-v1-20260901">
 (function(){
 'use strict';
@@ -27460,8 +27444,6 @@ window.addEventListener('yardivo:login',()=>setTimeout(normalizeSettings,120));
 window.YardivoSettingsCleanup={apply:normalizeSettings,refreshHolidays};
 })();
 </script>
-
-
 <style id="yardivo-canonical-logout-fix-v1-20260901">
 #logoutBtn,#homeLogoutBtn{
   display:inline-flex!important;
@@ -27553,8 +27535,6 @@ document.addEventListener('click',e=>{
 window.YardivoCanonicalLogout={logout};
 })();
 </script>
-
-
 <style id="yardivo-myyard-360-orbit-final-v1-20260901">
 #myYard[data-yardivo-yard-mode="3d"] #yardivoMyYardWebGL{
   pointer-events:auto!important;
@@ -27598,8 +27578,6 @@ window.addEventListener('yardivo:data-synced',protect);
 window.YardivoMyYard360={protect};
 })();
 </script>
-
-
 <style id="yardivo-light-absolute-white-v4-20260901">
 /* LIGHT MODE — absolute white structural palette.
    This final layer intentionally overrides old inline navy/graphite backgrounds. */
@@ -27751,7 +27729,6 @@ html[data-yardivo-main-theme="light"] body.light-mode :is(
   box-shadow:none!important;
 }
 </style>
-
 <script id="yardivo-light-absolute-white-v4-20260901-js">
 (function(){
 'use strict';
@@ -27787,8 +27764,6 @@ document.addEventListener('click',e=>{
 window.YardivoAbsoluteWhite={apply:enforce};
 })();
 </script>
-
-
 <style id="yardivo-light-ux-canonical-v5-20260901">
 /* ============================================================
    YARDIVO LIGHT UX — canonical final owner
@@ -28044,7 +28019,6 @@ html[data-yardivo-main-theme="dark"] #yardivoThemeSwitch .theme-thumb{
   transform:translateX(0)!important;
 }
 </style>
-
 <script id="yardivo-theme-canonical-single-owner-v5-20260901">
 (function(){
 'use strict';
@@ -28146,8 +28120,6 @@ window.YardivoMainTheme={apply,toggle,current:read};
 apply(read(),false);
 })();
 </script>
-
-
 <style id="yardivo-myyard-focus-live-v1-20260901">
 /* My Yard toolbar action */
 #myYard .myy-toolbar .myy-enlarge-btn{
@@ -28301,7 +28273,6 @@ body.yardivo-myyard-focus #yardivoMyYardFocusExit{display:block}
   pointer-events:none!important;
 }
 </style>
-
 <script id="yardivo-myyard-focus-live-v1-20260901-js">
 (function(){
 'use strict';
@@ -28463,8 +28434,6 @@ document.addEventListener('click',e=>{
 window.YardivoMyYardFocus={enter,exit,refresh:()=>scan(true)};
 })();
 </script>
-
-
 <style id="yardivo-overview-all-suppliers-wheel-v2-20260901">
 #overview #overviewFullChartScroll,
 #overview .overview-full-chart-scroll{
@@ -28510,8 +28479,6 @@ html[data-yardivo-main-theme="light"] #overview .overview-full-bar-item.no-info 
   color:#6c7f8c!important;
 }
 </style>
-
-
 <style id="yardivo-myyard-2d-final-fix-v2-20260901">
 #myYard[data-yardivo-yard-mode="2d"] #yardivoMyYardWebGL{
   display:none!important;
@@ -28547,7 +28514,6 @@ body.yardivo-myyard-focus #myYard[data-yardivo-yard-mode="3d"] .myy-world{
   display:none!important;
 }
 </style>
-
 <script id="yardivo-myyard-2d-final-fix-v2-20260901-js">
 (function(){
 'use strict';
@@ -28636,8 +28602,6 @@ window.YardivoMyYardMode={set:setMode,current:()=>{
 }};
 })();
 </script>
-
-
 <style id="yardivo-full-reset-home-zero-v1-20260901">
 #homeMenuGrid .home-menu-card{position:relative!important}
 #homeMenuGrid .yardivo-home-zero-count{
@@ -28659,7 +28623,6 @@ window.YardivoMyYardMode={set:setMode,current:()=>{
   box-sizing:border-box;
 }
 </style>
-
 <script id="yardivo-full-reset-home-zero-v1-20260901-js" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
@@ -28826,8 +28789,6 @@ document.addEventListener('click',e=>{
 window.YardivoFullOperationalReset={run:fullDelete,homeZero:updateHomeZero};
 })();
 </script>
-
-
 <style id="yardivo-home-original-blue-dark-v1-20260901">
 /* Početni izbornik u Dark modeu uvijek koristi autentični ORIGINAL PLAVI YARDIVO izgled. */
 html[data-yardivo-main-theme="dark"] body.home-menu-mode,
@@ -28878,8 +28839,6 @@ html[data-yardivo-main-theme="dark"] body.home-menu-mode #homeMenu .yardivo-home
   color:#edf6ff!important;
 }
 </style>
-
-
 <style id="yardivo-notification-delete-read-style-v1-20260901">
 /* Pročitane notifikacije više ne glowaju. */
 #notifList .notif-item:not(.y5-unread),
@@ -28912,7 +28871,6 @@ html[data-yardivo-main-theme="dark"] #yardivoNotificationHistory .y5-clear-all{
   border-color:#8f3b43!important;
 }
 </style>
-
 <script id="yardivo-notification-delete-read-style-v1-20260901-js">
 (function(){
 'use strict';
@@ -29004,8 +28962,6 @@ setInterval(()=>{addClearButton();cleanupReadGlow()},1200);
 window.YardivoNotificationAdmin={clearAll,cleanupReadGlow};
 })();
 </script>
-
-
 <style id="yardivo-notification-sound-v1-20260901">
 #yardivoNotifSoundToggle{
   margin-left:8px!important;
@@ -29016,7 +28972,6 @@ window.YardivoNotificationAdmin={clearAll,cleanupReadGlow};
   font-weight:1000!important;
 }
 </style>
-
 <script id="yardivo-notification-sound-v1-20260901-js">
 (function(){
 'use strict';
@@ -29141,8 +29096,6 @@ setInterval(addToggle,1400);
 window.YardivoNotificationSound={play:chime,enabled,setEnabled};
 })();
 </script>
-
-
 <style id="yardivo-incidents-delete-v1-20260901">
 #yardivoDeleteAllIncidents{
   background:#fff5f5!important;
@@ -29156,7 +29109,6 @@ html[data-yardivo-main-theme="dark"] #yardivoDeleteAllIncidents{
   border-color:#8f3b43!important;
 }
 </style>
-
 <script id="yardivo-incidents-delete-v1-20260901-js">
 (function(){
 'use strict';
@@ -29238,8 +29190,6 @@ document.addEventListener('click',e=>{
 window.YardivoIncidentDelete={one:removeOne,all:removeAll};
 })();
 </script>
-
-
 <style id="yardivo-overview-executive-simple-v1-20260901">
 /* Manager summary: only the three decisions that matter. */
 #overviewExecutive .overview-exec-grid,
@@ -29289,7 +29239,6 @@ window.YardivoIncidentDelete={one:removeOne,all:removeAll};
   }
 }
 </style>
-
 <script id="yardivo-overview-executive-simple-v1-20260901-js">
 (function(){
 'use strict';
@@ -29348,8 +29297,6 @@ document.addEventListener('click',e=>{
 window.YardivoOverviewExecutiveSimple={render:simplify};
 })();
 </script>
-
-
 <style id="yardivo-overview-hero3-v2-20260901">
 #overviewExecutive{
   padding:28px!important;
@@ -29515,7 +29462,6 @@ html[data-yardivo-main-theme="light"] #yardivoOverviewSimple3 strong{
   }
 }
 </style>
-
 <script id="yardivo-overview-hero3-v2-20260901-js">
 (function(){
 'use strict';
@@ -29610,8 +29556,6 @@ setInterval(()=>{
 window.YardivoOverviewHero3={render:apply};
 })();
 </script>
-
-
 <style id="yardivo-total-operational-wipe-v2-20260901">
 #deleteAllDataBtn{font-weight:1000!important}
 </style>
@@ -29819,13 +29763,10 @@ document.addEventListener('click',e=>{
 window.YardivoTotalOperationalWipe={run:wipe,zero:zeroDom};
 })();
 </script>
-
-
 <style id="yardivo-overview-reset-empty-fix-v1-20260901">
 #yardivoOverviewSimple3 .yardivo-card-score:empty{display:none!important}
 #yardivoOverviewSimple3 .yardivo-card-meta.empty-state{color:#7f93a2!important}
 </style>
-
 <script id="yardivo-overview-reset-empty-fix-v1-20260901-js">
 (function(){
 'use strict';
@@ -29988,8 +29929,6 @@ document.addEventListener('click',e=>{
 window.YardivoOverviewEmptyResetFix={refresh,clear:clearOverviewSurfaces};
 })();
 </script>
-
-
 <style id="yardivo-settings-cleanup-light-sheets-v1-20260901">
 /* Requested Settings cleanup: no Light appearance chooser and no legacy Google Sheets central DB panel. */
 #yardivoLightStyleSettings,
@@ -30001,7 +29940,6 @@ window.YardivoOverviewEmptyResetFix={refresh,clear:clearOverviewSurfaces};
   display:none!important;
 }
 </style>
-
 <script id="yardivo-settings-cleanup-light-sheets-v1-20260901-js">
 (function(){
 'use strict';
@@ -30038,8 +29976,6 @@ window.addEventListener('yardivo:login',()=>setTimeout(cleanup,100));
 window.YardivoSettingsCleanup={run:cleanup};
 })();
 </script>
-
-
 <style id="yardivo-gate-stable-access-v1-20260901">
 body[data-yardivo-role="gate"] [data-view="checkin"],
 body[data-yardivo-role="gate"] [data-view="unannounced"],
@@ -30059,7 +29995,6 @@ body[data-yardivo-role="gate"] #uaGateCreatePanel{
   display:block!important;
 }
 </style>
-
 <script id="yardivo-gate-stable-access-v1-20260901-js" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
@@ -30208,8 +30143,6 @@ setInterval(()=>{if(isGate())expose()},1500);
 window.YardivoGateStableAccess={apply:expose,open:openGateView,views:[...GATE_VIEWS]};
 })();
 </script>
-
-
 <style id="yardivo-gate-and-users-final-v3-20260901">
 /* Gate: one stable matrix, no blinking. */
 body[data-yardivo-role="gate"] [data-view="homeMenu"],
@@ -30273,7 +30206,6 @@ body[data-yardivo-role="admin"] #masterUserAdmin .master-admin-grid{
 /* Role is determined by the server profile; no manual role mismatch at login. */
 #loginRole{opacity:.82}
 </style>
-
 <script id="yardivo-gate-and-users-final-v3-20260901-js">
 (function(){
 'use strict';
@@ -30508,8 +30440,6 @@ window.YardivoGateCanonical={apply:syncGate,open:enterGateView};
 window.YardivoServerProfiles={render:renderProfiles,create:createProfile};
 })();
 </script>
-
-
 <style id="yardivo-role-stability-final-v4-20260901">
 /* Canonical stable role visibility. My Yard is available to every application role. */
 body[data-yardivo-role="admin"] [data-view="myYard"],
@@ -30548,7 +30478,6 @@ body[data-yardivo-role="reception"] [data-view="liveYard"]{
   visibility:visible!important;
 }
 </style>
-
 <script id="yardivo-role-stability-final-v6-20260902-js">
 (function(){
 'use strict';
@@ -30761,8 +30690,6 @@ apply();
 window.YardivoRoleStableFinal={apply,open:activate,allowed,matrix:MATRIX,stabilizeInventorySidebar,stabilizeGateSidebar};
 })();
 </script>
-
-
 <style id="yardivo-home-single-view-fix-v1-20260901">
 /* Početni izbornik is a true single-view screen. No operational view may leak below it. */
 body.home-menu-mode .view:not(#homeMenu){
@@ -30781,8 +30708,6 @@ body:not(.home-menu-mode) #homeMenu:not(.active){
   cursor:pointer!important;
 }
 </style>
-
-
 <style id="yardivo-login-feedback-v1-20260901">
 #loginError{
   min-height:18px;
@@ -30804,7 +30729,6 @@ body:not(.home-menu-mode) #homeMenu:not(.active){
   background:#0d2719!important;
 }
 </style>
-
 <script id="yardivo-login-feedback-password-v2-20260901-js">
 (function(){
 'use strict';
@@ -30834,8 +30758,6 @@ window.addEventListener('load',()=>{
 window.YardivoLoginFeedback={style:styleOnly};
 })();
 </script>
-
-
 <style id="yardivo-login-error-hard-visible-v2-20260901">
 #loginOverlay #loginError{
   display:none;
@@ -30867,7 +30789,6 @@ window.YardivoLoginFeedback={style:styleOnly};
   75%{transform:translateX(5px)}
 }
 </style>
-
 <script id="yardivo-login-error-hard-visible-v2-20260901-js" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
@@ -30957,8 +30878,6 @@ document.addEventListener('submit',ev=>{
 window.YardivoLoginErrorUI={show:showRed,unlock,normalize};
 })();
 </script>
-
-
 <script id="yardivo-login-no-freeze-final-v1-20260901-js" type="application/x-yardivo-disabled">
 (function(){
 'use strict';
@@ -31000,8 +30919,6 @@ window.addEventListener('yardivo:login',()=>{attempt++;unlock()});
 window.YardivoLoginNoFreeze={fail,unlock};
 })();
 </script>
-
-
 <style id="yardivo-login-clean-state-v2-20260901">
 #loginError:empty{display:none!important}
 #loginSubmitBtn[aria-busy="true"]{
@@ -31012,7 +30929,6 @@ window.YardivoLoginNoFreeze={fail,unlock};
   cursor:pointer!important;
 }
 </style>
-
 <script id="yardivo-login-change-password-v2-20260901-js">
 (function(){
 'use strict';
@@ -31082,7 +30998,6 @@ document.addEventListener('click',e=>{
 window.YardivoPasswordChange={change};
 })();
 </script>
-
 <style id="yardivo-admin-account-password-style-v1-20260901">
 #masterUserList .master-user-row>div:last-child{
   display:flex;
@@ -31098,8 +31013,6 @@ window.YardivoPasswordChange={change};
   white-space:nowrap;
 }
 </style>
-
-
 <style id="yardivo-inventory-sidebar-stable-v1-20260902">
 html[data-yardivo-role="inventory"] .nav-btn[data-view="checkin"],
 html[data-yardivo-role="inventory"] .nav-btn[data-view="docks"],
@@ -31123,8 +31036,6 @@ html[data-yardivo-role="inventory"] .nav-btn[data-view="settings"]{
  visibility:visible!important;opacity:1!important;
 }
 </style>
-
-
 <style id="yardivo-gate-sidebar-stable-v2-20260902">
 html[data-yardivo-role="gate"] .nav-btn[data-view]{display:none!important}
 html[data-yardivo-role="gate"] .nav-btn[data-view="homeMenu"],
@@ -31136,8 +31047,6 @@ html[data-yardivo-role="gate"] .nav-btn[data-view="docks"]{
 }
 html[data-yardivo-role="gate"] .nav-btn[data-view="epal"]{display:none!important}
 </style>
-
-
 <style id="yardivo-gate-no-epal-controltower-v4-20260902">
 html[data-yardivo-role="gate"] .nav-btn[data-view="controlTower"],
 html[data-yardivo-role="gate"] .nav-btn[data-view="controltower"],
@@ -31157,14 +31066,29 @@ body[data-yardivo-role="gate"] [data-home-target="epal"]{
  pointer-events:none!important;
 }
 </style>
-
-
 <style id="yardivo-ux-stability-cleanup-v1-20260902">
 .nav-btn.role-hidden,[data-home-target].role-hidden{display:none!important}
 html.yardivo-home-ready #homeMenuGrid{visibility:visible}
 html[data-yardivo-role="gate"] .nav-btn[data-view="controlTower"],
 html[data-yardivo-role="gate"] .nav-btn[data-view="controltower"],
 html[data-yardivo-role="gate"] .nav-btn[data-view="epal"]{display:none!important}
+</style>
+
+<style id="yardivo-settings-inventory-visible-fix-v2-20260902">
+html[data-yardivo-role="inventory"] #settings #yardivoNonWorkingDaysSettings,
+body[data-yardivo-role="inventory"] #settings #yardivoNonWorkingDaysSettings{
+ display:block!important;
+ visibility:visible!important;
+ opacity:1!important;
+}
+html[data-yardivo-role="inventory"] #settings #qrMobileSettingsPanel,
+html[data-yardivo-role="inventory"] #settings #receptionRampSettings,
+html[data-yardivo-role="inventory"] #settings .danger-zone,
+body[data-yardivo-role="inventory"] #settings #qrMobileSettingsPanel,
+body[data-yardivo-role="inventory"] #settings #receptionRampSettings,
+body[data-yardivo-role="inventory"] #settings .danger-zone{
+ display:none!important;
+}
 </style>
 
 </body>
